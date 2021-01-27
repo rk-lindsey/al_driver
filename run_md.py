@@ -91,13 +91,12 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
 	# 2. Cluster
 	################################
 	
+	cluster.get_pared_trajs(args["do_cluster"])
+		
 	if args["do_cluster"]:
-	
+		
 		print "compilation: ", args["compilation"]
-		
-		cluster.get_pared_trajs(args["do_cluster"])
-		
-		
+				
 		cluster.generate_clusters(traj_file   = "traj_250F.xyz",
 					  tight_crit  = args["tight_crit" ],
 					  loose_crit  = args["loose_crit" ],
