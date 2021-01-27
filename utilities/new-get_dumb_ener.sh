@@ -49,7 +49,7 @@ if [ "$#" -eq 5 ]; then
 	TARGETS="tight"
 fi 
 
-mkdir dumb_job_logs
+#mkdir dumb_job_logs
 
 for crit in $TARGETS
 do
@@ -152,8 +152,8 @@ do
 			
 			TASK=`pwd`
 			TASK="${TASK}/new-get_dumb_ener_subjob.sh 1 ${EXEC} ${BASE} ${i} "
-
-			${TASK} > dumb_job_logs/${crit}.${i} & #srun -N 1 -n 1 ${TASK}
+			
+			srun -N 1 -n 1 ${TASK} &
 
 			cd ..
 		done

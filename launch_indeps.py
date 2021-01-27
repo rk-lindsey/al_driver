@@ -124,7 +124,7 @@ def main(args):
 				job_walltime   = config.CHIMES_MD_TIME,      
 				job_queue      = config.CHIMES_MD_QUEUE,      
 				job_account    = config.HPC_ACCOUNT, 
-				job_executable = config.CHIMES_MD,	 
+				job_executable = config.CHIMES_MD_MPI,	 
 				job_system     = "slurm",  	 
 				job_file       = "run.cmd")
 		

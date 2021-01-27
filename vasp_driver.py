@@ -491,6 +491,23 @@ def post_process(*argv, **kwargs):
 
 			print helpers.run_bash_cmnd(args["vasp_postproc"] + " " + outcar_list[j] + " 1 " + args_properties + " | grep ERROR ")
 			
+			if "ENERGY" in args_properties: # Make sure the configuration energy is less than or equal to zero
+			
+				tmp_ener = helpers.head(outcar_list[j] + ".xyzf",2)
+				tmp_ener = float(tmp_ener[1].split()[-1])
+				
+				if tmp_ener >= 0.0:
+					
+					#print "THIS IS A TEST WARNING: "
+					#print "DETECTED A VASP CONFIGURATION ENERGY GREATER THAN 0.0"
+					#print "FOR DEBUG PURPOSES, KILLING THE SCRIPT"
+					#print "IF THIS IS THE EXPECTED FUNCTIONALITY, FIX THIS DEBUG EXIT IN vasp_driver.py"
+					#print "FYI, THIS IS NOT IN THE GIT VERSION YET"
+					#exit()
+					
+					print "Warning: VASP energy is positive energy for job name", outcar_list[j], ":", tmp_ener, "...skipping."
+					continue
+			
 			if os.path.isfile(outcar_list[j] + ".xyzf"):
 			
 				if os.path.isfile("OUTCAR.xyzf"):

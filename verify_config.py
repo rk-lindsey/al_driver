@@ -372,14 +372,30 @@ def verify():
 	##### ChIMES MD
 	################################
 	
-	if not hasattr(user_config,'CHIMES_MD'):
+	if hasattr(user_config,'CHIMES_MD'):
 
 		# Path to chimes_md executable
 
-		print "WARNING: Option config.CHIMES_MD was not set"
-		print "         Will use config.CHIMES_SRCDIR + \"chimes_md\""
+		print "WARNING: Defunct option config.CHIMES_MD was set"
+		print "         Ignoring. Will search for config.CHIMES_MD_SER and config.CHIMES_MD_MPI"
 		
-		user_config.CHIMES_MD = user_config.CHIMES_SRCDIR + "chimes_md"
+	if not hasattr(user_config,'CHIMES_MD_SER'):
+
+		# Path to the serial chimes_md executable
+
+		print "WARNING: Option config.CHIMES_MD_SER was not set"
+		print "         Will use config.CHIMES_SRCDIR + \"chimes_md-serial\""
+		
+		user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "chimes_md-serial"		
+		
+	if not hasattr(user_config,'CHIMES_MD_MPI'):
+
+		# Path to chimes_md executable
+
+		print "WARNING: Option config.CHIMES_MD_MPI was not set"
+		print "         Will use config.CHIMES_SRCDIR + \"chimes_md-mpi\""
+		
+		user_config.CHIMES_MD_MPI user_config.CHIMES_SRCDIR + "chimes_md-mpi"		
 		
 	if not hasattr(user_config,'CHIMES_MOLANAL'):
 
@@ -477,15 +493,15 @@ def verify():
 
 		user_config.TIGHT_CRIT = user_config.WORKING_DIR + "ALL_BASE_FILES/tight_bond_crit.dat"
 		
-	if not hasattr(user_config,'TIGHT_CRIT'):
+	if not hasattr(user_config,'LOOSE_CRIT'):
 
 		# File with loose clustering criteria... if set equal to the tight criteria file,
 		# then no "loose" (i.e. "ts") clusters are generated.
 
 		print "WARNING: Option config.LOOSE_CRIT was not set"
-		print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/tight_bond_crit.dat\""
+		print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/loose_bond_crit.dat\""
 
-		user_config.LOOSE_CRIT = user_config.WORKING_DIR + "ALL_BASE_FILES/tight_bond_crit.dat"		
+		user_config.LOOSE_CRIT = user_config.WORKING_DIR + "ALL_BASE_FILES/loose_bond_crit.dat"		
 		
 	if not hasattr(user_config,'CLU_CODE'):
 
@@ -659,9 +675,15 @@ def verify():
 			exit()
 
 	if user_config.IGAS_QM_METHOD == "Gaussian":
-	
 
-		AUS_POSTPRC = CHIMES_SRCDIR + "gaussian2xyzf.py" # THIS IS UNUSED!!!! CLEAN UP THE CODE
+		if not hasattr(user_config,'GAUS_POSTPRC'):
+
+			# Number of nodes to use for a Gaussian calculation
+
+			print "WARNING: Option config.GAUS_POSTPRC was not set"
+			print "         Will use config.CHIMES_SRCDIR + \"gaussian2xyzf.py\""
+
+			user_config.GAUS_NODES = 4			
 
 		if not hasattr(user_config,'GAUS_NODES'):
 

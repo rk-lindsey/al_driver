@@ -166,7 +166,7 @@ def get_xyzf(logfile, comfile, natoms, boxls):
 	
 	#print "Gauss energy minus atom contributions is:",energy
 	
-	energy = energy + n_C*E_VASP_C  + n_C*E_VASP_N  + n_C*E_VASP_O	
+	energy = energy + n_C*E_VASP_C  + n_N*E_VASP_N  + n_O*E_VASP_O	
 	
 	#print "VASP energy is:", energy
 	

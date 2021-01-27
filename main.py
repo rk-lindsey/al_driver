@@ -388,7 +388,7 @@ def main(args):
 						job_cent_walltime = str(config.CALC_REPO_ENER_CENT_TIME), 
 						job_account    = config.HPC_ACCOUNT, 
 						job_system     = config.HPC_SYSTEM,
-						job_executable = config.CHIMES_MD)	
+						job_executable = config.CHIMES_MD_SER)	
 						
 				helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
 			
@@ -734,7 +734,7 @@ def main(args):
 						job_walltime   = config.CHIMES_MD_TIME,      
 						job_queue      = config.CHIMES_MD_QUEUE,      
 						job_account    = config.HPC_ACCOUNT, 
-						job_executable = config.CHIMES_MD,	 
+						job_executable = config.CHIMES_MD_MPI,	 
 						job_system     = "slurm",  	 
 						job_file       = "run.cmd")
 		
@@ -828,7 +828,7 @@ def main(args):
 						job_cent_walltime = str(config.CALC_REPO_ENER_CENT_TIME), 
 						job_account    = config.HPC_ACCOUNT, 
 						job_system     = config.HPC_SYSTEM,
-						job_executable = config.CHIMES_MD)	
+						job_executable = config.CHIMES_MD_SER)	
 						
 				helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
 
