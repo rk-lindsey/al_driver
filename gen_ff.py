@@ -347,32 +347,31 @@ def build_amat(my_ALC, **kwargs):
 	# 0. Set up an argument parser
 	################################
 	
-	default_keys   = [""]*15
-	default_values = [""]*15
+	default_keys   = [""]*16
+	default_values = [""]*16
 	
 	# Paths
 	
 	default_keys[0 ] = "prev_gen_path"     ; default_values[0 ] = 	 "../ALC-" + `my_ALC-1` + "/GEN_FF/"    # Path to previous ALCs GEN_FF folder -- absolute is best
-	default_keys[1 ] = "prev_qm_all_path"  ; default_values[1 ] = 	 ""	       	       	       	        # Path to previous ALCs <QM>-all folder -- absolute is best
-	default_keys[2 ] = "prev_qm_20_path"   ; default_values[2 ] = 	 ""	       	       	       	        # Path to previous ALCs <QM>-20 folder --absolute is best
-	default_keys[3 ] = "split_files"       ; default_values[3 ] = 	 False					# !!! UNUSED
-	default_keys[4 ] = "include_stress"    ; default_values[4 ] = 	 False       	       	       	        # Should stress tensors be included in the A-matrix?
-	default_keys[5 ] = "stress_style"      ; default_values[5 ] = 	 "DIAG"       	       	       	        # Should the full stress tensor or only diagonal componets be considered? Only used if include_stress is true
+	default_keys[1 ] = "prev_qm_all_path"  ; default_values[1 ] = 	 ""	       	       	       	        	# Path to previous ALCs <QM>-all folder -- absolute is best
+	default_keys[2 ] = "prev_qm_20_path"   ; default_values[2 ] = 	 ""	       	       	       	        	# Path to previous ALCs <QM>-20 folder --absolute is best
+	default_keys[3 ] = "do_cluster"        ; default_values[3 ] =    True									# Should cluser configurations be considered 
+	default_keys[4 ] = "split_files"       ; default_values[4 ] = 	 False									# !!! UNUSED
+	default_keys[5 ] = "include_stress"    ; default_values[5 ] = 	 False       	       	       	        # Should stress tensors be included in the A-matrix?
+	default_keys[6 ] = "stress_style"      ; default_values[6 ] = 	 "DIAG"       	       	       	        # Should the full stress tensor or only diagonal componets be considered? Only used if include_stress is true
 	
 	# Job controls
 	
-	default_keys[6 ] = "job_name"	       ; default_values[6 ] =	 "ALC-"+ `my_ALC`+"-lsq-1"		# Name for ChIMES lsq job
-	default_keys[7 ] = "job_nodes"         ; default_values[7 ] =	 "2"					# Number of nodes for ChIMES lsq job
-	default_keys[8 ] = "job_ppn"	       ; default_values[8 ] =	 "36"					# Number of processors per node for ChIMES lsq job
-	default_keys[9 ] = "job_walltime"      ; default_values[9 ] =	 "1"					# Walltime in hours for ChIMES lsq job
-	default_keys[10] = "job_queue"         ; default_values[10] =	 "pdebug"				# Queue for ChIMES lsq job
-	default_keys[11] = "job_account"       ; default_values[11] =	 "pbronze"				# Account for ChIMES lsq job
-	default_keys[12] = "job_executable"    ; default_values[12] =	 ""					# Full path to executable for ChIMES lsq job
-	default_keys[13] = "job_system"        ; default_values[13] =	 "slurm"				# slurm or torque	
-	default_keys[14] = "job_email"         ; default_values[14] =	  True  				# Send slurm emails?
+	default_keys[7 ] = "job_name"	       ; default_values[7 ] =	 "ALC-"+ `my_ALC`+"-lsq-1"	# Name for ChIMES lsq job
+	default_keys[8 ] = "job_nodes"         ; default_values[8 ] =	 "2"						# Number of nodes for ChIMES lsq job
+	default_keys[9 ] = "job_ppn"	       ; default_values[9 ] =	 "36"						# Number of processors per node for ChIMES lsq job
+	default_keys[10] = "job_walltime"      ; default_values[10] =	 "1"						# Walltime in hours for ChIMES lsq job
+	default_keys[11] = "job_queue"         ; default_values[11] =	 "pdebug"					# Queue for ChIMES lsq job
+	default_keys[12] = "job_account"       ; default_values[12] =	 "pbronze"					# Account for ChIMES lsq job
+	default_keys[13] = "job_executable"    ; default_values[13] =	 ""							# Full path to executable for ChIMES lsq job
+	default_keys[14] = "job_system"        ; default_values[14] =	 "slurm"					# slurm or torque	
+	default_keys[15] = "job_email"         ; default_values[15] =	  True  					# Send slurm emails?
 
-		
-	
 	args = dict(zip(default_keys, default_values))
 	args.update(kwargs)
 	
@@ -405,7 +404,7 @@ def build_amat(my_ALC, **kwargs):
 
 		# Get the number of files and number of frames in each file
 
-		if args["prev_qm_all_path"]:
+		if args["prev_qm_all_path"] and args["do_cluster"]:
 	
 			nfiles     += 1
 			nframes_all = helpers.count_xyzframes_general(args["prev_qm_all_path"] + "/OUTCAR.xyzf")
@@ -491,7 +490,7 @@ def build_amat(my_ALC, **kwargs):
 		if args["prev_qm_20_path"]:
 			ifstream.write(`nframes_20`  + " " + args["prev_qm_20_path"]  + "/OUTCAR.xyzf\n")
 
-		if args["prev_qm_all_path"]:
+		if args["prev_qm_all_path"] and args["do_cluster"]:
 			ifstream.write(`nframes_all` + " " + args["prev_qm_all_path"] + "/OUTCAR.xyzf G_ G_ G_\n")
 			
 		ifstream.close()

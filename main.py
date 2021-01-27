@@ -171,13 +171,19 @@ def main(args):
 	for THIS_ALC in ALC_LIST:
 
 		THIS_ALC = int(THIS_ALC)
-		
-		
+				
 		# Let the ALC process know whether this is a restarted cycle or a completely new cycle
 		
 		if THIS_ALC != restart_controller.last_ALC:
 		
 			restart_controller.reinit_vars()
+		#	
+		# SHOULD THIS NEXT CHUNK GO BEFORE OR AFTER THE ABOVE IF STATEMENT?
+		# 
+		if (THIS_ALC == 0) and 	(not config.DO_CLUSTER):
+			print "config.DO_CLUSTER was set false."
+			print "Skipping ALC-0"
+			continue
 		
 		
 		# Prepare the restart file
@@ -607,16 +613,17 @@ def main(args):
 				active_job = gen_ff.build_amat(THIS_ALC, 
 					prev_qm_all_path = qm_all_path,
 					prev_qm_20_path  = qm_20F_path,
-					include_stress     = do_stress,	
-					stress_style       = config.STRS_STYLE,
-					job_email          = config.HPC_EMAIL,
-					job_ppn            = str(config.HPC_PPN),
-					job_nodes          = config.CHIMES_BUILD_NODES,
-					job_walltime       = config.CHIMES_BUILD_TIME,	
-					job_queue          = config.CHIMES_BUILD_QUEUE,						
-					job_account        = config.HPC_ACCOUNT, 
-					job_system         = config.HPC_SYSTEM,
-					job_executable     = config.CHIMES_LSQ)
+					do_cluster       = config.DO_CLUSTER,
+					include_stress   = do_stress,	
+					stress_style     = config.STRS_STYLE,
+					job_email        = config.HPC_EMAIL,
+					job_ppn          = str(config.HPC_PPN),
+					job_nodes        = config.CHIMES_BUILD_NODES,
+					job_walltime     = config.CHIMES_BUILD_TIME,	
+					job_queue        = config.CHIMES_BUILD_QUEUE,						
+					job_account      = config.HPC_ACCOUNT, 
+					job_system       = config.HPC_SYSTEM,
+					job_executable   = config.CHIMES_LSQ)
 			
 				helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")
 			
@@ -754,8 +761,7 @@ def main(args):
 			
 					# Post-process the MD job
 			
-					run_md.post_proc(THIS_ALC, THIS_CASE, THIS_INDEP,
-					        config.MOLANAL_SPECIES,
+					run_md.post_proc(THIS_ALC, THIS_CASE, THIS_INDEP, config.MOLANAL_SPECIES,
 						basefile_dir   = config.CHIMES_MDFILES, 
 						driver_dir     = config.DRIVER_DIR,
 						penalty_pref   = config.CHIMES_PEN_PREFAC,	  
@@ -773,101 +779,109 @@ def main(args):
 				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "POST_PROC: COMPLETE ")
 			else:
 				restart_controller.update_file("POST_PROC: COMPLETE" + '\n')	
-			
-			if not restart_controller.CLUSTER_EXTRACTION:
-			
-				# list ... remember, we only do clustering/active learning on a single indep (0)
-			
-				cat_xyzlist_cmnd    = ""
-				cat_ts_xyzlist_cmnd = ""		
-			
-				for THIS_CASE in xrange(config.NO_CASES):
-				        
-				        repo = "CASE-" + str(THIS_CASE) + "_INDEP_" + str(THIS_INDEP) + "/CFG_REPO/"
-
-					if config.MAX_CLUATM:
-			
-						cluster.list_clusters(repo, config.ATOM_TYPES, config.MAX_CLUATM)
-					else:
-						cluster.list_clusters(repo, config.ATOM_TYPES)		
-		
-				        helpers.run_bash_cmnd("mv xyzlist.dat	 " + "CASE-" + str(THIS_CASE) + ".xyzlist.dat"   )
-				        helpers.run_bash_cmnd("mv ts_xyzlist.dat " + "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat")
-
-				        cat_xyzlist_cmnd    += "CASE-" + str(THIS_CASE) + ".xyzlist.dat "
-				        cat_ts_xyzlist_cmnd += "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat "
-
-				helpers.cat_specific("xyzlist.dat"   , cat_xyzlist_cmnd   .split())
-				helpers.cat_specific("ts_xyzlist.dat", cat_ts_xyzlist_cmnd.split())
-
-				helpers.run_bash_cmnd("rm -f " + cat_xyzlist_cmnd   )
-				helpers.run_bash_cmnd("rm -f " + cat_ts_xyzlist_cmnd)
 				
-				restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')	
 				
-				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUSTER_EXTRACTION: COMPLETE ")				
-			else:
-				restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')					
+			if config.DO_CLUSTER:
 			
+				if not restart_controller.CLUSTER_EXTRACTION:
+				
+					# list ... remember, we only do clustering/active learning on a single indep (0)
+				
+					cat_xyzlist_cmnd    = ""
+					cat_ts_xyzlist_cmnd = ""		
+				
+					for THIS_CASE in xrange(config.NO_CASES):
+					        
+					        repo = "CASE-" + str(THIS_CASE) + "_INDEP_" + str(THIS_INDEP) + "/CFG_REPO/"
+            	
+						if config.MAX_CLUATM:
+				
+							cluster.list_clusters(repo, config.ATOM_TYPES, config.MAX_CLUATM)
+						else:
+							cluster.list_clusters(repo, config.ATOM_TYPES)		
+		    	
+					        helpers.run_bash_cmnd("mv xyzlist.dat	 " + "CASE-" + str(THIS_CASE) + ".xyzlist.dat"   )
+					        helpers.run_bash_cmnd("mv ts_xyzlist.dat " + "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat")
+            	
+					        cat_xyzlist_cmnd    += "CASE-" + str(THIS_CASE) + ".xyzlist.dat "
+					        cat_ts_xyzlist_cmnd += "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat "
+            	
+					helpers.cat_specific("xyzlist.dat"   , cat_xyzlist_cmnd   .split())
+					helpers.cat_specific("ts_xyzlist.dat", cat_ts_xyzlist_cmnd.split())
+            	
+					helpers.run_bash_cmnd("rm -f " + cat_xyzlist_cmnd   )
+					helpers.run_bash_cmnd("rm -f " + cat_ts_xyzlist_cmnd)
 					
-			if not restart_controller.CLUENER_CALC:
-			
-				# Compute cluster energies
-			
-				gen_selections.cleanup_repo(THIS_ALC)	
-			
-				active_jobs = cluster.get_repo_energies(
-						calc_central   = True,
-						base_runfile   = config.WORKING_DIR + "ALL_BASE_FILES/" + "run_md.cluster",
-						driver_dir     = config.DRIVER_DIR,
-						job_email      = config.HPC_EMAIL,
-						job_ppn        = str(config.HPC_PPN),
-						job_queue      = config.CALC_REPO_ENER_QUEUE,
-						job_walltime   = str(config.CALC_REPO_ENER_TIME),				  
-						job_cent_queue    = config.CALC_REPO_ENER_CENT_QUEUE,
-						job_cent_walltime = str(config.CALC_REPO_ENER_CENT_TIME), 
-						job_account    = config.HPC_ACCOUNT, 
-						job_system     = config.HPC_SYSTEM,
-						job_executable = config.CHIMES_MD_SER)	
+					restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')	
+					
+					helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUSTER_EXTRACTION: COMPLETE ")				
+				else:
+					restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')					
+				
 						
-				helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
-
-				restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')	
+				if not restart_controller.CLUENER_CALC:
 				
-				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUENER_CALC: COMPLETE ")	
-			else:
-				restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')	
-
-
-			if not restart_controller.CLU_SELECTION:
-
-				# Generate cluster sub-selection and store in central repository
-
-				gen_selections.gen_subset(
-						 repo	  = "../CENTRAL_REPO/full_repo.energies_normed",
-						 nsel	  = config.MEM_NSEL, # Number of selections to make    
-						 nsweep   = config.MEM_CYCL, # Number of MC sqeeps	       
-						 nbins    = config.MEM_BINS, # Number of histogram bins 	 
-						 ecut	  = config.MEM_ECUT) # Maximum energy to consider	
-						 
-				gen_selections.populate_repo(THIS_ALC)   
-						 
-				restart_controller.update_file("CLU_SELECTION: COMPLETE" + '\n')
+					# Compute cluster energies
 				
-				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLU_SELECTION: COMPLETE ")
-			else:
-				restart_controller.update_file("CLU_SELECTION: COMPLETE" + '\n')
-								 
-
+					gen_selections.cleanup_repo(THIS_ALC)	
+				
+					active_jobs = cluster.get_repo_energies(
+							calc_central   = True,
+							base_runfile   = config.WORKING_DIR + "ALL_BASE_FILES/" + "run_md.cluster",
+							driver_dir     = config.DRIVER_DIR,
+							job_email      = config.HPC_EMAIL,
+							job_ppn        = str(config.HPC_PPN),
+							job_queue      = config.CALC_REPO_ENER_QUEUE,
+							job_walltime   = str(config.CALC_REPO_ENER_TIME),				  
+							job_cent_queue    = config.CALC_REPO_ENER_CENT_QUEUE,
+							job_cent_walltime = str(config.CALC_REPO_ENER_CENT_TIME), 
+							job_account    = config.HPC_ACCOUNT, 
+							job_system     = config.HPC_SYSTEM,
+							job_executable = config.CHIMES_MD_SER)	
+							
+					helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
+            	
+					restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')	
+					
+					helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUENER_CALC: COMPLETE ")	
+				else:
+					restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')	
+            	
+            	
+				if not restart_controller.CLU_SELECTION:
+            	
+					# Generate cluster sub-selection and store in central repository
+            	
+					gen_selections.gen_subset(
+							 repo	  = "../CENTRAL_REPO/full_repo.energies_normed",
+							 nsel	  = config.MEM_NSEL, # Number of selections to make    
+							 nsweep   = config.MEM_CYCL, # Number of MC sqeeps	       
+							 nbins    = config.MEM_BINS, # Number of histogram bins 	 
+							 ecut	  = config.MEM_ECUT) # Maximum energy to consider	
+							 
+					gen_selections.populate_repo(THIS_ALC)   
+							 
+					restart_controller.update_file("CLU_SELECTION: COMPLETE" + '\n')
+					
+					helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLU_SELECTION: COMPLETE ")
+				else:
+					restart_controller.update_file("CLU_SELECTION: COMPLETE" + '\n')
+									 
+            	
 			################################
 			# Launch QM
 			################################
 			
 			# Note: If multiple cases are being used, only run clean/setup once!
 			
+			tasks = ["20"]
+			
+			if config.DO_CLUSTER:
+				tasks = ["20","all"]
+			
 			if not restart_controller.CLEANSETUP_QM:
 			
-				qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD,["20","all"], build_dir=".")
+				qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, build_dir=".")
 			
 				restart_controller.update_file("CLEANSETUP_QM: COMPLETE" + '\n')	
 			else:
@@ -877,14 +891,14 @@ def main(args):
 			
 				active_jobs = []
 
-				qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["20", "all"], build_dir=".")
+				qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, build_dir=".")
 				
 				for THIS_CASE in xrange(config.NO_CASES):
 
-					qm_driver  .cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD,["20", "all"], THIS_CASE, build_dir=".") # Always clean up, just in case
+					qm_driver  .cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE, build_dir=".") # Always clean up, just in case
 										
 					active_job = qm_driver.setup_qm(THIS_ALC,config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
-						["20", "all"], 
+						tasks, 
 						config.ATOM_TYPES,
 						THIS_CASE, 
 						SMEARING,
@@ -927,9 +941,8 @@ def main(args):
 				
 					for THIS_CASE in xrange(config.NO_CASES):
 
-						active_job = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
-								["all","20"], THIS_CASE, 
-								job_system     = config.HPC_SYSTEM)
+						active_job = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE, 
+								job_system = config.HPC_SYSTEM)
 								
 						active_jobs += active_job
 								
@@ -950,9 +963,7 @@ def main(args):
 			else:
 				restart_controller.update_file("ALL_QMJOBS: COMPLETE" + '\n')
 				
-			total_failed = qm_driver.check_convergence(THIS_ALC, config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
-									config.NO_CASES,
-									["all","20"])
+			total_failed = qm_driver.check_convergence(THIS_ALC, config.BULK_QM_METHOD, config.IGAS_QM_METHOD, config.NO_CASES, tasks)
 			
 			print "Detected",total_failed,"unconverged QM jobs"	
 										
@@ -968,9 +979,8 @@ def main(args):
 				
 						for THIS_CASE in xrange(config.NO_CASES):
 
-							active_jobs = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
-									["all","20"], THIS_CASE, 
-									job_system     = config.HPC_SYSTEM)
+							active_jobs = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE,
+								job_system = config.HPC_SYSTEM)
 									
 							active_jobs += active_job
 									
@@ -999,9 +1009,11 @@ def main(args):
 			
 				print "post-processing..."	
 
-				# Do all first... extract only forces and energies
+				if config.DO_CLUSTER:
 				
-				qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY", config.NO_CASES,
+					# Do all first... extract only forces and energies
+				
+					qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY", config.NO_CASES,
 						vasp_postproc = config.VASP_POSTPRC,
 						gaus_postproc = config.GAUS_POSTPRC)
 						
