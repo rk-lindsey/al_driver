@@ -77,9 +77,10 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
 	# 1. Run molanal
 	################################
 	
-	if os.path.isfile("case-" + str(my_case) + ".skip.dat"):
+	if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
 	
-		helpers.run_bash_cmnd("cp case-" + str(my_case) + ".skip.dat skip.dat")
+		helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
+	
 	
 	helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
 	helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
@@ -176,7 +177,6 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
 	helpers.run_bash_cmnd("mkdir -p " + my_md_path)
 
 	#helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/*"  )) + " " + my_md_path)
-
 	helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/case-" + str(my_case) + ".indep-" + str(my_indep) + "*" )) + " " + my_md_path)
 	helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/bonds.dat"     )) + " " + my_md_path)
 	helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/run_molanal.sh")) + " " + my_md_path)
