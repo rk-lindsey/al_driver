@@ -211,9 +211,9 @@ def check_convergence(my_ALC, *argv, **kwargs):
 	
 	Checks whether Gaussian jobs have completed within their requested SCF steps
 	
-	Usage: check_convergence(my_ALC, no. cases, Gaussin_job_types)
+	Usage: check_convergence(my_ALC, no. cases, Gaussian_job_types)
 	
-	Notes: Gaussin_job_types can only be ["all"]
+	Notes: Gaussian_job_types can only be ["all"]
 	 
 	# WARNING: This functionality is not used right now. If the Gaussian job
 	#          doesn't converge, we will declare the problem "impossible" and ignore it
@@ -222,6 +222,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
 	
 	"""
 	
+	# These notes are outdated:
 	# Developer notes: gaus_driver.continue_job counts *.coms and *.logs.
 	# If !=, then simply resubs the .cmd file and lets the .cmd file take care 
 	# of the rest of the logic. The .cmd file also looks to see if *.log 

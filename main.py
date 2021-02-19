@@ -602,28 +602,45 @@ def main(args):
 				else:
 					print "Error in main driver while building Amat: unkown BULK QM method:", config.BULK_QM_METHOD
 					exit()
-	
+
 			if not restart_controller.BUILD_AMAT:
 			
 				do_stress = False
 				
 				if THIS_ALC >= config.USE_AL_STRS:
-					do_stress = True		
+					do_stress = True
+					
+				print config.DO_CLUSTER
+				
+				if (not config.DO_CLUSTER) and (THIS_ALC == 1):	
+				
+					active_job = gen_ff.build_amat(THIS_ALC,
+							do_cluster       = config.DO_CLUSTER,
+							prev_gen_path      = config.ALC0_FILES,
+							job_email          = config.HPC_EMAIL,
+							job_ppn            = str(config.HPC_PPN),
+							job_nodes          = config.CHIMES_BUILD_NODES,
+							job_walltime       = config.CHIMES_BUILD_TIME,	
+							job_queue          = config.CHIMES_BUILD_QUEUE,		
+							job_account        = config.HPC_ACCOUNT, 
+							job_system         = config.HPC_SYSTEM,
+							job_executable     = config.CHIMES_LSQ)	
+				else:
 			
-				active_job = gen_ff.build_amat(THIS_ALC, 
-					prev_qm_all_path = qm_all_path,
-					prev_qm_20_path  = qm_20F_path,
-					do_cluster       = config.DO_CLUSTER,
-					include_stress   = do_stress,	
-					stress_style     = config.STRS_STYLE,
-					job_email        = config.HPC_EMAIL,
-					job_ppn          = str(config.HPC_PPN),
-					job_nodes        = config.CHIMES_BUILD_NODES,
-					job_walltime     = config.CHIMES_BUILD_TIME,	
-					job_queue        = config.CHIMES_BUILD_QUEUE,						
-					job_account      = config.HPC_ACCOUNT, 
-					job_system       = config.HPC_SYSTEM,
-					job_executable   = config.CHIMES_LSQ)
+					active_job = gen_ff.build_amat(THIS_ALC, 
+						prev_qm_all_path = qm_all_path,
+						prev_qm_20_path  = qm_20F_path,
+						do_cluster       = config.DO_CLUSTER,
+						include_stress   = do_stress,	
+						stress_style     = config.STRS_STYLE,
+						job_email        = config.HPC_EMAIL,
+						job_ppn          = str(config.HPC_PPN),
+						job_nodes        = config.CHIMES_BUILD_NODES,
+						job_walltime     = config.CHIMES_BUILD_TIME,	
+						job_queue        = config.CHIMES_BUILD_QUEUE,						
+						job_account      = config.HPC_ACCOUNT, 
+						job_system       = config.HPC_SYSTEM,
+						job_executable   = config.CHIMES_LSQ)
 			
 				helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")
 			
@@ -644,6 +661,7 @@ def main(args):
 					print "Starting solve_amat from scratch"
 			
 					active_job = gen_ff.solve_amat(THIS_ALC, 
+						do_cluster       = config.DO_CLUSTER,
 						weights_force      = config.WEIGHTS_FORCE,
 						weights_force_gas  = config.WEIGHTS_FGAS,
 						weights_energy     = config.WEIGHTS_ENER,

@@ -1,6 +1,6 @@
 # Global (python) modules
 
-import glob # Warning: glob is unserted... set my_list = sorted(glob.glob(<str>)) if sorting needed
+import glob # Warning: glob is unsorted... set my_list = sorted(glob.glob(<str>)) if sorting needed
 import os
 
 # Localmodules
@@ -627,7 +627,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 
 			# Need to figure out the possible temperatures ... 
 			
-			ifstream = open("../../../ALC-0/GEN_FF/" + args["traj_list"], 'r')
+			ifstream = ""
+			
+			try:
+				ifstream = open("../../../ALC-0/GEN_FF/" + args["traj_list"], 'r')
+			except:
+				ifstream = open("../../../ALC-1/GEN_FF/" + args["traj_list"], 'r')
+				
 
 			temps    = ifstream.readlines()[1:]
 

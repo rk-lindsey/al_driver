@@ -143,17 +143,17 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	if (bulk_qm_method == igas_qm_method) or is_just_bulk: # Then it's all VASP, just submit as normal
 
 		if bulk_qm_method == "VASP":
-			run_qm_jobid.append(vasp_driver.setup_vasp(my_ALC, *argv,
+			run_qm_jobids += vasp_driver.setup_vasp(my_ALC, *argv,
 				first_run      = True,		     
 				basefile_dir   = args  ["basefile_dir"],
 				job_executable = args  ["VASP_exe"],
-				job_email      = config.HPC_EMAIL,
+				job_email      = args  ["job_email"],
 				job_nodes      = args  ["VASP_nodes"],
-				job_ppn        = config.HPC_PPN,
+				job_ppn        = args  ["job_ppn"],
 				job_walltime   = args  ["VASP_time"],
 				job_queue      = args  ["VASP_queue"],
-				job_account    = config.HPC_ACCOUNT, 
-				job_system     = config.HPC_SYSTEM))
+				job_account    = args  ["job_account"], 
+				job_system     = args  ["job_system"])
 		else:
 			print "ERROR: Unknown bulk/igas_qm_method in qm_driver.setup_qm:", bulk_qm_method
 	

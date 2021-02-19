@@ -395,7 +395,7 @@ def verify():
 		print "WARNING: Option config.CHIMES_MD_MPI was not set"
 		print "         Will use config.CHIMES_SRCDIR + \"chimes_md-mpi\""
 		
-		user_config.CHIMES_MD_MPI user_config.CHIMES_SRCDIR + "chimes_md-mpi"		
+		user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"		
 		
 	if not hasattr(user_config,'CHIMES_MOLANAL'):
 

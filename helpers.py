@@ -536,13 +536,13 @@ def wait_for_jobs(*argv, **kwargs):
 	
 	active_jobs = argv[0] # Pointer!
 	
-	
+
 	################################
 	# 1. Determine job status, hold until complete
 	################################
 
 	njobs  = len(active_jobs)
-	
+
 	active = [True]*njobs
 	
 	while True:
@@ -554,6 +554,7 @@ def wait_for_jobs(*argv, **kwargs):
 				active_jobs[i] = str(active_jobs[i])
 		
 			if args["job_system"] == "slurm":
+
 				check_job = "squeue -j " + active_jobs[i]
 			
 			elif args["job_system"] == "torque":

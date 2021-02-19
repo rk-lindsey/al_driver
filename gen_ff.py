@@ -81,7 +81,8 @@ def split_amat(amat, bvec, nproc, ppn):
 	                        file_idx += 1
 	                        line_srt  = line_idx
 
-	                        Aname = "A." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
+	                        Aname = "A." + str(file_idx).rjust(4,'0') + ".txt"
+				#Aname = "A." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
 	                        Afstream = open(Aname,'w')
 	        
 	        
@@ -91,7 +92,8 @@ def split_amat(amat, bvec, nproc, ppn):
 	if not Afstream.closed:
 		Afstream.close()
 	        
-	        Dname = "dim." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
+		Dname = "dim." + str(file_idx).rjust(4,'0') + ".txt"
+	        #Dname = "dim." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
 	        Dfstream = open(Dname,'w')
 	        Dfstream.write(str(cols) + " " + str(line_srt) + " " + str(line_idx-1) + " " + str(lines) + "\n") 
 	        Dfstream.close()  
@@ -390,7 +392,11 @@ def build_amat(my_ALC, **kwargs):
 	nframes_all = 0
 	nframes_20  = 0	
 	
-	if my_ALC == 0:
+	print "my_ALC:    ",my_ALC
+	print "do_cluster:",args["do_cluster"]
+	print "prev_path: ",args["prev_gen_path"] 
+	
+	if (my_ALC == 0) or ((my_ALC == 1) and (not args["do_cluster"])):
 		
 		helpers.run_bash_cmnd("cp " + args["prev_gen_path"] + "/fm_setup.in"   + " GEN_FF/fm_setup.in")
 		helpers.run_bash_cmnd("cp " + args["prev_gen_path"] + "/traj_list.dat" + " GEN_FF/traj_list.dat")
@@ -558,8 +564,8 @@ def solve_amat(my_ALC, **kwargs):
 	# 0. Set up an argument parser
 	################################
 	
-	default_keys   = [""]*18
-	default_values = [""]*18
+	default_keys   = [""]*19
+	default_values = [""]*19
 	
 	# Weights
 	
@@ -568,25 +574,26 @@ def solve_amat(my_ALC, **kwargs):
 	default_keys[2 ] = "weights_energy"    ; default_values[2 ] =	 "0.1"   # Weights to be added to per-frame energies
 	default_keys[3 ] = "weights_energy_gas"; default_values[3 ] =	 "0.01"  # Weights to be added to per cluster energies
 	default_keys[4 ] = "weights_stress"    ; default_values[4 ] =	 "250.0" # Weights to be added to stress tensor components
+	default_keys[5 ] = "do_cluster"        ; default_values[5 ] =    True									# Should cluser configurations be considered 
 	
 	# LSQ controls
 	
-	default_keys[5 ] = "regression_alg"    ; default_values[5 ] =	 "lassolars" # Regression algorithm to be used in lsq2
-	default_keys[6 ] = "regression_var"    ; default_values[6 ] =	 "1.0E-4"    # SVD eps or Lasso alpha
-	default_keys[7 ] = "regression_nrm"    ; default_values[7 ] =	 "True"      # Normalizes the a-mat by default ... may not give best result
-	default_keys[8 ] = "split_files"       ; default_values[8 ] =	 False       # !!! UNUSED
+	default_keys[6 ] = "regression_alg"    ; default_values[6 ] =	 "lassolars" # Regression algorithm to be used in lsq2
+	default_keys[7 ] = "regression_var"    ; default_values[7 ] =	 "1.0E-4"    # SVD eps or Lasso alpha
+	default_keys[8 ] = "regression_nrm"    ; default_values[8 ] =	 "True"      # Normalizes the a-mat by default ... may not give best result
+	default_keys[9 ] = "split_files"       ; default_values[9 ] =	 False       # !!! UNUSED
 	
 	# Overall job controls
 	
-	default_keys[9 ] = "job_name"	       ; default_values[9 ] =	 "ALC-"+ `my_ALC`+"-lsq-2"		# Name for ChIMES lsq job
-	default_keys[10] = "job_nodes"         ; default_values[10] =	 "1"					# Number of nodes for ChIMES lsq job
-	default_keys[11] = "job_ppn"	       ; default_values[11] =	 "36"					# Number of processors per node for ChIMES lsq job
-	default_keys[12] = "job_walltime"      ; default_values[12] =	 "1"					# Walltime in hours for ChIMES lsq job
-	default_keys[13] = "job_queue"         ; default_values[13] =	 "pdebug"				# Queue for ChIMES lsq job
-	default_keys[14] = "job_account"       ; default_values[14] =	 "pbronze"				# Account for ChIMES lsq job
-	default_keys[15] = "job_executable"    ; default_values[15] =	 ""					# Full path to executable for ChIMES lsq job
-	default_keys[16] = "job_system"        ; default_values[16] =	 "slurm"				# slurm or torque	
-	default_keys[17] = "job_email"         ; default_values[17] =	 True					# Send slurm emails?
+	default_keys[10] = "job_name"	       ; default_values[10] =	 "ALC-"+ `my_ALC`+"-lsq-2"		# Name for ChIMES lsq job
+	default_keys[11] = "job_nodes"         ; default_values[11] =	 "1"					# Number of nodes for ChIMES lsq job
+	default_keys[12] = "job_ppn"	       ; default_values[12] =	 "36"					# Number of processors per node for ChIMES lsq job
+	default_keys[13] = "job_walltime"      ; default_values[13] =	 "1"					# Walltime in hours for ChIMES lsq job
+	default_keys[14] = "job_queue"         ; default_values[14] =	 "pdebug"				# Queue for ChIMES lsq job
+	default_keys[15] = "job_account"       ; default_values[15] =	 "pbronze"				# Account for ChIMES lsq job
+	default_keys[16] = "job_executable"    ; default_values[16] =	 ""					# Full path to executable for ChIMES lsq job
+	default_keys[17] = "job_system"        ; default_values[17] =	 "slurm"				# slurm or torque	
+	default_keys[18] = "job_email"         ; default_values[18] =	 True					# Send slurm emails?
 	
 	
 
@@ -640,8 +647,21 @@ def solve_amat(my_ALC, **kwargs):
 	#    ... Only needed for ALC >= 1
 	################################
 	
+
+	if (my_ALC == 0) or ((my_ALC == 1) and (not args["do_cluster"])):
 	
-	if my_ALC > 0: # "*_comb" files should always exist, because we create them for ALC-0 too
+		os.chdir("GEN_FF")
+		
+		if not os.path.isfile("A_comb.txt"): # for restarted jobs that died at this stage
+			helpers.run_bash_cmnd("mv A.txt         A_comb.txt"        )
+			helpers.run_bash_cmnd("mv b.txt         b_comb.txt"        ) 
+			helpers.run_bash_cmnd("mv b-labeled.txt b-labeled_comb.txt")  
+			helpers.run_bash_cmnd("mv natoms.txt    natoms_comb.txt"   )
+			helpers.run_bash_cmnd("mv weights.dat   weights_comb.dat"  )
+
+
+	
+	else: # "*_comb" files should always exist, because we create them for ALC-0 too
 	
 		# A-files
 	
@@ -658,16 +678,6 @@ def solve_amat(my_ALC, **kwargs):
 		helpers.cat_specific("GEN_FF/weights_comb.dat",  ["../ALC-" + `my_ALC-1` + "/GEN_FF/weights_comb.dat",  "GEN_FF/weights.dat"]   )
 
 		os.chdir("GEN_FF")
-			
-	else:
-		os.chdir("GEN_FF")
-		
-		if not os.path.isfile("A_comb.txt"): # for restarted jobs that died at this stage
-			helpers.run_bash_cmnd("mv A.txt         A_comb.txt"        )
-			helpers.run_bash_cmnd("mv b.txt         b_comb.txt"        ) 
-			helpers.run_bash_cmnd("mv b-labeled.txt b-labeled_comb.txt")  
-			helpers.run_bash_cmnd("mv natoms.txt    natoms_comb.txt"   )
-			helpers.run_bash_cmnd("mv weights.dat   weights_comb.dat"  )
 
 	
 	if "dlasso" in args["regression_alg"]:
