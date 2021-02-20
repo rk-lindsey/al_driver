@@ -109,6 +109,14 @@ def main(args):
 		print "Exiting."
 		
 		exit()
+		
+	# Check whether the user just requested help
+	
+	if "--help" in args:
+		verify_config.print_help()
+		exit()
+	
+	verify_config.verify(config)
 	
 	print "The following has been set as the working directory:"
 	print '\t', config.WORKING_DIR
@@ -122,9 +130,13 @@ def main(args):
 
 	config.CHIMES_SOLVER  = config.HPC_PYTHON + " " + config.CHIMES_SOLVER
 	config.CHIMES_POSTPRC = config.HPC_PYTHON + " " + config.CHIMES_POSTPRC
-
-	config.VASP_POSTPRC   = config.HPC_PYTHON + " " + config.VASP_POSTPRC
-	config.GAUS_POSTPRC   = config.HPC_PYTHON + " " + config.GAUS_POSTPRC
+	
+	if ((config.BULK_QM_METHOD == "VASP") or (config.IGAS_QM_METHOD == "VASP")):
+		config.VASP_POSTPRC   = config.HPC_PYTHON + " " + config.VASP_POSTPRC
+	if ((config.BULK_QM_METHOD == "DFTB+") or (config.IGAS_QM_METHOD == "DFTB+")):
+		config.DFTB_POSTPRC   = config.HPC_PYTHON + " " + config.DFTB_POSTPRC
+	#if config.IGAS_QM_METHOD == "Gaussian":
+	#	config.GAUS_POSTPRC   = config.HPC_PYTHON + " " + config.GAUS_POSTPRC -- this is unused
 	
 	if config.EMAIL_ADD:
 		EMAIL_ADD = config.EMAIL_ADD	
@@ -467,6 +479,13 @@ def main(args):
 						VASP_nodes     = config.VASP_NODES,
 						VASP_time      = config.VASP_TIME,
 						VASP_queue     = config.VASP_QUEUE,
+						VASP_modules   = config.VASP_MODULES,
+						DFTB_nodes     = config.DFTB_NODES,  
+						DFTB_ppn       = config.DFTB_PPN,    
+						DFTB_time      = config.DFTB_TIME,   
+						DFTB_queue     = config.DFTB_QUEUE,  
+						DFTB_exe       = config.DFTB_EXE,    
+						DFTB_modules   = config.DFTB_MODULES,
 						Gaussian_exe   = config.GAUS_EXE,
 						Gaussian_scr   = config.GAUS_SCR,
 						Gaussian_nodes = config.GAUS_NODES,
@@ -563,7 +582,8 @@ def main(args):
 			
 				qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY",
 					vasp_postproc = config.VASP_POSTPRC,
-					gaus_postproc = config.GAUS_POSTPRC)
+					dftb_postproc = config.DFTB_POSTPRC) #,
+					# gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 
 			os.chdir("..")
 			
@@ -589,6 +609,8 @@ def main(args):
 			
 			if config.IGAS_QM_METHOD == "VASP":
 				qm_all_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/VASP-all/"
+			elif config.IGAS_QM_METHOD == "DFTB+":
+				qm_all_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/DFTB-all/"
 			elif config.IGAS_QM_METHOD == "Gaussian":
 				qm_all_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/GAUS-all/"
 			else:
@@ -599,6 +621,8 @@ def main(args):
 			
 				if config.BULK_QM_METHOD == "VASP":
 					qm_20F_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/VASP-20/"
+				elif config.BULK_QM_METHOD == "DFTB+":
+					qm_20F_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/DFTB-20/"			
 				else:
 					print "Error in main driver while building Amat: unkown BULK QM method:", config.BULK_QM_METHOD
 					exit()
@@ -930,6 +954,12 @@ def main(args):
 						VASP_nodes     = config.VASP_NODES,
 						VASP_time      = config.VASP_TIME,
 						VASP_queue     = config.VASP_QUEUE,
+						DFTB_exe       = config.DFTB_EXE,
+						DFTB_nodes     = config.DFTB_NODES,
+						DFTB_ppn       = config.DFTB_PPN,
+						DFTB_time      = config.DFTB_TIME,
+						DFTB_modules   = config.DFTB_MODULES,
+						DFTB_queue     = config.DFTB_QUEUE,						
 						Gaussian_exe   = config.GAUS_EXE,
 						Gaussian_scr   = config.GAUS_SCR,
 						Gaussian_nodes = config.GAUS_NODES,
@@ -1023,7 +1053,7 @@ def main(args):
 			
 			if not restart_controller.THIS_ALC:
 
-				# Post-process the vasp jobs
+				# Post-process the vasp/DFTB jobs
 			
 				print "post-processing..."	
 
@@ -1033,7 +1063,8 @@ def main(args):
 				
 					qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY", config.NO_CASES,
 						vasp_postproc = config.VASP_POSTPRC,
-						gaus_postproc = config.GAUS_POSTPRC)
+						dftb_postproc = config.DFTB_POSTPRC)#,
+						#gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 						
 				# Now do full frames... may or may not need to extract stress tensors as well. This descision is based on whether the *next* ALC requires stresses!
 
@@ -1048,7 +1079,8 @@ def main(args):
 				
 				qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["20"], extract, config.NO_CASES,
 					vasp_postproc = config.VASP_POSTPRC,
-					gaus_postproc = config.GAUS_POSTPRC)				
+					dftb_postproc = config.DFTB_POSTPRC) #,
+					#gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 						
 						
 			os.chdir("..")

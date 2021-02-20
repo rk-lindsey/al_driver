@@ -8,16 +8,6 @@ import os
 import helpers
 
 
-
-# Functions to write:
-
-# def cleanup_and_setup(*argv, **kwargs):		-- Written
-# def continue_job(*argv, **kwargs):
-# def check_convergence(my_ALC, *argv, **kwargs):	-- Written
-# def generate_gen(inxyz, *argv):			-- Written
-# def post_process(*argv, **kwargs):			-- Written
-# def setup_vasp(my_ALC, *argv, **kwargs):		-- Written
-
 def cleanup_and_setup(*argv, **kwargs):
 
 	""" 
@@ -257,7 +247,7 @@ def generate_gen(inxyz, *argv):
 	# Count up the number of atoms of each type
 	
 	contents = ifstream.readlines()
-	contents.sort() # Vasp expects sorted coordinates
+	contents.sort() # To remain constistent with all other QM methods that expects sorted coordinates
 	
 	natm_types = [0]*len(atm_types)
 	
@@ -315,11 +305,11 @@ def post_process(*argv, **kwargs):
 
 	""" 
 	
-	Converts a converts a VASP OUTCAR file to .xyzf file
+	Converts a converts a DFTB+ .gen file to .xyzf file
 	
 	Usage: post_process(<arguments>)
 	
-	Notes: See function definition in vasp_driver.py for a full list of options. 
+	Notes: See function definition in dftbplus_driver.py for a full list of options. 
 	       	
 	"""
 	
@@ -456,9 +446,9 @@ def setup_dftb(my_ALC, *argv, **kwargs):
 	default_values = [""]*14
 
 
-	# VASP specific controls
+	# DFTB specific controls
 	
-	default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../DFTB_BASEFILES/"		# dftb_in.hsd files, optionall .sfk files
+	default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../QM_BASEFILES/"		# dftb_in.hsd files, optionall .sfk files
 	default_keys[1 ] = "traj_list" 	   ; default_values[1 ] = "traj_list.dat"		# Traj_list used in fm_setup.in... last column is target temperatura
 	default_keys[2 ] = "modules" 	   ; default_values[2 ] = "mkl" 			# Post_proc_lsq*py file... should also include the python command
 	default_keys[3 ] = "build_dir" 	   ; default_values[3 ] = "." 				# Post_proc_lsq*py file... should also include the python command
@@ -482,7 +472,7 @@ def setup_dftb(my_ALC, *argv, **kwargs):
 	args.update(kwargs)	
 	
 	
-	run_vasp_jobid = []
+	run_dftb_jobid = []
 	
 	################################
 	# 1. Set up and launch the dftb+ single point calculations

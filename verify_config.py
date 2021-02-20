@@ -3,8 +3,107 @@
 import os
 import sys
 
+def print_help():
 
-def verify():
+	"""
+	
+	Prints a list of expected config options and thier purpose"
+	
+	"""
+
+	PARAM.append("EMAIL_ADD");                      VARTYP.append("str");           DETAILS.append("E-mail address for driver to sent status updates to")
+	PARAM.append("SEED");                           VARTYP.append("int");           DETAILS.append("Seed for random number generator (used for MC cluster selection)")
+	PARAM.append("ATOM_TYPES");                     VARTYP.append("str list");      DETAILS.append("List of atom types in system of interest , e.g. [\"C\", \"H\", \"O\", \"N\"]")
+	PARAM.append("NO_CASES");                       VARTYP.append("int");           DETAILS.append("Number of different state points considered")
+	PARAM.append("MOLANAL_SPECIES");                VARTYP.append("str list");      DETAILS.append("List of species to track in molanal output, e.g. [\"C1 O1 1(O-C)\", \"C1 O2 2(O-C)\"] ")
+	PARAM.append("STRS_STYLE");                     VARTYP.append("int");           DETAILS.append("ALC at which to start including stress tensors from ALC generated configrations ")
+	PARAM.append("USE_AL_STRS");                    VARTYP.append("str");           DETAILS.append("How stress tensors should be included in the fit, e.g. \"DIAG\" or \"ALL\"")
+	PARAM.append("THIS_SMEAR");                     VARTYP.append("float");         DETAILS.append("Thermal smearing T in K; if \"None\", different values are used for each case, set in the ALL_BASE_FILES traj_list.dat")
+	PARAM.append("DRIVER_DIR");                     VARTYP.append("str");           DETAILS.append("Path to the al_driver code")
+	PARAM.append("WORKING_DIR");                    VARTYP.append("str");           DETAILS.append("Path to directory in which code is being run")
+	PARAM.append("CHIMES_SRCDIR");                  VARTYP.append("str");           DETAILS.append("Path to directory containing the ChIMES_MD source code")
+	PARAM.append("HPC_PPN");                        VARTYP.append("int");           DETAILS.append("The number of processors per node on the machine code is launched on")
+	PARAM.append("HPC_ACCOUNT");                    VARTYP.append("str");           DETAILS.append("Charge bank name on machine code is launched on (e.g. \"pbronze\")")
+	PARAM.append("HPC_SYSTEM");                     VARTYP.append("str");           DETAILS.append("Job scheduler on machine code is launched on (only \"slurm\" is supported currently)")
+	PARAM.append("HPC_PYTHON");                     VARTYP.append("str");           DETAILS.append("Path to python executable (2.X required for now)")
+	PARAM.append("HPC_EMAIL");                      VARTYP.append("bool");          DETAILS.append("Controls whether driver status updates are e-mailed to user")
+	PARAM.append("ALC0_FILES");                     VARTYP.append("str");           DETAILS.append("Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)")
+	PARAM.append("CHIMES_LSQ");                     VARTYP.append("str");           DETAILS.append("ChIMES_lsq executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_lsq\")")
+	PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"lsq2.py\")")
+	PARAM.append("CHIMES_POSTPRC");                 VARTYP.append("str");           DETAILS.append("post_proc_lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"post_proc_lsq2.py\")")
+	PARAM.append("WEIGHTS_FORCE");                  VARTYP.append("float");         DETAILS.append("Weight to apply to bulk forces during A-matrix solution ")
+	PARAM.append("WEIGHTS_FGAS");                   VARTYP.append("float");         DETAILS.append("Weight to apply to gas forces during A-matrix solution")
+	PARAM.append("WEIGHTS_ENER");                   VARTYP.append("float");         DETAILS.append("Weight to apply to bulk energies during A-matrix solution")
+	PARAM.append("WEIGHTS_EGAS");                   VARTYP.append("float");         DETAILS.append("Weight to apply to gas energies during A-matrix solution")
+	PARAM.append("WEIGHTS_STRES");                  VARTYP.append("float");         DETAILS.append("Weight to apply to stress tensor components during A-matrix solution")
+	PARAM.append("REGRESS_ALG");                    VARTYP.append("str");           DETAILS.append("Regression algorithm to use for fitting; only \"lassolars\" supported for now")
+	PARAM.append("REGRESS_NRM");                    VARTYP.append("bool");          DETAILS.append("Controls whether A-matrix is normalized prior to solution")
+	PARAM.append("REGRESS_VAR");                    VARTYP.append("bool");          DETAILS.append("Regression regularization variable")
+	PARAM.append("CHIMES_BUILD_NODES");             VARTYP.append("int");           DETAILS.append("Number of nodes to use when running chimes_lsq")
+	PARAM.append("CHIMES_BUILD_QUEUE");             VARTYP.append("int");           DETAILS.append("Queue to submit chimes_lsq job to")
+	PARAM.append("CHIMES_BUILD_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for chimes_lsq job (e.g. \"04:00:00\")")
+	PARAM.append("CHIMES_SOLVE_NODES");             VARTYP.append("int");           DETAILS.append("Number of nodes to use when running lsq2.py/DLARS (lassolars)")
+	PARAM.append("CHIMES_SOLVE_QUEUE");             VARTYP.append("str");           DETAILS.append("Queue to submit the lsq2.py/DLARS (lassolars) job to")
+	PARAM.append("CHIMES_SOLVE_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for lsq2.py/DLARS (lassolars) job (e.g. \"04:00:00\")")
+	PARAM.append("CHIMES_MD_ser");                  VARTYP.append("str");           DETAILS.append("Serial ChIMES_md executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-serial\")")
+	PARAM.append("CHIMES_MD_MPI");                  VARTYP.append("str");           DETAILS.append("MPI-compatible ChIMES_md exectuable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-mpi\")")
+	PARAM.append("CHIMES_MOLANAL");                 VARTYP.append("str");           DETAILS.append("Absolute path to the molanal src directory")
+	PARAM.append("CHIMES_MDFILES");                 VARTYP.append("str");           DETAILS.append("Absolute path to ChIMES_MD input files like case-0.indep-0.run_md.in (e.g. WORKING_DIR + \"ALL_BASE_FILES/CHIMESMD_FILES\")")
+	PARAM.append("CHIMES_PEN_PREFAC");              VARTYP.append("float");         DETAILS.append("ChIMES penalty function prefactor")
+	PARAM.append("CHIMES_PEN_DIST");                VARTYP.append("float");         DETAILS.append("ChIMES pentalty function kick-in distance")
+	PARAM.append("CHIMES_MD_NODES");                VARTYP.append("int");           DETAILS.append("Number of nodes to use when running chimes_md")
+	PARAM.append("CHIMES_MD_QUEUE");                VARTYP.append("str");           DETAILS.append("Queue to submit chimes_md to")
+	PARAM.append("CHIMES_MD_TIME");                 VARTYP.append("str");           DETAILS.append("Walltime for chimes_md (e.g. \"04:00:00\")")
+	PARAM.append("DO_CLUSTER");                     VARTYP.append("bool");          DETAILS.append("If false, AL-driver only considers bulk configurations. Otherwise, cluster extraction, etc. is performed")
+	PARAM.append("MAX_CLUATM");                     VARTYP.append("int");           DETAILS.append("Maximum number of atoms a cluster is allowed to contain (ignores clusters with more atoms)")
+	PARAM.append("TIGHT_CRIT");                     VARTYP.append("str");           DETAILS.append("Absolute path to tight cutoff criteria file for clustering")
+	PARAM.append("LOOSE_CRIT");                     VARTYP.append("str");           DETAILS.append("Absolute path to loose cutoff criteria file for clustering")
+	PARAM.append("CLU_CODE");                       VARTYP.append("str");           DETAILS.append("Absolute path the clustering executable (compiled from utilities/new_ts_cluster.cpp)")
+	PARAM.append("MEM_BINS");                       VARTYP.append("int");           DETAILS.append("Number of bins to use during cluster selection")
+	PARAM.append("MEM_CYCL");                       VARTYP.append("int");           DETAILS.append("Number of MC cycles to use during cluster selection")
+	PARAM.append("MEM_NSEL");                       VARTYP.append("int");           DETAILS.append("Number of clusters to select")
+	PARAM.append("MEM_ECUT");                       VARTYP.append("float");         DETAILS.append("Maximum ChIMES \"dumb\" energy cutoff for cluster selection")
+	PARAM.append("CALC_REPO_ENER_CENT_QUEUE");      VARTYP.append("str");           DETAILS.append("Queue to submit cluster ChIMES \"dumb\" energy calculations for central repository clusters to")
+	PARAM.append("CALC_REPO_ENER_CENT_TIME");       VARTYP.append("str");           DETAILS.append("Walltime for ChIMES \"dumb\" energy calculations for central repository clusters")
+	PARAM.append("CALC_REPO_ENER_QUEUE");           VARTYP.append("str");           DETAILS.append("Queue to submit cluster ChIMES \"dumb\" energy calculations for candidate clusters to")
+	PARAM.append("CALC_REPO_ENER_TIME");            VARTYP.append("str");           DETAILS.append("Walltime for ChIMES \"dumb\" energy calculations for candidate clusters")
+	PARAM.append("BULK_QM_METHOD");                 VARTYP.append("str");           DETAILS.append("Specifies which nominal QM code to use for bulk configurations; options are \"VASP\" or \"DFTB+\"")
+	PARAM.append("IGAS_QM_METHOD");                 VARTYP.append("str");           DETAILS.append("Specifies which nominal QM code to use for gas configurations; options are \"VASP\", \"DFTB+\", and \"Gaussian\"")
+	PARAM.append("VASP_FILES");                     VARTYP.append("str");           DETAILS.append("Absolute path to VASP input files")
+	PARAM.append("VASP_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to vasp2yzf.py ")
+	PARAM.append("VASP_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for VASP jobs")
+	PARAM.append("VASP_PPN");                       VARTYP.append("int");           DETAILS.append("Number of processors to use per node for VASP jobs")
+	PARAM.append("VASP_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for VASP calculations, e.g. \"04:00:00\"")
+	PARAM.append("VASP_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit VASP jobs to")
+	PARAM.append("VASP_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to VASP executable")
+	PARAM.append("DFTB_FILES");                     VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ input file ")
+	PARAM.append("DFTB_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to dftb+2yzf.py ")
+	PARAM.append("DFTB_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for DFTB+ jobs")
+	PARAM.append("DFTB_PPN");                       VARTYP.append("int");           DETAILS.append("Number of processors to use per node for DFTB+ jobs")
+	PARAM.append("DFTB_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for DFTB+ calculations, e.g. \"04:00:00\"")
+	PARAM.append("DFTB_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit DFTB+ jobs to")
+	PARAM.append("DFTB_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ executable")
+	PARAM.append("GAUS_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for Gaussian jobs")
+	PARAM.append("GAUS_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for Gaussian calculations, e.g. \"04:00:00\"")
+	PARAM.append("GAUS_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit Gaussian jobs to")
+	PARAM.append("GAUS_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian executable")
+	PARAM.append("GAUS_SCR");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian scratch directory")
+
+
+	print "Help info: "
+	print "Run with, e.g.: unbuffer python /path/to/al_driver/main.py 0 1 2 | tee driver.log"
+	print "This tool is best launched from a screen session, which allows the determinal to be detached"
+	print "Config file options are:"
+
+	for i in xrange(len(PARAM)):
+	        print PARAM[i] + '\t' + VARTYP[i] + '\t' + DETAILS[i] + '\n'
+
+	print ""
+	
+	return	
+	
+
+def verify(user_config):
 
 	"""
 	
@@ -12,7 +111,7 @@ def verify():
 	Produces warnings for un-initialized values and interactively
 	allows the user to either use a default or enter the desired value.
 	
-	Usage: verify()
+	Usage: verify(user_config)
 	
 	"""
 	
@@ -645,7 +744,16 @@ def verify():
 			print "WARNING: Option config.VASP_NODES was not set"
 			print "         Will use a value of 6"
 
-			user_config.VASP_NODES = 6				
+			user_config.VASP_NODES = 6
+			
+		if not hasattr(user_config,'VASP_PPN'):
+
+			# Number of nodes to use for a VASP calculation
+
+			print "WARNING: Option config.VASP_PPN was not set"
+			print "         Will use a value of 36"
+
+			user_config.VASP_NODES = 36							
 
 		if not hasattr(user_config,'VASP_TIME'):
 
@@ -673,17 +781,83 @@ def verify():
 			print "         Acceptable settings are of the form: \"/path/to/vasp.exe\""
 			
 			exit()
+			
+	if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+	
+		if not hasattr(user_config,'DFTB_FILES'):
+
+			# Location of basic DFTB+ input files (dftb_in.hsd)
+
+			print "WARNING: Option config.DFTB_FILES was not set"
+			print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\""
+
+			user_config.VASP_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
+			
+		if not hasattr(user_config,'DFTB_POSTPRC'):
+
+			# Location of a dftb+ post-processing file ... this should really be in a process_dftb.py file...
+
+			print "WARNING: Option config.DFTB_POSTPRC was not set"
+			print "         Will use config.CHIMES_SRCDIR + \"dftb+2xyzf.py\""
+
+			user_config.DFTB_POSTPRC = user_config.CHIMES_SRCDIR + "dftb+2xyzf.py"			
+			
+		if not hasattr(user_config,'DFTB_NODES'):
+
+			# Number of nodes to use for a DFTB calculation
+
+			print "WARNING: Option config.DFTB_NODES was not set"
+			print "         Will use a value of 1"
+
+			user_config.DFTB_NODES = 1
+			
+		if not hasattr(user_config,'DFTB_PPN'):
+
+			# Number of nodes to use for a DFTB calculation
+
+			print "WARNING: Option config.DFTB_PPN was not set"
+			print "         Will use a value of 1"
+
+			user_config.DFTB_NODES = 1							
+
+		if not hasattr(user_config,'DFTB_TIME'):
+
+			# Time for a DFTB calculation (hrs)
+
+			print "WARNING: Option config.DFTB_TIME was not set"
+			print "         Will use a value of \"04:00:00\""
+
+			user_config.DFTB_TIME = "04:00:00"
+			
+		if not hasattr(user_config,'DFTB_QUEUE'):
+
+			# Queue for a DFTB calculation
+
+			print "WARNING: Option config.DFTB_QUEUE was not set"
+			print "         Will use pbatch"
+
+			user_config.DFTB_QUEUE = "pbatch"
+			
+		if not hasattr(user_config,'DFTB_EXE'):
+
+			# DFTB+ executable
+
+			print "ERROR: Option config.DFTB_EXE was not set"
+			print "         Acceptable settings are of the form: \"/path/to/dftbplus.exe\""
+			
+			exit()
+			
 
 	if user_config.IGAS_QM_METHOD == "Gaussian":
 
-		if not hasattr(user_config,'GAUS_POSTPRC'):
-
-			# Number of nodes to use for a Gaussian calculation
-
-			print "WARNING: Option config.GAUS_POSTPRC was not set"
-			print "         Will use config.CHIMES_SRCDIR + \"gaussian2xyzf.py\""
-
-			user_config.GAUS_NODES = 4			
+		#if not hasattr(user_config,'GAUS_POSTPRC'): -- this option is unused
+		#
+		#	# Number of nodes to use for a Gaussian calculation
+		#
+		#	print "WARNING: Option config.GAUS_POSTPRC was not set"
+		#	print "         Will use config.CHIMES_SRCDIR + \"/contrib/gaussian2xyzf.py\""
+		#
+		#	user_config.GAUS_POSTPRC = config.CHIMES_SRCDIR + "/contrib/gaussian2xyzf.py"			
 
 		if not hasattr(user_config,'GAUS_NODES'):
 
