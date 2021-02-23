@@ -67,7 +67,7 @@ def run_bash_cmnd(cmnd_str):
 	try:
 		msg = check_output(cmnd_str.split())
 	except CalledProcessError as err_msg:
-		msg = err_msg
+		msg = err_msg.output
 
 	return msg
 	
@@ -88,7 +88,7 @@ def run_bash_cmnd_presplit(cmnd_str):
 	try:
 		msg = check_output(cmnd_str)
 	except CalledProcessError as err_msg:
-		msg = err_msg
+		msg = err_msg.output
 
 	return msg	
 	
