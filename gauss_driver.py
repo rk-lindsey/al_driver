@@ -8,6 +8,12 @@ import os
 import helpers
 import process_gaussian
 
+
+######
+# Note: Implementation is based on Gaussian 16
+######
+
+
 def NoneIsInf(val):
 	if val is None:
 		return float("inf")
@@ -356,7 +362,9 @@ def post_process(*argv, **kwargs):
 	default_keys   = [""]*1
 	default_values = [""]*1
 	
-	# Not needed.. .py postproc file is in ALDriver:  default_keys[0 ] = "vasp_postproc"  ; default_values[0 ] = ""
+	# Not needed.. .py postproc file is in ALDriver:  
+	
+	default_keys[0 ] = "refdatafile"  ; default_values[0 ] = None
 
 	args = dict(zip(default_keys, default_values))
 	args.update(kwargs)	
@@ -460,7 +468,7 @@ def post_process(*argv, **kwargs):
 		
 			print "Working on:",job_log[stable]
 	
-			xyzfname = process_gaussian.get_xyzf(job_log[stable], job_com[stable], natoms, boxlens)
+			xyzfname = process_gaussian.get_xyzf(job_log[stable], job_com[stable], natoms, boxlens, args["refdatafile"])
 
 			print "\tConfiguration",i,"completed:", job_log[stable]
 		

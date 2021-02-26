@@ -88,6 +88,7 @@ def print_help():
 	PARAM.append("GAUS_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit Gaussian jobs to")
 	PARAM.append("GAUS_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian executable")
 	PARAM.append("GAUS_SCR");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian scratch directory")
+	PARAM.append("GAUS_REF");                       VARTYP.append("str");           DETAILS.append("Name of file containing single atom energies from Gaussian and target planewave method")
 
 
 	print "Help info: "
@@ -102,6 +103,255 @@ def print_help():
 	
 	return	
 	
+	
+def check_VASP(user_config):	
+
+	"""
+	
+	Checks whether settings for VASP compatibility.
+	Produces warnings for un-initialized values if VASP is requested
+		
+	Usage: check_VASP(user_config)
+	
+	"""
+
+	if not hasattr(user_config,'VASP_FILES'):
+
+		# Location of basic VASP input files (INCAR, KPOINTS, etc)
+		
+		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+			print "WARNING: Option config.VASP_FILES was not set"
+			print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/VASP_BASEFILES\""
+
+		user_config.VASP_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/VASP_BASEFILES"
+		
+	if not hasattr(user_config,'VASP_POSTPRC'):
+
+		# Location of a vasp post-processing file ... this should really be in a process_vasp.py file...
+
+		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+			print "WARNING: Option config.VASP_POSTPRC was not set"
+			print "         Will use config.CHIMES_SRCDIR + \"vasp2xyzf.py\""
+
+		user_config.VASP_POSTPRC = user_config.CHIMES_SRCDIR + "vasp2xyzf.py"			
+		
+	if not hasattr(user_config,'VASP_NODES'):
+
+		# Number of nodes to use for a VASP calculation
+
+		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+			print "WARNING: Option config.VASP_NODES was not set"
+			print "         Will use a value of 6"
+
+		user_config.VASP_NODES = 6
+		
+	if not hasattr(user_config,'VASP_PPN'):
+
+		# Number of nodes to use for a VASP calculation
+
+		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+			print "WARNING: Option config.VASP_PPN was not set"
+			print "         Will use a value of 36"
+
+		user_config.VASP_NODES = 36							
+
+	if not hasattr(user_config,'VASP_TIME'):
+
+		# Time for a VASP calculation (hrs)
+
+		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+			print "WARNING: Option config.VASP_TIME was not set"
+			print "         Will use a value of \"04:00:00\""
+
+		user_config.VASP_TIME = "04:00:00"
+		
+	if not hasattr(user_config,'VASP_QUEUE'):
+
+		# Queue for a VASP calculation
+
+		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+			print "WARNING: Option config.VASP_QUEUE was not set"
+			print "         Will use pbatch"
+
+		user_config.VASP_QUEUE = "pbatch"
+		
+	if not hasattr(user_config,'VASP_EXE'):
+
+		# VASP executable
+		
+		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+			print "ERROR: Option config.VASP_EXE was not set"
+			print "         Acceptable settings are of the form: \"/path/to/vasp.exe\""
+			exit()
+		else:
+			user_config.VASP_EXE = None
+
+
+def check_DFTB(user_config):
+	
+	"""
+	
+	Checks whether settings for DFTB compatibility.
+	Produces warnings for un-initialized values if DFTB is requested
+		
+	Usage: check_DFTB(user_config)
+	
+	"""	
+	
+	if not hasattr(user_config,'DFTB_FILES'):
+
+		# Location of basic DFTB+ input files (dftb_in.hsd)
+
+		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+			print "WARNING: Option config.DFTB_FILES was not set"
+			print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\""
+
+		user_config.DFTB_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
+	
+	if not hasattr(user_config,'DFTB_POSTPRC'):
+
+		# Location of a dftb+ post-processing file ... this should really be in a process_dftb.py file...
+
+		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+			print "WARNING: Option config.DFTB_POSTPRC was not set"
+			print "         Will use config.CHIMES_SRCDIR + \"dftb+2xyzf.py\""
+
+		user_config.DFTB_POSTPRC = user_config.CHIMES_SRCDIR + "dftb+2xyzf.py"			
+	
+	if not hasattr(user_config,'DFTB_NODES'):
+
+		# Number of nodes to use for a DFTB calculation
+
+		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+			print "WARNING: Option config.DFTB_NODES was not set"
+			print "         Will use a value of 1"
+
+		user_config.DFTB_NODES = 1
+	
+	if not hasattr(user_config,'DFTB_PPN'):
+
+		# Number of nodes to use for a DFTB calculation
+		
+		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+			print "WARNING: Option config.DFTB_PPN was not set"
+			print "         Will use a value of 1"
+
+		user_config.DFTB_PPN = 1							
+
+	if not hasattr(user_config,'DFTB_TIME'):
+
+		# Time for a DFTB calculation (hrs)
+
+		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+			print "WARNING: Option config.DFTB_TIME was not set"
+			print "         Will use a value of \"04:00:00\""
+
+		user_config.DFTB_TIME = "04:00:00"
+	
+	if not hasattr(user_config,'DFTB_QUEUE'):
+
+		# Queue for a DFTB calculation
+		
+		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+			print "WARNING: Option config.DFTB_QUEUE was not set"
+			print "         Will use pbatch"
+
+		user_config.DFTB_QUEUE = "pbatch"
+	
+	if not hasattr(user_config,'DFTB_MODULES'):
+
+		# Queue for a DFTB calculation
+
+		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+			print "WARNING: Option config.DFTB_QUEUE was not set"
+			print "         Will use pbatch"
+
+		user_config.DFTB_MODULES = ""		
+	
+	if not hasattr(user_config,'DFTB_EXE'):
+
+		# DFTB+ executable
+		
+		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
+			print "ERROR: Option config.DFTB_EXE was not set"
+			print "         Acceptable settings are of the form: \"/path/to/dftbplus.exe\""
+			exit()
+		else:
+			user_config.DFTB_EXE = None
+
+def check_GAUS(user_config):
+	
+	"""
+	
+	Checks whether settings for Gaussian compatibility.
+	Produces warnings for un-initialized values if Gaussian is requested
+		
+	Usage: check_GAUS(user_config)
+	
+	"""
+
+	if not hasattr(user_config,'GAUS_NODES'):
+
+		# Number of nodes to use for a Gaussian calculation
+
+		if user_config.IGAS_QM_METHOD == "Gaussian":
+			print "WARNING: Option config.GAUS_NODES was not set"
+			print "         Will use a value of 4"
+
+		user_config.GAUS_NODES = 4				
+
+	if not hasattr(user_config,'GAUS_TIME'):
+
+		# Time for a Gaussian calculation (hrs)
+
+		if user_config.IGAS_QM_METHOD == "Gaussian":
+			print "WARNING: Option config.GAUS_TIME was not set"
+			print "         Will use a value of \"04:00:00\""
+
+		user_config.GAUS_TIME = "04:00:00"
+		
+	if not hasattr(user_config,'GAUS_QUEUE'):
+
+		# Queue for a Gaussian calculation
+
+		if user_config.IGAS_QM_METHOD == "Gaussian":
+			print "WARNING: Option config.GAUS_QUEUE was not set"
+			print "         Will use pbatch"
+
+		user_config.GAUS_QUEUE = "pbatch"
+		
+	if not hasattr(user_config,'GAUS_EXE'):
+
+		# Gaussian executable
+
+		if user_config.IGAS_QM_METHOD == "Gaussian":	
+			print "ERROR: Option config.GAUS_EXE was not set"
+			print "         Acceptable settings are of the form: \"/path/to/gaussian.exe\""
+			exit()			
+		else:
+			user_config.GAUS_EXE = None
+		
+	if not hasattr(user_config,'GAUS_SCR'):
+
+		# Gaussian scratch space
+
+		if user_config.IGAS_QM_METHOD == "Gaussian":	
+			print "ERROR: Option config.GAUS_SCR was not set"
+			print "         Acceptable settings are of the form: \"/path/to/gaussian/scratch/space\""
+			
+			exit()			
+		else:
+			user_config.GAUS_SCR = None
+			
+	if not hasattr(user_config,'GAUS_REF'):
+	
+		# Gaussian single atom reference energy file
+		
+		if user_config.IGAS_QM_METHOD == "Gaussian":
+			print "WARNING: Option config.GAUS_REF was not set"
+			print "         Using default Gaussian/VASP single atom energy offsets"
+			
+		user_config.GAUS_REF = None
 
 def verify(user_config):
 
@@ -235,8 +485,6 @@ def verify(user_config):
 	################################
 	##### General HPC options
 	################################
-
-
 
 	if not hasattr(user_config,'HPC_PPN'):
 
@@ -711,221 +959,19 @@ def verify(user_config):
 		# Note that if Gaussian is used, single-atom-energy offsets are hardcoded currentlly (see process_gaussian.py)
 		# NWChem should be added in the future
 
-		print "WARNING: Option config.IGAS_QM_METHOD was not set"
-		print "         Will use VASP"
+		if user_config.DO_CLUSTER:
+			print "WARNING: Option config.IGAS_QM_METHOD was not set"
+			print "         Will use VASP"
 
 		user_config.IGAS_QM_METHOD = "VASP"		
 
+	# If a given reference (QM) method is not used, set defaults silently
+	# In this case they are unused, but ensure function call compatibility
 
-#	if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+	check_VASP(user_config)
+	check_DFTB(user_config)
+	check_GAUS(user_config)
 	
-	if not hasattr(user_config,'VASP_FILES'):
 
-		# Location of basic VASP input files (INCAR, KPOINTS, etc)
 
-		print "WARNING: Option config.VASP_FILES was not set"
-		print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/VASP_BASEFILES\""
 
-		user_config.VASP_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/VASP_BASEFILES"
-		
-	if not hasattr(user_config,'VASP_POSTPRC'):
-
-		# Location of a vasp post-processing file ... this should really be in a process_vasp.py file...
-
-		print "WARNING: Option config.VASP_POSTPRC was not set"
-		print "         Will use config.CHIMES_SRCDIR + \"vasp2xyzf.py\""
-
-		user_config.VASP_POSTPRC = user_config.CHIMES_SRCDIR + "vasp2xyzf.py"			
-		
-	if not hasattr(user_config,'VASP_NODES'):
-
-		# Number of nodes to use for a VASP calculation
-
-		print "WARNING: Option config.VASP_NODES was not set"
-		print "         Will use a value of 6"
-
-		user_config.VASP_NODES = 6
-		
-	if not hasattr(user_config,'VASP_PPN'):
-
-		# Number of nodes to use for a VASP calculation
-
-		print "WARNING: Option config.VASP_PPN was not set"
-		print "         Will use a value of 36"
-
-		user_config.VASP_NODES = 36							
-
-	if not hasattr(user_config,'VASP_TIME'):
-
-		# Time for a VASP calculation (hrs)
-
-		print "WARNING: Option config.VASP_TIME was not set"
-		print "         Will use a value of \"04:00:00\""
-
-		user_config.VASP_TIME = "04:00:00"
-		
-	if not hasattr(user_config,'VASP_QUEUE'):
-
-		# Queue for a VASP calculation
-
-		print "WARNING: Option config.VASP_QUEUE was not set"
-		print "         Will use pbatch"
-
-		user_config.VASP_QUEUE = "pbatch"
-		
-	if not hasattr(user_config,'VASP_EXE'):
-
-		# VASP executable
-
-		print "ERROR: Option config.VASP_EXE was not set"
-		print "         Acceptable settings are of the form: \"/path/to/vasp.exe\""
-		
-		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
-		
-			exit()
-		else:
-			user_config.VASP_EXE = None
-		
-			
-#	if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
-	
-	if not hasattr(user_config,'DFTB_FILES'):
-
-		# Location of basic DFTB+ input files (dftb_in.hsd)
-
-		print "WARNING: Option config.DFTB_FILES was not set"
-		print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\""
-
-		user_config.DFTB_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
-		
-	if not hasattr(user_config,'DFTB_POSTPRC'):
-
-		# Location of a dftb+ post-processing file ... this should really be in a process_dftb.py file...
-
-		print "WARNING: Option config.DFTB_POSTPRC was not set"
-		print "         Will use config.CHIMES_SRCDIR + \"dftb+2xyzf.py\""
-
-		user_config.DFTB_POSTPRC = user_config.CHIMES_SRCDIR + "dftb+2xyzf.py"			
-		
-	if not hasattr(user_config,'DFTB_NODES'):
-
-		# Number of nodes to use for a DFTB calculation
-
-		print "WARNING: Option config.DFTB_NODES was not set"
-		print "         Will use a value of 1"
-
-		user_config.DFTB_NODES = 1
-		
-	if not hasattr(user_config,'DFTB_PPN'):
-
-		# Number of nodes to use for a DFTB calculation
-
-		print "WARNING: Option config.DFTB_PPN was not set"
-		print "         Will use a value of 1"
-
-		user_config.DFTB_PPN = 1							
-
-	if not hasattr(user_config,'DFTB_TIME'):
-
-		# Time for a DFTB calculation (hrs)
-
-		print "WARNING: Option config.DFTB_TIME was not set"
-		print "         Will use a value of \"04:00:00\""
-
-		user_config.DFTB_TIME = "04:00:00"
-		
-	if not hasattr(user_config,'DFTB_QUEUE'):
-
-		# Queue for a DFTB calculation
-
-		print "WARNING: Option config.DFTB_QUEUE was not set"
-		print "         Will use pbatch"
-
-		user_config.DFTB_QUEUE = "pbatch"
-		
-	if not hasattr(user_config,'DFTB_MODULES'):
-
-		# Queue for a DFTB calculation
-
-		print "WARNING: Option config.DFTB_QUEUE was not set"
-		print "         Will use pbatch"
-
-		user_config.DFTB_MODULES = ""		
-		
-	if not hasattr(user_config,'DFTB_EXE'):
-
-		# DFTB+ executable
-		
-		print "ERROR: Option config.DFTB_EXE was not set"
-		print "         Acceptable settings are of the form: \"/path/to/dftbplus.exe\""
-		
-		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
-		
-			exit()
-		else:
-			user_config.DFTB_EXE = None
-		
-
-#	if user_config.IGAS_QM_METHOD == "Gaussian":
-
-		#if not hasattr(user_config,'GAUS_POSTPRC'): -- this option is unused
-		#
-		#	# Number of nodes to use for a Gaussian calculation
-		#
-		#	print "WARNING: Option config.GAUS_POSTPRC was not set"
-		#	print "         Will use config.CHIMES_SRCDIR + \"/contrib/gaussian2xyzf.py\""
-		#
-		#	user_config.GAUS_POSTPRC = config.CHIMES_SRCDIR + "/contrib/gaussian2xyzf.py"			
-
-	if not hasattr(user_config,'GAUS_NODES'):
-
-		# Number of nodes to use for a Gaussian calculation
-
-		print "WARNING: Option config.GAUS_NODES was not set"
-		print "         Will use a value of 4"
-
-		user_config.GAUS_NODES = 4				
-
-	if not hasattr(user_config,'GAUS_TIME'):
-
-		# Time for a Gaussian calculation (hrs)
-
-		print "WARNING: Option config.GAUS_TIME was not set"
-		print "         Will use a value of \"04:00:00\""
-
-		user_config.GAUS_TIME = "04:00:00"
-		
-	if not hasattr(user_config,'GAUS_QUEUE'):
-
-		# Queue for a Gaussian calculation
-
-		print "WARNING: Option config.GAUS_QUEUE was not set"
-		print "         Will use pbatch"
-
-		user_config.GAUS_QUEUE = "pbatch"
-		
-	if not hasattr(user_config,'GAUS_EXE'):
-
-		# Gaussian executable
-
-		print "ERROR: Option config.GAUS_EXE was not set"
-		print "         Acceptable settings are of the form: \"/path/to/gaussian.exe\""
-		
-		if user_config.IGAS_QM_METHOD == "Gaussian":	
-			
-			exit()			
-		else:
-			user_config.GAUS_EXE = None
-		
-	if not hasattr(user_config,'GAUS_SCR'):
-
-		# Gaussian scratch space
-
-		print "ERROR: Option config.GAUS_SCR was not set"
-		print "         Acceptable settings are of the form: \"/path/to/gaussian/scratch/space\""
-		
-		if user_config.IGAS_QM_METHOD == "Gaussian":	
-			
-			exit()			
-		else:
-			user_config.GAUS_SCR = None

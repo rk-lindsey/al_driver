@@ -423,8 +423,8 @@ def post_process(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	       	
 	"""	
 	
-	default_keys   = [""]*3
-	default_values = [""]*3
+	default_keys   = [""]*4
+	default_values = [""]*4
 
 
 	# VASP specific controls
@@ -434,10 +434,11 @@ def post_process(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	# Gaussian specific controls
 	
 	default_keys[1 ] = "gaus_postproc"  ; default_values[1 ] = "" # Python file for post-processing Gausian output
+	default_keys[2 ] = "gaus_reffile"   ; default_values[2 ] = None # Single atom energy corrections
 
 	# DFTB+ specific controls
 	
-	default_keys[2 ] = "dftb_postproc"  ; default_values[1 ] = "" # Python file for post-processing DFTB+ output	
+	default_keys[3 ] = "dftb_postproc"  ; default_values[1 ] = "" # Python file for post-processing DFTB+ output	
 
 	args = dict(zip(default_keys, default_values))
 	args.update(kwargs)
@@ -476,6 +477,6 @@ def post_process(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 				elif igas_qm_method == "DFTB+":
 					dftbplus_driver.post_process(*tmp_args, dftb_postproc = args["dftb_postproc"])					
 				elif igas_qm_method == "Gaussian":
-					gauss_driver.post_process(*tmp_args, gaus_postproc = args["gaus_postproc"])
+					gauss_driver.post_process(*tmp_args, gaus_postproc = args["gaus_postproc"], refdatafile = args["gaus_reffile"])
 				else:
 					print "ERROR: Unknown igas_qm_method in qm_driver.post_process:", igas_qm_method	

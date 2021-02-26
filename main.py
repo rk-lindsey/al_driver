@@ -582,7 +582,8 @@ def main(args):
 			
 				qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY",
 					vasp_postproc = config.VASP_POSTPRC,
-					dftb_postproc = config.DFTB_POSTPRC) #,
+					dftb_postproc = config.DFTB_POSTPRC, # ) #,
+					gaus_reffile  = config.GAUS_REF)
 					# gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 
 			os.chdir("..")
@@ -1063,7 +1064,8 @@ def main(args):
 				
 					qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY", config.NO_CASES,
 						vasp_postproc = config.VASP_POSTPRC,
-						dftb_postproc = config.DFTB_POSTPRC)#,
+						dftb_postproc = config.DFTB_POSTPRC, # )#,
+						gaus_reffile  = config.GAUS_REF)
 						#gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 						
 				# Now do full frames... may or may not need to extract stress tensors as well. This descision is based on whether the *next* ALC requires stresses!
@@ -1079,7 +1081,8 @@ def main(args):
 				
 				qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["20"], extract, config.NO_CASES,
 					vasp_postproc = config.VASP_POSTPRC,
-					dftb_postproc = config.DFTB_POSTPRC) #,
+					dftb_postproc = config.DFTB_POSTPRC, # ) #,
+					gaus_reffile  = config.GAUS_REF)
 					#gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 						
 						
