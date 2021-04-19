@@ -6,6 +6,7 @@ import time
 import glob
 import sys
 import math
+import sys
 import os
 
 """ Small helper functions and utilities general to the ALC process. """
@@ -103,10 +104,6 @@ def run_bash_cmnd_to_file(outfile, cmnd_str):
 	Notes: Linux wildcards will not work as expected. Use the glob if needed.
 	
 	"""
-	
-	#print cmnd_str
-	#print run_bash_cmnd("pwd")
-	#print run_bash_cmnd(cmnd_str)
 	
 	ofstream = open(outfile,'w+')
 	ofstream .write(run_bash_cmnd(cmnd_str))
@@ -733,10 +730,6 @@ def break_apart_xyz(*argv):
 	                FRSTREAM.write(`float(LINE[5])*(627.50960803*1.889725989)` + '\n')
 	                FRSTREAM.write(`float(LINE[6])*(627.50960803*1.889725989)` + '\n')    
 	return
-
-
-	
-import sys
 
 
 def dftbgen_to_xyz(*argv):
