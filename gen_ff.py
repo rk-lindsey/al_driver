@@ -263,9 +263,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 		n_split_amat = len(glob.glob("A.*.txt"))
 		n_split_dims = len(glob.glob("dim.*.txt"))
 		n_expected   = int(args["job_nodes"])*int(args["job_ppn"])
-		
-		n_expected   = int(helpers.run_bash_cmnd("grep Expected run-" + `run_no` + "/dlars.log").split()[-1])
-		
+
 		if n_split_amat != n_expected:
 			print "ERROR: Expected",n_expected, "A.XXXX.txt files, counted", n_split_amat
 			exit()
@@ -391,13 +389,9 @@ def build_amat(my_ALC, **kwargs):
 	nfiles      = 0
 	nframes_all = 0
 	nframes_20  = 0	
-	
-	print "my_ALC:    ",my_ALC
-	print "do_cluster:",args["do_cluster"]
-	print "prev_path: ",args["prev_gen_path"] 
-	
-	if (my_ALC == 0) or ((my_ALC == 1) and (not args["do_cluster"])):
 		
+	if (my_ALC == 0) or ((my_ALC == 1) and (not args["do_cluster"])):
+	
 		helpers.run_bash_cmnd("cp " + args["prev_gen_path"] + "/fm_setup.in"   + " GEN_FF/fm_setup.in")
 		helpers.run_bash_cmnd("cp " + args["prev_gen_path"] + "/traj_list.dat" + " GEN_FF/traj_list.dat")
 		helpers.run_bash_cmnd("cp " + ' '.join(glob.glob(args["prev_gen_path"] + "/*xyzf"  )) + " GEN_FF/")
@@ -700,7 +694,7 @@ def solve_amat(my_ALC, **kwargs):
 	
 	if "dlasso" in args["regression_alg"]:
 		
-		print "Dim file contents:", helpers.cat_to_var("dim.txt")
+		print "Dim file contents:", helpers.cat_to_var("dim.txt")[0]
 		
 	
 	################################
