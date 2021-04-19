@@ -6,7 +6,7 @@ import os
 # Localmodules
 
 import helpers
-
+import dftbgen_to_xyz
 
 def cleanup_and_setup(*argv, **kwargs):
 
@@ -143,11 +143,11 @@ def continue_job(*argv, **kwargs):
 
 			# Count the number of possible jobs
 			
-			count_gen = len(glob.glob("*.gen")) 
+			count_gen = len(glob.glob("case*.xyz.gen")) 
 			
 			# Count the number of completed jobs
 			
-			count_tag = len(glob.glob("*.tag"))
+			count_tag = len(glob.glob("case*.tag"))
 
 			print ""
 			print "		Counted .gen:", count_gen
@@ -156,7 +156,7 @@ def continue_job(*argv, **kwargs):
 			
 			# If all jobs haven't completed, resubmit
 			
-			if count_com > count_log:
+			if count_gen > count_tag:
 			
 				print "			Resubmitting."
 
@@ -212,6 +212,10 @@ def check_convergence(my_ALC, *argv, **kwargs):
 	
 	#os.chdir("ALC-" + `my_ALC`)
 	
+	
+	print "WARNING: This functionality is not used right now. If the DFTB job"
+	print "          doesn't converge, we will declare the problem \"impossible\" and ignore it"
+	
 	total_failed = 0
 	
 	
@@ -228,22 +232,35 @@ def generate_gen(inxyz, *argv):
 	Notes: The second argument is list of atom types
 	       The final argument is the smearing temperature, in Kelvin
 		      
-	WARNING: Assumes an orthorhombic box
-	WARNING: Assumes origin is at 0,0,0
-	       	
 	"""
 
 	atm_types = argv[0] # pointer!
-	smearing  = int(argv[1])
-	ifstream = open(inxyz,'r')
-	ofstream = open(inxyz + ".gen", 'w')
+	smearing  = float(argv[1])
+	ifstream  = open(inxyz,'r')
+	ofstream  = open(inxyz + ".gen", 'w')
 	
 	
 	# Set up the header portion
 		
 	box = ifstream.readline()		# No. atoms
 	box = ifstream.readline().split()	# Box lengths
+		
+	a = [0.0]*3
+	b = [0.0]*3
+	c = [0.0]*3
+	
+	if box[0] == "NON_ORTHO":
+		
+		for i in xrange(3):
 			
+			a[i] = box[1+i]
+			b[i] = box[1+i+3]
+			c[i] = box[1+i+6]
+	else:
+		a[0] = box[0]
+		b[1] = box[1]
+		c[2] = box[2]
+		
 	# Count up the number of atoms of each type
 	
 	contents = ifstream.readlines()
@@ -273,31 +290,26 @@ def generate_gen(inxyz, *argv):
 			tmp.pop(i)
 	
 	atm_types  = list(zip(*tmp)[0])
-	natm_types = map(str, list(zip(*tmp)[1]))
-	
-	
+	natm_types = map(int, list(zip(*tmp)[1]))
+
 	# Finish up the header portion
 	
-	ofstream.write(str(sum(natm_types) + "S\n")
-	ofstream.write("# (" + str(smearing) + ' K)\n')
+	ofstream.write(str(sum(natm_types)) + " S\n")
+	ofstream.write("# " + str(smearing) + " K\n")
 	ofstream.write(' '.join(atm_types) + '\n')
 	
 	for i in xrange(len(contents)):
 		
-		line = contents[i].split()		
-		line = str(i+1) + " " + str(atm_types.index(line[[0])+1) + ' '.join(line[1:]) + '\n'
+		line = contents[i].split()				
+		line = str(i+1) + " " + str(atm_types.index(line[0])+1) + " " +  ' '.join(line[1:]) + '\n'
 		ofstream.write(line)
 	
 	ofstream.write("0.0 0.0 0.0\n")	
 	
-	ofstream.write(box[0] + " 0.000       0.000" + '\n')
-	ofstream.write("0.000 " + box[1]  + " 0.000" + '\n')
-	ofstream.write("0.000     0.000 " +   box[2] + '\n')
-	
-	ofstream.write( ' '.join(atm_types ) +'\n')
-	ofstream.write( ' '.join(natm_types) +'\n')
-	ofstream.write("Cartesian" + '\n')
-		
+	ofstream.write(' '.join(map(str,a)) + '\n')
+	ofstream.write(' '.join(map(str,b)) + '\n')
+	ofstream.write(' '.join(map(str,c)) + '\n')
+			
 	ofstream.close()
 
 
@@ -318,7 +330,7 @@ def post_process(*argv, **kwargs):
 	################################
 	
 	### ...argv
-	
+
 	args_targets    = argv[0] # ... all ... 20
 	args_properties = argv[1] # "ENERGY STRESS" ...etc for the post process script
 	
@@ -326,7 +338,6 @@ def post_process(*argv, **kwargs):
 	
 	if len(argv) == 3:
 		args_cases    = argv[2]	
-	
 	
 	### ...kwargs
 	
@@ -359,20 +370,24 @@ def post_process(*argv, **kwargs):
 		helpers.run_bash_cmnd("rm -f OUTCAR.xyzf")
 		
 		outcar_list = []
+		gencoord_list = []
+		resulttg_list = []
 		
 		for j in xrange(args_cases):
 		
+			gencoord_list += sorted(glob.glob("CASE-" + `j` + "/*xyz.gen"))
 			resulttg_list += sorted(glob.glob("CASE-" + `j` + "/*.results.tag"))
-			detailed_list += sorted(glob.glob("CASE-" + `j` + "/*.detailed.out"))
-			dftb_out_list += sorted(glob.glob("CASE-" + `j` + "/*.dftb.out"))
 			
-		for j in xrange(len(detailed_list)):
+		for j in xrange(len(resulttg_list)):
 
-			print helpers.run_bash_cmnd(args["dftb_postproc"] + " " + resulttg_list[j] + " " + detailed_list[j] + " " + args_properties + " " + dftb_out_list[j] + " | grep ERROR ")
+			dftbgen_to_xyz.dftbgen_to_xyzf(gencoord_list[j], resulttg_list[j], args_properties)
+			
+			outfile = gencoord_list[j].split(".xyz.gen")
+			outfile = ''.join(outfile) + ".xyz.xyzf"
 			
 			if "ENERGY" in args_properties: # Make sure the configuration energy is less than or equal to zero
 			
-				tmp_ener = helpers.head(outcar_list[j] + ".xyzf",2)
+				tmp_ener = helpers.head(outfile,2)
 				tmp_ener = float(tmp_ener[1].split()[-1])
 				
 				if tmp_ener >= 0.0:
@@ -380,13 +395,13 @@ def post_process(*argv, **kwargs):
 					print "Warning: DFTB energy is positive energy for job name", resulttg_list[j], ":", tmp_ener, "...skipping."
 					continue
 			
-			if os.path.isfile(dftb_out_list[j] + ".xyzf"):
+			if os.path.isfile(outfile):
 			
 				if os.path.isfile("OUTCAR.xyzf"):
 			
-					helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf", dftb_out_list[j] + ".xyzf"])
+					helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf", outfile])
 				else:
-					helpers.cat_specific("tmp.dat", [dftb_out_list[j] + ".xyzf"])
+					helpers.cat_specific("tmp.dat", [outfile])
 				
 				helpers.run_bash_cmnd("mv tmp.dat OUTCAR.xyzf")
 		
@@ -402,7 +417,7 @@ def setup_dftb(my_ALC, *argv, **kwargs):
 	
 	Usage: setup_dftb(1, <arguments>)
 	
-	Notes: See function definition in dftb_driver.py for a full list of options. 
+	Notes: See function definition in dftbplus_driver.py for a full list of options. 
 	       Expects to be run from the ALC-X folder.
 	       Expects the "all" file in the ALC-X folder.
 	       Expects the "20" file in the ALC-X/INDEP_X folder.
@@ -607,22 +622,23 @@ def setup_dftb(my_ALC, *argv, **kwargs):
 		job_task = []
 		job_task.append("module load " + args["modules"] + '\n')
 
-		job_task.append("for j in $(ls *.gen)	          ")	
+		job_task.append("for j in $(ls *xyz.gen)	          ")	
 		job_task.append("do				  ")
+		job_task.append("	if [[ $j == \"dftbjob.gen\" ]] ; then continue; fi")
 		job_task.append("	TAG=${j%*.gen}	          ")	
 		job_task.append("	cp ${TAG}.gen dftbjob.gen ")
-		job_task.append("	CHECK=${TAG}.dftb.out     ")
+		job_task.append("	CHECK=${TAG}.results.tag  ")
 		job_task.append("	if [ -e ${CHECK} ] ; then ")	
 		job_task.append("		continue	")	
 		job_task.append("	fi			")
-		job_task.append("	TEMP=`awk '{if(NR==2){print $(NF-1); exit}}' dftbjob.gen`")
-		job_task.append("	cp ${TEMP}.dftb_in.hsd dftb_in.hsd		")	
-		job_task.append("	srun -N " + `args["job_nodes" ]` + " -n " + `int(args["job_nodes"])*int(args["job_ppn"])` + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")		
+		job_task.append("	TEMP=`awk '{if(NR==2){print int($(NF-1)); exit}}' dftbjob.gen`")
+		job_task.append("	cp " + args["basefile_dir" ] + "/${TEMP}.dftb_in.hsd dftb_in.hsd		")	
+		job_task.append("	srun -N " + str(args["job_nodes" ]) + " -n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")		
 		job_task.append("	cp results.tag ${TAG}.results.tag")
 		job_task.append("	cp md.out      ${TAG}.md.out	 ")
 		job_task.append("	cp geo_end.xyz ${TAG}.geo_end.xyz")
 		job_task.append("	cp geo_end.gen ${TAG}.geo_end.gen")
-		job_task.append("	rm -f charges.bin tmp-broyden* dftb_pin.hsd")	
+		job_task.append("	rm -f charges.bin tmp-broyden* dftb_pin.hsd dftbjob.gen geo_end.*")	
 		job_task.append("done	")
 		
 		this_jobid = helpers.create_and_launch_job(job_task,

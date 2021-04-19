@@ -1,5 +1,112 @@
 import sys
 
+def dftbgen_to_xyzf(genfile, resultstag, argv):
+
+	""" 
+	
+	Run with: 
+	
+	#dftbgen_to_xyzf(["ENERGY","ALLSTR"], genfile="0000.gen", resultstag="results.tag")
+	dftbgen_to_xyzf(<genfile>, <resultstag>, ["ENERGY","ALLSTR"])
+	
+	Only processes one file at a time
+	Requires original genfile and results.tag
+	Produces, e.g.,  0000.xyzf
+	
+	"""
+	
+	################################
+	# 0. Set up an argument parser
+	################################
+	
+	### ...argv
+	
+	args_targets = argv[0] # This is a pointer! ... specified whether/how to include stress & energy
+	
+	################################
+	# Read in the calculated energy, forces, and stress tensor
+	################################
+	
+	ifstream = open(resultstag,'r')
+	results  = ifstream.readlines()
+	ifstream.close()
+	
+	idx = [i for i, s in enumerate(results) if 'forces ' in s][-1]
+	
+	natoms = int(results[idx].split(',')[-1])
+	energy = float(results[1])*627.50960803 # Convert from au (Hartree) to kcal/mol
+	
+	forces = results[idx+1:idx+1+natoms]
+	
+	idx = [i for i, s in enumerate(results) if 'stress ' in s][-1]
+	
+	stress = ""
+	stress += results[idx+1]
+	stress += results[idx+2]
+	stress += results[idx+3]
+	stress  = stress.split()
+	
+	stress = [ float(i)*29421.9091 for i in stress] # Convert from au H/b^3) to GPA		
+	stress = [stress[0], stress[4], stress[8], stress[1], stress[2], stress[5]]
+		
+	################################	
+	# Read in the atom coordinates
+	################################
+	
+	ifstream = open(genfile,'r')
+	results  = ifstream.readlines()
+	ifstream.close()
+	
+	cell_a = results[-3].rstrip()
+	cell_b = results[-2].rstrip()
+	cell_c = results[-1].rstrip()
+
+	symbols = results[2].split()
+	
+	coords  = results[3:]
+	atomtyp = []
+	
+	for i in xrange(natoms): # Doesn't include atom type!
+	
+		atomtyp.append(coords[i].split()[1])
+		
+		coords[i] = ' '.join(coords[i].split()[2:])
+		#units should already be correct
+		#coords[i] = [float(i)*0.529177 for i in coords[i]]
+		
+	################################
+	# Generate the .xyzf file
+	################################
+	
+	outname = ''.join(genfile.split(".gen")) + ".xyzf"
+		
+	ofstream = open(outname,'w')
+
+	ofstream.write(str(natoms) + '\n')
+	
+	boxline = "NON_ORTHO " + cell_a + " " + cell_b + " " + cell_c + " "
+	
+	if "ALLSTR" in argv:
+		boxline = boxline + ' '.join(map(str,stress)) + " "
+	elif "STRESS" in argv:
+		boxline = boxline + ' '.join(map(str,stress[0:3])) + " "
+	
+	if "ENERGY" in argv:
+		boxline  = boxline + str(energy)
+		
+		
+	ofstream.write(boxline + '\n')
+	
+	for i in xrange(int(natoms)):
+	
+		ofstream.write(symbols[int(atomtyp[i])-1] + " ")
+		
+		ofstream.write(coords[i] + "  ")
+		
+		ofstream.write(forces[i])
+		
+	ofstream.close()
+		
 
 def dftbgen_to_xyz(*argv):
 	#NOTE: Assumes an orthorhombic box
@@ -82,7 +189,3 @@ def dftbgen_to_xyz(*argv):
 			BOXSTREAM.write(X + " " + Y + " " + Z + '\n')
 			
 	return
-
-
-
-

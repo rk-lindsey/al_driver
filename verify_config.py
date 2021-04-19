@@ -69,7 +69,7 @@ def print_help():
 	PARAM.append("CALC_REPO_ENER_TIME");            VARTYP.append("str");           DETAILS.append("Walltime for ChIMES \"dumb\" energy calculations for candidate clusters")
 	PARAM.append("BULK_QM_METHOD");                 VARTYP.append("str");           DETAILS.append("Specifies which nominal QM code to use for bulk configurations; options are \"VASP\" or \"DFTB+\"")
 	PARAM.append("IGAS_QM_METHOD");                 VARTYP.append("str");           DETAILS.append("Specifies which nominal QM code to use for gas configurations; options are \"VASP\", \"DFTB+\", and \"Gaussian\"")
-	PARAM.append("VASP_FILES");                     VARTYP.append("str");           DETAILS.append("Absolute path to VASP input files")
+	PARAM.append("QM_FILES");                       VARTYP.append("str");           DETAILS.append("Absolute path to QM input files")
 	PARAM.append("VASP_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to vasp2yzf.py ")
 	PARAM.append("VASP_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for VASP jobs")
 	PARAM.append("VASP_PPN");                       VARTYP.append("int");           DETAILS.append("Number of processors to use per node for VASP jobs")
@@ -84,6 +84,7 @@ def print_help():
 	PARAM.append("DFTB_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit DFTB+ jobs to")
 	PARAM.append("DFTB_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ executable")
 	PARAM.append("GAUS_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for Gaussian jobs")
+	PARAM.append("GAUS_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for Gaussian jobs")
 	PARAM.append("GAUS_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for Gaussian calculations, e.g. \"04:00:00\"")
 	PARAM.append("GAUS_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit Gaussian jobs to")
 	PARAM.append("GAUS_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian executable")
@@ -115,15 +116,14 @@ def check_VASP(user_config):
 	
 	"""
 
-	if not hasattr(user_config,'VASP_FILES'):
+	if not hasattr(user_config,'QM_FILES'):
 
-		# Location of basic VASP input files (INCAR, KPOINTS, etc)
+		# Location of basic QM input files (INCAR, KPOINTS, etc)
 		
-		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
-			print "WARNING: Option config.VASP_FILES was not set"
-			print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/VASP_BASEFILES\""
+		print "WARNING: Option config.QM_FILES was not set"
+		print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\""
 
-		user_config.VASP_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/VASP_BASEFILES"
+		user_config.QM_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
 		
 	if not hasattr(user_config,'VASP_POSTPRC'):
 
@@ -153,7 +153,7 @@ def check_VASP(user_config):
 			print "WARNING: Option config.VASP_PPN was not set"
 			print "         Will use a value of 36"
 
-		user_config.VASP_NODES = 36							
+		user_config.VASP_PPN = 36							
 
 	if not hasattr(user_config,'VASP_TIME'):
 
@@ -298,7 +298,17 @@ def check_GAUS(user_config):
 			print "WARNING: Option config.GAUS_NODES was not set"
 			print "         Will use a value of 4"
 
-		user_config.GAUS_NODES = 4				
+		user_config.GAUS_NODES = 4
+		
+	if not hasattr(user_config,'GAUS_PPN'):
+
+		# Number of procs per node to use for a Gaussian calculation
+
+		if user_config.IGAS_QM_METHOD == "Gaussian":
+			print "WARNING: Option config.GAUS_PPN was not set"
+			print "         Will use a value of 36"
+
+		user_config.GAUS_PPN = 36						
 
 	if not hasattr(user_config,'GAUS_TIME'):
 

@@ -474,7 +474,7 @@ def main(args):
 						loose_crit     = config.LOOSE_CRIT,
 						clu_code       = config.CLU_CODE,  
 						compilation    = "g++ -std=c++11 -O3",
-						basefile_dir   = config.VASP_FILES,
+						basefile_dir   = config.QM_FILES,
 						VASP_exe       = config.VASP_EXE,
 						VASP_nodes     = config.VASP_NODES,
 						VASP_time      = config.VASP_TIME,
@@ -634,8 +634,6 @@ def main(args):
 				
 				if THIS_ALC >= config.USE_AL_STRS:
 					do_stress = True
-					
-				print config.DO_CLUSTER
 				
 				if (not config.DO_CLUSTER) and (THIS_ALC == 1):	
 				
@@ -950,9 +948,10 @@ def main(args):
 						loose_crit     = config.LOOSE_CRIT,
 						clu_code       = config.CLU_CODE,  
 						compilation    = "g++ -std=c++11 -O3",
-						basefile_dir   = config.VASP_FILES,
+						basefile_dir   = config.QM_FILES,
 						VASP_exe       = config.VASP_EXE,
 						VASP_nodes     = config.VASP_NODES,
+						VASP_ppn       = config.VASP_PPN,
 						VASP_time      = config.VASP_TIME,
 						VASP_queue     = config.VASP_QUEUE,
 						DFTB_exe       = config.DFTB_EXE,
@@ -964,6 +963,7 @@ def main(args):
 						Gaussian_exe   = config.GAUS_EXE,
 						Gaussian_scr   = config.GAUS_SCR,
 						Gaussian_nodes = config.GAUS_NODES,
+						Gaussian_ppn   = config.GAUS_PPN,
 						Gaussian_time  = config.GAUS_TIME,
 						Gaussian_queue = config.GAUS_QUEUE,
 						job_ppn        = config.HPC_PPN,
