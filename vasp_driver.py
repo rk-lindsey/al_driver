@@ -7,6 +7,10 @@ import os
 
 import helpers
 
+######
+# NOTE: Implementation is based on VASP 5.4.1
+######
+
 def cleanup_and_setup(*argv, **kwargs):
 
 	""" 
@@ -177,6 +181,7 @@ def continue_job(*argv, **kwargs):
 			print helpers.run_bash_cmnd("pwd")
 
 	return job_list	
+	
 
 def check_convergence(my_ALC, *argv, **kwargs):
 
@@ -246,6 +251,10 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		print "Working on:","VASP-" + args_targets[i]
 	
 		os.chdir("VASP-" + args_targets[i])
+		
+		# Clear out the "tries" file so we try to achieve convergence one more time
+
+		helpers.run_bash_cmnd("rm -f *.tries")
 		
 		# Build the list of failed jobs for the current VASP job type (i.e. "all" or "20")
 	
@@ -346,8 +355,10 @@ def generate_POSCAR(inxyz, *argv):
 	Notes: The second argument is list of atom types
 	       The final argument is the smearing temperature, in Kelvin
 		      
-	WARNING: Assumes an orthorhombic box
-	       	
+	WARNING: Assumes the inxyz comment line is formatted like:
+	         <boxl_x> <boxl_y> <boxl_z> .....
+		 or
+		 NON_ORTHO <a_x> <a_y> <a_z> <b_x> <b_y> <b_z> <c_x> <c_y> <c_z> ... 
 	"""
 
 	atm_types = argv[0] # pointer!
@@ -357,18 +368,9 @@ def generate_POSCAR(inxyz, *argv):
 	
 	
 	# Set up the header portion
-	
-	#ofstream.write(' '.join(atm_types) + " ( " + `smearing` + " K)" + '\n') 
-	#ofstream.write("1.0" + '\n')
-	
+
 	box = ifstream.readline()		# No. atoms
 	box = ifstream.readline().split()	# Box lengths
-	
-	
-	#ofstream.write(box[0] + " 0.000       0.000" + '\n')
-	#ofstream.write("0.000 " + box[1]  + " 0.000" + '\n')
-	#ofstream.write("0.000     0.000 " +   box[2] + '\n')
-	
 	
 	# Count up the number of atoms of each type
 	
@@ -407,9 +409,14 @@ def generate_POSCAR(inxyz, *argv):
 	ofstream.write(' '.join(atm_types) + " ( " + `smearing` + " K)" + '\n') 
 	ofstream.write("1.0" + '\n')
 	
-	ofstream.write(box[0] + " 0.000       0.000" + '\n')
-	ofstream.write("0.000 " + box[1]  + " 0.000" + '\n')
-	ofstream.write("0.000     0.000 " +   box[2] + '\n')
+	if box[0] == "NON_ORTHO":
+		ofstream.write(box[1] + " " +  box[2] + " " +  box[3] + '\n')
+		ofstream.write(box[4] + " " +  box[5] + " " +  box[6] + '\n')
+		ofstream.write(box[7] + " " +  box[8] + " " +  box[9] + '\n')
+	else:
+		ofstream.write(box[0] + " 0.000       0.000" + '\n')
+		ofstream.write("0.000 " + box[1]  + " 0.000" + '\n')
+		ofstream.write("0.000     0.000 " +   box[2] + '\n')
 	
 	ofstream.write( ' '.join(atm_types ) +'\n')
 	ofstream.write( ' '.join(natm_types) +'\n')
@@ -488,10 +495,39 @@ def post_process(*argv, **kwargs):
 			outcar_list += sorted(glob.glob("CASE-" + `j` + "/*.OUTCAR"))
 			
 		for j in xrange(len(outcar_list)):
+		
+			# Make sure the job completed within requested NELM
+			
+			
+		        # Get max NELM
+		        
+		        NELM = None
+			
+		        with open(outcar_list[k]) as ifstream:
+		        
+		        	for line in ifstream:
+		        		
+		        		if "   NELM   =    " in line:
+		        		
+		        			NELM = int(line.split()[2].strip(';'))
+		        			break			
+			
+			# Determine if job failed because NELM reached
+			
+			oszicar = '.'.join(outcar_list[k].split('.')[:-1]) + ".OSZICAR"
+			last_rmm = int(helpers.tail(oszicar,2)[0].split()[1])
+			
+			if last_rmm >= NELM:
+				
+				print "Warning: VASP job never converged within requested NELM", outcar_list[j], ":", NELM
+				continue			
+			
 
 			print helpers.run_bash_cmnd(args["vasp_postproc"] + " " + outcar_list[j] + " 1 " + args_properties + " | grep ERROR ")
 			
-			if "ENERGY" in args_properties: # Make sure the configuration energy is less than or equal to zero
+			# Make sure the configuration energy is less than or equal to zero
+			
+			if "ENERGY" in args_properties:
 			
 				tmp_ener = helpers.head(outcar_list[j] + ".xyzf",2)
 				tmp_ener = float(tmp_ener[1].split()[-1])
@@ -746,8 +782,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 		job_task.append("	if [ -e ${CHECK} ] ; then ")	
 		job_task.append("		continue	")	
 		job_task.append("	fi			")
+		job_task.append("	prev_tries=`wc -l ${TAG}.tries`")
+		job_task.append("	if [ $prev_tries -ge 2 ]; then ")
+		job_task.append("		continue        ")
+		job_task.append("	fi                      ")				
+		job_task.append("	echo \"Attempt\" >> ${TAG}.tries")
 		job_task.append("	TEMP=`awk '{print $(NF-1); exit}' POSCAR`")
-		job_task.append("	cp ${TEMP}.INCAR INCAR		")	
+		job_task.append("	cp ${TEMP}.INCAR INCAR	")	
 		job_task.append("	rm -f POTCAR		")
 		job_task.append("	for k in ${ATOMS[@]}	")
 		job_task.append("	do			")
