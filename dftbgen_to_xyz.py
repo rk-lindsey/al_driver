@@ -109,8 +109,11 @@ def dftbgen_to_xyzf(genfile, resultstag, argv):
 		
 
 def dftbgen_to_xyz(*argv):
-	#NOTE: Assumes an orthorhombic box
 
+	# Warning: Currently assumes orthorhombic box!
+	
+	argv = list(argv)
+	
 	# How many frames are there? ... just do grep -F "Step" <file> | wc -l to find out
 	FRAMES = int(argv[0])
 
@@ -189,3 +192,10 @@ def dftbgen_to_xyz(*argv):
 			BOXSTREAM.write(X + " " + Y + " " + Z + '\n')
 			
 	return
+
+
+if __name__ == "__main__":
+
+    import sys
+		
+    dftbgen_to_xyz(*sys.argv[1:])
