@@ -289,10 +289,6 @@ def main(args):
 					print "solve amat job incomplete... restarting for the ", n_restarts, "st/nd/th time"
 					
 					active_job = gen_ff.restart_solve_amat(THIS_ALC,
-						weights_force      = config.WEIGHTS_FORCE,
-						weights_energy     = config.WEIGHTS_ENER,
-						weights_energy_gas = config.WEIGHTS_EGAS,
-						weights_stress     = config.WEIGHTS_STRES,
 						regression_alg     = config.REGRESS_ALG,
 						regression_nrm     = config.REGRESS_NRM,
 						regression_var     = config.REGRESS_VAR,	

@@ -98,6 +98,138 @@ def split_amat(amat, bvec, nproc, ppn):
 	        Dfstream.write(str(cols) + " " + str(line_srt) + " " + str(line_idx-1) + " " + str(lines) + "\n") 
 	        Dfstream.close()  
 	
+def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
+
+	""" 
+	Generates weights based on user requested method/parameters, current ALC 
+	number, labels in b-labeled.txt, and contents of natoms.txt
+	
+	Usage: gen_weights(w_method, this_ALC, b_labeled_i, natoms_i)
+
+	Methods:
+	
+	A. w = a0
+	
+	B. w = a0*this_ALC^a1 # NOTE: treats this_ALC = 0 as this_ALC = 1
+	
+	C. w = a0*exp(a1*|X|/a2)
+	
+	D. w = a0*exp(a1[X-a2]/a3)
+	
+	E. w = n_atoms^a0
+	
+	Example wXX value: ["C",[a0,a1,a2]]
+	
+	       	
+	"""
+	
+	weight = 0.0
+	
+
+	if w_method[0] == "A":
+	
+		if len(w_method[1]) != 1:
+			print "ERROR: Found weight request with wrong number of parameters:"
+			print w_method
+			exit()
+	
+		weight =  float(w_method[1][0])
+		
+	elif w_method[0] == "B":
+	
+		if len(w_method[1]) != 2:
+			print "ERROR: Found weight request with wrong number of parameters:"
+			print w_method
+			exit()
+	
+		eff_ALC = this_ALC
+		if eff_ALC == 0:
+			eff_ALC = 1
+			
+		
+		weight =  float(w_method[1][0]) * float(eff_ALC) ** float(w_method[1][1])
+		
+	elif w_method[0] == "C":
+	
+		if len(w_method[1]) != 3:
+			print "ERROR: Found weight request with wrong number of parameters:"
+			print w_method
+			exit()
+	
+		weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * abs(float(b_labeled_i)) / float(w_method[1][2]) )		
+		 
+		
+	elif w_method[0] == "D":
+	
+		if len(w_method[1]) != 4:
+			print "ERROR: Found weight request with wrong number of parameters:"
+			print w_method
+			exit()
+	
+		weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * (abs(float(b_labeled_i))-float(w_method[1][2])) / float(w_method[1][3]) )		
+		
+	
+	elif w_method[0] == "E":
+	
+		if len(w_method[1]) != 1:
+			print "ERROR: Found weight request with wrong number of parameters:"
+			print w_method
+			exit()
+	
+		weight =  float(natoms_i)**float(w_method[1][1])
+	
+	else:
+		print "ERROR: Unknown weight method!"
+		exit()
+		
+	return weight
+		
+		
+	
+def gen_weights(w_method, this_ALC, b_labeled_i, natoms_i):
+
+	""" 
+	Generates weights based on *A SET* of  user requested method/parameters, 
+	current ALC number, labels in b-labeled.txt, and contents of natoms.txt
+	
+	Usage: gen_weights(w_method, this_ALC, b_labeled_i, natoms_i)
+
+	Methods:
+	
+	A. w = a0
+	
+	B. w = a0*(this_ALC-1)^a1 # NOTE: treats this_ALC = 0 as this_ALC = 1
+	
+	C. w = a0*exp(a1*|X|/a2)
+	
+	D. w = a0*exp(a1[X-a2]/a3)
+	
+	E. w = n_atoms^a0
+	
+	Example wXX value: [ ["A","B","C"] , [[a0],[a0,a1],[a0,a1,a2]] ]
+	
+	       	
+	"""
+
+	methods = w_method[0] # e.g. ["A","B","C"]
+	wparams = w_method[1] # e.g. [ [a0], [a0,a1], [a0,a1,a2] ]
+	
+	if len(methods) != len(wparams):
+	
+		print "ERROR: number of requested weighting methods doesn't match "
+		print "       provided number of weighting parameter sets:"
+		print methods
+		print wparams
+		exit()
+	
+	weight = 1.0
+	
+	for i in xrange(len(methods)):
+	
+		weight *= gen_weights_one( [methods[i], wparams[i]], this_ALC, b_labeled_i, natoms_i)
+		
+	return weight
+
 
 def solve_amat_started():
 	
@@ -163,33 +295,27 @@ def restart_solve_amat(my_ALC, **kwargs):
 	# 0. Set up an argument parser
 	################################
 	
-	default_keys   = [""]*16
-	default_values = [""]*16
-	
-	# Weights
-	
-	default_keys[0 ] = "weights_force"     ; default_values[0 ] = 	 "1.0" # Weights to be added to per-atom forces
-	default_keys[1 ] = "weights_energy"    ; default_values[1 ] = 	 "5.0" # Weights to be added to per-frame and per cluster energies
-	default_keys[2 ] = "weights_stress"    ; default_values[2 ] = 	 "500.0" # Weights to be added to stress tensor components
+	default_keys   = [""]*13
+	default_values = [""]*13
 	
 	# LSQ controls
 	
-	default_keys[3 ] = "regression_alg"    ; default_values[3 ] = 	 "lassolars" # Regression algorithm to be used in lsq2
-	default_keys[4 ] = "regression_var"    ; default_values[4 ] = 	 "1.0E-4"    # SVD eps or Lasso alpha
-	default_keys[5 ] = "regression_nrm"    ; default_values[5 ] =    "True"      # Normalizes the a-mat by default ... may not give best result
-	default_keys[6 ] = "split_files"       ; default_values[6 ] = 	 False       # !!! UNUSED
+	default_keys[0 ] = "regression_alg"    ; default_values[0 ] = 	 "lassolars" # Regression algorithm to be used in lsq2
+	default_keys[1 ] = "regression_var"    ; default_values[1 ] = 	 "1.0E-4"    # SVD eps or Lasso alpha
+	default_keys[2 ] = "regression_nrm"    ; default_values[2 ] =    "True"      # Normalizes the a-mat by default ... may not give best result
+	default_keys[3 ] = "split_files"       ; default_values[3 ] = 	 False       # !!! UNUSED
 	
 	# Overall job controls
 	
-	default_keys[7 ] = "job_name"	       ; default_values[7 ] =	"ALC-"+ `my_ALC`+"-lsq-2"	       # Name for ChIMES lsq job
-	default_keys[8 ] = "job_nodes"         ; default_values[8 ] =	"1"				       # Number of nodes for ChIMES lsq job
-	default_keys[9 ] = "job_ppn"	       ; default_values[9 ] =	"36"				       # Number of processors per node for ChIMES lsq job
-	default_keys[10] = "job_walltime"      ; default_values[10] =	"1"				       # Walltime in hours for ChIMES lsq job
-	default_keys[11] = "job_queue"	       ; default_values[11] =   "pdebug" 			      # Queue for ChIMES lsq job
-	default_keys[12] = "job_account"       ; default_values[12] =   "pbronze"			      # Account for ChIMES lsq job
-	default_keys[13] = "job_executable"    ; default_values[13] =   ""				      # Full path to executable for ChIMES lsq job
-	default_keys[14] = "job_system"        ; default_values[14] =   "slurm"  			      # slurm or torque       
-	default_keys[15] = "job_email"	       ; default_values[15] =   True				      # Send slurm emails?
+	default_keys[4 ] = "job_name"	       ; default_values[4 ] =	"ALC-"+ `my_ALC`+"-lsq-2"	       # Name for ChIMES lsq job
+	default_keys[5 ] = "job_nodes"         ; default_values[5 ] =	"1"				       # Number of nodes for ChIMES lsq job
+	default_keys[6 ] = "job_ppn"	       ; default_values[6 ] =	"36"				       # Number of processors per node for ChIMES lsq job
+	default_keys[7 ] = "job_walltime"      ; default_values[7 ] =	"1"				       # Walltime in hours for ChIMES lsq job
+	default_keys[8 ] = "job_queue"         ; default_values[8 ] =	"pdebug"			      # Queue for ChIMES lsq job
+	default_keys[9 ] = "job_account"       ; default_values[9 ] =	"pbronze"			      # Account for ChIMES lsq job
+	default_keys[10] = "job_executable"    ; default_values[10] =	""				      # Full path to executable for ChIMES lsq job
+	default_keys[11] = "job_system"        ; default_values[11] =	"slurm" 			      # slurm or torque       
+	default_keys[12] = "job_email"         ; default_values[12] =	True				      # Send slurm emails?
 	
 	
 
@@ -614,23 +740,23 @@ def solve_amat(my_ALC, **kwargs):
 	
 	for i in xrange(len(contents)):
 	
-		if "+1" in contents[i].split()[0]:
-			if "G_" in contents[i].split()[0]:
-				weightfi.write(str(args["weights_energy_gas"])+'\n')
+		tag = contents[i].split()[0]
+		val = contents[i].split()[1]
+	
+		if "+1" in tag:
+			if "G_" in tag:
+				weightfi.write(str(gen_weights(args["weights_energy_gas"], my_ALC, val, natoms[i]))+'\n')
 			else:
-				weightfi.write(str(args["weights_energy"])+'\n')
-		elif "s_" in contents[i].split()[0]:
-			weightfi.write(str(args["weights_stress"])+'\n')
-		else:
-			if "G_" in contents[i].split()[0]:
-			
-				if float(args["weights_force_gas"]) < 0:
+				weightfi.write(str(gen_weights(args["weights_energy"]    , my_ALC, val, natoms[i]))+'\n')
 				
-					weightfi.write(str( abs(float(args["weights_force_gas"]))/float(natoms[i]) )+'\n')
-				else:
-					weightfi.write(str(args["weights_force_gas"])+'\n')
+		elif "s_" in tag:
+			weightfi.write(str(gen_weights(args["weights_stress"], my_ALC, val, natoms[i]))+'\n')
+		else:
+			if "G_" in tag:
+				weightfi.write(str(gen_weights(args["weights_force_gas"], my_ALC, val, natoms[i]))+'\n')
 			else:
-				weightfi.write(str(args["weights_force"])+'\n')
+				weightfi.write(str(gen_weights(args["weights_force"],     my_ALC, val, natoms[i]))+'\n')
+				
 	weightfi.close()
 	
 	os.chdir("..")
