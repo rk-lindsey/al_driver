@@ -415,6 +415,9 @@ def verify(user_config):
 		print "       Acceptable settings are of the form of an integer	"
 		
 		exit()	
+	else:	
+		user_config.NO_CASES = int(user_config.NO_CASES)
+		
 
 	if not hasattr(user_config,'MOLANAL_SPECIES'):
 
@@ -795,27 +798,42 @@ def verify(user_config):
 		# Number of nodes to use for MD jobs
 
 		print "WARNING: Option config.CHIMES_MD_NODES was not set"
-		print "         Will use a value of 8"
+		print "         Will use a value of 8 for all cases"
 		
-		user_config.CHIMES_MD_NODES = 8	
+		user_config.CHIMES_MD_NODES = [8]*NO_CASES
+		
+	elif hasattr(user_config,'CHIMES_MD_NODES') and (len(user_config.CHIMES_MD_NODES) != NO_CASES):
+		print "ERROR: Option config.CHIMES_MD_NODES should be provided in the "
+		print "       form of a NO_CASES long list, e.g. [8]*NO_CASES".
+		exit()				
 		
 	if not hasattr(user_config,'CHIMES_MD_QUEUE'):
 
 		# Queue to use for MD jobs
 
 		print "WARNING: Option config.CHIMES_MD_QUEUE was not set"
-		print "         Will use pbatch"
+		print "         Will use pbatch for all cases"
 		
-		user_config.CHIMES_MD_QUEUE = "pbatch"	
+		user_config.CHIMES_MD_QUEUE = ["pbatch"]*NO_CASES
+		
+	elif hasattr(user_config,'CHIMES_MD_QUEUE') and (len(user_config.CHIMES_MD_QUEUE) != NO_CASES):
+		print "ERROR: Option config.CHIMES_MD_QUEUE should be provided in the "
+		print "       form of a NO_CASES long list, e.g. [\"pbatch\"]*NO_CASES".
+		exit()		
 		
 	if not hasattr(user_config,'CHIMES_MD_TIME'):
 
 		# Time to request for MD jobs (hours)
 
 		print "WARNING: Option config.CHIMES_MD_TIME was not set"
-		print "         Will use a value of \"4:00:00\""
+		print "         Will use a value of \"4:00:00\" for all cases"
 		
-		user_config.CHIMES_MD_TIME = "4:00:00"			
+		user_config.CHIMES_MD_TIME = ["4:00:00"]*NO_CASES
+		
+	elif hasattr(user_config,'CHIMES_MD_TIME') and (len(user_config.CHIMES_MD_TIME) != NO_CASES):
+		print "ERROR: Option config.CHIMES_MD_TIME should be provided in the "
+		print "       form of a NO_CASES long list, e.g. [\"4:00:00\"]*NO_CASES".
+		exit()
 
 	################################
 	##### Cluster specific paths/variables
