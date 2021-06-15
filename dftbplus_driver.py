@@ -539,7 +539,15 @@ def setup_dftb(my_ALC, *argv, **kwargs):
 
 			helpers.run_bash_cmnd("cp " + my_md_path + "/traj_20F.xyz " + my_file)
 			
-			atoms  = helpers.head(my_file,1)[0].rstrip()
+			# Check whether there's even anything in the file. If not, skip
+			
+			try:
+				atoms  = helpers.head(my_file,1)[0].rstrip()
+			except:
+				print "Warning: No configurations found for case " + str(my_case)
+				print "\tSearched file:",my_file, ", which is based on \"all\" and \"20\" trajectories"
+				continue
+				
 			frames = helpers.wc_l(my_file  )
 			frames = frames / (2+int(atoms))
 

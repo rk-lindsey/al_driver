@@ -179,7 +179,10 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 				job_system     = args  ["job_system"])
 				
 		elif bulk_qm_method == "DFTB+":
-			print "WARNING: DFTB+ as a gas phase method is untested!"
+		
+			if not is_just_bulk:
+				print "WARNING: DFTB+ as a gas phase method is untested!"
+				
 			run_qm_jobids += dftbplus_driver.setup_dftb(my_ALC, *argv,
 				first_run      = True,		     
 				basefile_dir   = args  ["basefile_dir"],

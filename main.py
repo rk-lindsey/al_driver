@@ -63,20 +63,20 @@ def main(args):
 	WARNING: AL does not (yet) support different stress/energy options for different cases
 
 	WARNING: This driver does NOT support SPLITFI functionality in fm_setup.in file. A-matrix
-	         is handled by the driver itself, based on CHIMES_SOLVE_NODES and CHIMES_SOLVE_QUEUE
+	         is handled by the driver itself, based on CHIMES_SOLVE_NODES, CHIMES_SOLVE_PPN,
+		 and CHIMES_SOLVE_QUEUE. Note that number of files is CHIMES_SOLVE_NODES*CHIMES_SOLVE_PPN.
+		 To allow more memory per task, increase nodes and decrease ppn. Script will still request
+		 full nodes.
 
 	WARNING: Per-atom energies will be incorrect if number of atoms for multiple types is 
 	         identical across the entire A-mat (i.e. for a CO system) ... This can be/is
 		 rectified by running additional AL cycles that extracts individual molecules
 		 
 	To Do: 
-	
-	       - Add ability to do full-frame ALC only (no clustering) ... this would require
-		 either the ability to start at ALC-1, or the ability to run MD for ALC-0
-	
-	       - Add a utility to check/fix data types set in config      
+		       
+	       - Update/improve vasp2xyzf.py
 	       
-	       - Continue updating test suite		
+	       - Add a test suite		
 	       
 	       - Add an ability to go back and run additional independent simulations for various ALC's/cases	
 	       
@@ -135,8 +135,6 @@ def main(args):
 		config.VASP_POSTPRC   = config.HPC_PYTHON + " " + config.VASP_POSTPRC
 	if ((config.BULK_QM_METHOD == "DFTB+") or (config.IGAS_QM_METHOD == "DFTB+")):
 		config.DFTB_POSTPRC   = config.HPC_PYTHON + " " + config.DFTB_POSTPRC
-	#if config.IGAS_QM_METHOD == "Gaussian":
-	#	config.GAUS_POSTPRC   = config.HPC_PYTHON + " " + config.GAUS_POSTPRC -- this is unused
 	
 	if config.EMAIL_ADD:
 		EMAIL_ADD = config.EMAIL_ADD	
@@ -189,9 +187,7 @@ def main(args):
 		if THIS_ALC != restart_controller.last_ALC:
 		
 			restart_controller.reinit_vars()
-		#	
-		# SHOULD THIS NEXT CHUNK GO BEFORE OR AFTER THE ABOVE IF STATEMENT?
-		# 
+
 		if (THIS_ALC == 0) and 	(not config.DO_CLUSTER):
 			print "config.DO_CLUSTER was set false."
 			print "Skipping ALC-0"
@@ -268,6 +264,7 @@ def main(args):
 						regression_var     = config.REGRESS_VAR,
 						job_email          = config.HPC_EMAIL,
 						job_ppn            = str(config.HPC_PPN),
+						node_ppn           = config.HPC_PPN,
 						job_nodes          = config.CHIMES_SOLVE_NODES,
 						job_walltime       = config.CHIMES_SOLVE_TIME,	
 						job_queue          = config.CHIMES_SOLVE_QUEUE,					
@@ -293,7 +290,8 @@ def main(args):
 						regression_nrm     = config.REGRESS_NRM,
 						regression_var     = config.REGRESS_VAR,	
 						job_email          = config.HPC_EMAIL,		
-						job_ppn            = str(config.HPC_PPN),
+						job_ppn            = config.CHIMES_SOLVE_PPN,
+						node_ppn           = config.HPC_PPN,
 						job_nodes          = config.CHIMES_SOLVE_NODES,
 						job_walltime       = config.CHIMES_SOLVE_TIME,	
 						job_queue          = config.CHIMES_SOLVE_QUEUE,	
@@ -690,7 +688,8 @@ def main(args):
 						regression_nrm     = config.REGRESS_NRM,
 						regression_var     = config.REGRESS_VAR,	
 						job_email          = config.HPC_EMAIL,					
-						job_ppn            = str(config.HPC_PPN),
+						job_ppn            = config.CHIMES_SOLVE_PPN,
+						node_ppn           = config.HPC_PPN,
 						job_nodes          = config.CHIMES_SOLVE_NODES,
 						job_walltime       = config.CHIMES_SOLVE_TIME,	
 						job_queue          = config.CHIMES_SOLVE_QUEUE,							
@@ -719,7 +718,8 @@ def main(args):
 						regression_nrm     = config.REGRESS_NRM,
 						regression_var     = config.REGRESS_VAR,	
 						job_email          = config.HPC_EMAIL,		
-						job_ppn            = str(config.HPC_PPN),
+						job_ppn            = config.CHIMES_SOLVE_PPN,
+						node_ppn           = config.HPC_PPN,	
 						job_nodes          = config.CHIMES_SOLVE_NODES,
 						job_walltime       = config.CHIMES_SOLVE_TIME,	
 						job_queue          = config.CHIMES_SOLVE_QUEUE,	

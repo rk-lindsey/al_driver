@@ -295,8 +295,8 @@ def restart_solve_amat(my_ALC, **kwargs):
 	# 0. Set up an argument parser
 	################################
 	
-	default_keys   = [""]*13
-	default_values = [""]*13
+	default_keys   = [""]*14
+	default_values = [""]*14
 	
 	# LSQ controls
 	
@@ -316,6 +316,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 	default_keys[10] = "job_executable"    ; default_values[10] =	""				      # Full path to executable for ChIMES lsq job
 	default_keys[11] = "job_system"        ; default_values[11] =	"slurm" 			      # slurm or torque       
 	default_keys[12] = "job_email"         ; default_values[12] =	True				      # Send slurm emails?
+	default_keys[13] = "node_ppn"          ; default_values[13] =	"36"				      # Send slurm emails?
 	
 	
 
@@ -436,7 +437,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 		job_name       =     args["job_name"	] ,
 		job_email      =     args["job_email"   ] ,	
 		job_nodes      = str(args["job_nodes"	]),
-		job_ppn        = str(args["job_ppn"	]),
+		job_ppn        = str(args["node_ppn"	]),
 		job_walltime   = str(args["job_walltime"]),
 		job_queue      =     args["job_queue"	] ,
 		job_account    =     args["job_account" ] ,
@@ -684,8 +685,8 @@ def solve_amat(my_ALC, **kwargs):
 	# 0. Set up an argument parser
 	################################
 	
-	default_keys   = [""]*19
-	default_values = [""]*19
+	default_keys   = [""]*20
+	default_values = [""]*20
 	
 	# Weights
 	
@@ -714,6 +715,7 @@ def solve_amat(my_ALC, **kwargs):
 	default_keys[16] = "job_executable"    ; default_values[16] =	 ""					# Full path to executable for ChIMES lsq job
 	default_keys[17] = "job_system"        ; default_values[17] =	 "slurm"				# slurm or torque	
 	default_keys[18] = "job_email"         ; default_values[18] =	 True					# Send slurm emails?
+	default_keys[19] = "node_ppn"          ; default_values[19] =	 "36"					# The actual number of procs per node
 	
 	
 
@@ -886,7 +888,7 @@ def solve_amat(my_ALC, **kwargs):
 		job_name       =     args["job_name"	] ,
 		job_email      =     args["job_email"   ] ,	
 		job_nodes      = str(args["job_nodes"	]),
-		job_ppn        = str(args["job_ppn"	]),
+		job_ppn        = str(args["node_ppn"	]),
 		job_walltime   = str(args["job_walltime"]),
 		job_queue      =     args["job_queue"	] ,
 		job_account    =     args["job_account" ] ,

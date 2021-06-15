@@ -26,9 +26,12 @@ def parse_refdatafile(infile):
 	tmp = []
 	
 	for i in xrange(len(contents)):
+	
+		if "#" in contents[i]:
+			continue
+			
+		tmp.append(contents[i].rstrip())
 		
-		if contents[i][0] != '#':
-			tmp.append(contents[i])
 	# Break up into atom type, Gaussian energy, and VASP energy
 	
 	atyps = []
@@ -36,11 +39,15 @@ def parse_refdatafile(infile):
 	Vener = []
 	
 	for i in xrange(len(tmp)):
-		
+	
 		contents = tmp[i].split()
+		
+		if len(contents) < 1:
+			continue
+		
 		atyps    .append(contents[0])
-		Gener    .append(contents[1])
-		Vener    .append(contents[2])
+		Gener    .append(float(contents[1]))
+		Vener    .append(float(contents[2]))
 		
 	# Output results
 	
@@ -187,23 +194,8 @@ def get_xyzf(logfile, comfile, natoms, boxls, refdatafile):
 
 	atm_typs, E_GAUSS, E_VASP = parse_refdatafile(refdatafile)
 	
-	# Gaussian Atom Offset Energies (kcal/mol):
-	#E_GAUSS_C = -23716.035500449343
-	#E_GAUSS_N = -34217.444307885125
-	#E_GAUSS_O = -47066.163622356100
+	natm_typ = [1.0]*len(atm_typs)
 
-	# Vasp Atom Offset Energies (kcal/mol):
-	#E_VASP_C = -29.848029661940735
-	#E_VASP_N = -72.0692392257318
-	#E_VASP_O = -44.01350025037822
-	
-	natm_typ = [0.0]*len(atm_typs)
-	
-	#n_C = 0
-	#n_N = 0
-	#n_O = 0
-	
-	
 	for i in xrange(int(natoms)):
 	
 		found = False
@@ -211,37 +203,24 @@ def get_xyzf(logfile, comfile, natoms, boxls, refdatafile):
 		for j in xrange(len(natm_typ)):
 		
 			tmp_typ = coords[i].split()[0]
-		
+
 			if tmp_typ == atm_typs[j]:
 				natm_typ[j] += 1
 				found = True
 				
-			if not found:
-				print "ERROR: Could not find reference energies for atom type:", tmp_typ
-				print "       Check Gaussian energy to planewave input file"
-				exit() 
-	
-	
-		#if coords[i].split()[0] == "C":
-		#	n_C += 1
-		#if coords[i].split()[0] == "N":
-		#	n_N += 1
-		#if coords[i].split()[0] == "O":
-		#	n_O += 1
-			
-	#print "Counted the following C N and O:", n_C, n_N, n_O
+		if not found:
+			print "ERROR: Could not find reference energies for atom type:", tmp_typ
+			print "       Check Gaussian energy to planewave input file"
+			exit() 
+
 	#print "Gaussian energy was:", energy
 	
 	for i in xrange(len(natm_typ)):
-	
-		energy -= natom_typ[i]*E_GAUS[i]
-		energy += natom_typ[i]*E_VASP[i]
-			
-	#energy = energy - n_C*E_GAUSS_C - n_N*E_GAUSS_N - n_O*E_GAUSS_O
-	
+
+		energy -= natm_typ[i]*E_GAUSS[i]
+		energy += natm_typ[i]*E_VASP[i]
+				
 	#print "Gauss energy minus atom contributions is:",energy
-	
-	#energy = energy + n_C*E_VASP_C  + n_N*E_VASP_N  + n_O*E_VASP_O	
 	
 	#print "VASP energy is:", energy
 	

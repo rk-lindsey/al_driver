@@ -503,7 +503,7 @@ def post_process(*argv, **kwargs):
 		        
 		        NELM = None
 			
-		        with open(outcar_list[k]) as ifstream:
+		        with open(outcar_list[j]) as ifstream:
 		        
 		        	for line in ifstream:
 		        		
@@ -514,7 +514,7 @@ def post_process(*argv, **kwargs):
 			
 			# Determine if job failed because NELM reached
 			
-			oszicar = '.'.join(outcar_list[k].split('.')[:-1]) + ".OSZICAR"
+			oszicar = '.'.join(outcar_list[j].split('.')[:-1]) + ".OSZICAR"
 			last_rmm = int(helpers.tail(oszicar,2)[0].split()[1])
 			
 			if last_rmm >= NELM:

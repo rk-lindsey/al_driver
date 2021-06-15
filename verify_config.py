@@ -43,6 +43,7 @@ def print_help():
 	PARAM.append("CHIMES_BUILD_QUEUE");             VARTYP.append("int");           DETAILS.append("Queue to submit chimes_lsq job to")
 	PARAM.append("CHIMES_BUILD_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for chimes_lsq job (e.g. \"04:00:00\")")
 	PARAM.append("CHIMES_SOLVE_NODES");             VARTYP.append("int");           DETAILS.append("Number of nodes to use when running lsq2.py/DLARS (lassolars)")
+	PARAM.append("CHIMES_SOLVE_PPN");               VARTYP.append("int");           DETAILS.append("Number of procs per node to use when running lsq2.py/DLARS (lassolars)")
 	PARAM.append("CHIMES_SOLVE_QUEUE");             VARTYP.append("str");           DETAILS.append("Queue to submit the lsq2.py/DLARS (lassolars) job to")
 	PARAM.append("CHIMES_SOLVE_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for lsq2.py/DLARS (lassolars) job (e.g. \"04:00:00\")")
 	PARAM.append("CHIMES_MD_ser");                  VARTYP.append("str");           DETAILS.append("Serial ChIMES_md executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-serial\")")
@@ -358,10 +359,15 @@ def check_GAUS(user_config):
 		# Gaussian single atom reference energy file
 		
 		if user_config.IGAS_QM_METHOD == "Gaussian":
-			print "WARNING: Option config.GAUS_REF was not set"
-			print "         Using default Gaussian/VASP single atom energy offsets"
+			print "ERROR: Option config.GAUS_REF was not set"
+			print "       Provide path to/name of file containing list of"
+			print "       <chemical symbol> <Gaussian energy> <planewave code energy>"
+			print "       Energies are expected in kcal/mol, and there should be an entry "
+			print "       for each atom type of interest."
 			
-		user_config.GAUS_REF = None
+			exit()
+		else:
+			user_config.GAUS_REF = None
 
 def verify(user_config):
 
@@ -699,6 +705,15 @@ def verify(user_config):
 		print "         Will use a value of 12"
 		
 		user_config.CHIMES_SOLVE_NODES = 12
+		
+	if not hasattr(user_config,'CHIMES_SOLVE_PPN'):
+
+		# The number of procs per nodes to use when solving the design matrix
+
+		print "WARNING: Option config.CHIMES_SOLVE_PPN was not set"
+		print "         Will use a value of 36"
+		
+		user_config.CHIMES_SOLVE_PPN = 36		
 
 	if not hasattr(user_config,'CHIMES_SOLVE_QUEUE'):
 
@@ -800,11 +815,11 @@ def verify(user_config):
 		print "WARNING: Option config.CHIMES_MD_NODES was not set"
 		print "         Will use a value of 8 for all cases"
 		
-		user_config.CHIMES_MD_NODES = [8]*NO_CASES
+		user_config.CHIMES_MD_NODES = [8]*user_config.NO_CASES
 		
-	elif hasattr(user_config,'CHIMES_MD_NODES') and (len(user_config.CHIMES_MD_NODES) != NO_CASES):
+	elif hasattr(user_config,'CHIMES_MD_NODES') and (len(user_config.CHIMES_MD_NODES) != user_config.NO_CASES):
 		print "ERROR: Option config.CHIMES_MD_NODES should be provided in the "
-		print "       form of a NO_CASES long list, e.g. [8]*NO_CASES".
+		print "       form of a NO_CASES long list, e.g. [8]*NO_CASES."
 		exit()				
 		
 	if not hasattr(user_config,'CHIMES_MD_QUEUE'):
@@ -814,11 +829,11 @@ def verify(user_config):
 		print "WARNING: Option config.CHIMES_MD_QUEUE was not set"
 		print "         Will use pbatch for all cases"
 		
-		user_config.CHIMES_MD_QUEUE = ["pbatch"]*NO_CASES
+		user_config.CHIMES_MD_QUEUE = ["pbatch"]*user_config.NO_CASES
 		
-	elif hasattr(user_config,'CHIMES_MD_QUEUE') and (len(user_config.CHIMES_MD_QUEUE) != NO_CASES):
+	elif hasattr(user_config,'CHIMES_MD_QUEUE') and (len(user_config.CHIMES_MD_QUEUE) != user_config.NO_CASES):
 		print "ERROR: Option config.CHIMES_MD_QUEUE should be provided in the "
-		print "       form of a NO_CASES long list, e.g. [\"pbatch\"]*NO_CASES".
+		print "       form of a NO_CASES long list, e.g. [\"pbatch\"]*NO_CASES."
 		exit()		
 		
 	if not hasattr(user_config,'CHIMES_MD_TIME'):
@@ -828,11 +843,11 @@ def verify(user_config):
 		print "WARNING: Option config.CHIMES_MD_TIME was not set"
 		print "         Will use a value of \"4:00:00\" for all cases"
 		
-		user_config.CHIMES_MD_TIME = ["4:00:00"]*NO_CASES
+		user_config.CHIMES_MD_TIME = ["4:00:00"]*user_config.NO_CASES
 		
-	elif hasattr(user_config,'CHIMES_MD_TIME') and (len(user_config.CHIMES_MD_TIME) != NO_CASES):
+	elif hasattr(user_config,'CHIMES_MD_TIME') and (len(user_config.CHIMES_MD_TIME) != user_config.NO_CASES):
 		print "ERROR: Option config.CHIMES_MD_TIME should be provided in the "
-		print "       form of a NO_CASES long list, e.g. [\"4:00:00\"]*NO_CASES".
+		print "       form of a NO_CASES long list, e.g. [\"4:00:00\"]*NO_CASES."
 		exit()
 
 	################################
