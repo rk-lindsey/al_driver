@@ -145,6 +145,10 @@ def continue_job(*argv, **kwargs):
 			
 			count_gen = len(glob.glob("case*.xyz.gen")) 
 			
+			# Check for convergence issues
+			
+			check_convergence(-1, args_case,args_targets, True) # First arg isn't used
+			
 			# Count the number of completed jobs
 			
 			count_tag = len(glob.glob("case*.tag"))
@@ -195,9 +199,14 @@ def check_convergence(my_ALC, *argv, **kwargs):
 	################################
 	
 	### ...argv
+	
+	args_from = False
 
 	args_cases   = argv[0]	
 	args_targets = argv[1] # ... all ... 20
+	
+	if len(argv) >= 3:
+		args_from    = argv[2] # Called from continue_job?
 
 
 	# DFTB+ specific controls
@@ -212,11 +221,82 @@ def check_convergence(my_ALC, *argv, **kwargs):
 	
 	#os.chdir("ALC-" + `my_ALC`)
 	
+	# FYI, if convergence not achieved within target SCC, dftb+ prints:
+	# SCC is NOT converged, maximal SCC iterations exceeded
 	
-	print "WARNING: This functionality is not used right now. If the DFTB job"
-	print "          doesn't converge, we will declare the problem \"impossible\" and ignore it"
+	
+	######
+	# Generate a list of all DFTB+ jobs with n-SC > max SCC
+
+	loc = helpers.run_bash_cmnd("pwd").strip()
 	
 	total_failed = 0
+	
+	prefix = ""
+	
+	for i in xrange(len(args_targets)): # 20 all
+	
+		if args_from: # Logic differs depending on whether called from continue_job (True) or check_convergence (False)
+			prefix = "\t... (Convergence check): "	
+			os.chdir("../..")
+
+		if not os.path.isdir("DFTB-" + args_targets[i]):
+	
+			print "Skipping DFTB-" + args_targets[i]
+		
+			continue
+
+				
+		print prefix + "Working on:","DFTB-" + args_targets[i]
+	
+		os.chdir("DFTB-" + args_targets[i])
+		
+		# Clear out the "tries" file so we try to achieve convergence one more time
+
+		helpers.run_bash_cmnd("rm -f *.tries")
+		
+		# Build the list of failed jobs for the current DFTB job type (i.e. "all" or "20")
+	
+		base_list = []	
+
+		iter_list = xrange(args_cases)
+		
+		if args_from:
+			iter_list = xrange(args_cases,args_cases+1,1)
+		
+		for j in iter_list:
+			
+		        tmp_list = sorted(glob.glob("CASE-" + `j` + "/*.dftb.out")) # list of all .dftb.out files for the current ALC's DFTB-20 or DFTB-all specific t/p case
+
+		        for k in xrange(len(tmp_list)):
+		        	with open(tmp_list[k]) as ifstream:
+		        		for line in ifstream:
+		        			if "SCC is NOT converged, maximal SCC iterations exceeded" in line:
+							base_list.append('.'.join(tmp_list[k].split(".")[0:4]))
+		        				break
+		
+		if len(base_list) > 0:
+		
+			print "Found",len(base_list),"job(s) with nSCC > MaxSCCIterations:"
+			
+			for j in xrange(len(base_list)):
+				print "-",base_list[j]
+			print "Declaring the problem impossible - renaming to *.ignored and skipping."
+		
+		total_failed += len(base_list)
+		
+		# Renaiming corresponding .out and .tag files
+		
+		for j in xrange(len(base_list)):
+			helpers.run_bash_cmnd("mv " + base_list[j] + ".dftb.out "    + base_list[j] + ".ignored")
+			#helpers.run_bash_cmnd("mv " + base_list[j] + ".results.tag " + base_list[j] + ".ignored") # File not generated if nSCC > max
+			helpers.run_bash_cmnd("mv " + base_list[j] + " "             + base_list[j] + ".ignored")
+			helpers.run_bash_cmnd("mv " + base_list[j] + ".gen  "        + base_list[j] + ".ignored")			
+
+
+	total_failed = 0
+	
+	os.chdir(loc)
 	
 	
 	return  total_failed
@@ -239,7 +319,6 @@ def generate_gen(inxyz, *argv):
 	ifstream  = open(inxyz,'r')
 	ofstream  = open(inxyz + ".gen", 'w')
 	
-	
 	# Set up the header portion
 		
 	box = ifstream.readline()		# No. atoms
@@ -257,6 +336,8 @@ def generate_gen(inxyz, *argv):
 			b[i] = box[1+i+3]
 			c[i] = box[1+i+6]
 	else:
+	
+		print box
 		a[0] = box[0]
 		b[1] = box[1]
 		c[2] = box[2]
@@ -369,7 +450,7 @@ def post_process(*argv, **kwargs):
 	
 		helpers.run_bash_cmnd("rm -f OUTCAR.xyzf")
 		
-		outcar_list = []
+		dftb_out_list = []
 		gencoord_list = []
 		resulttg_list = []
 		
@@ -377,13 +458,43 @@ def post_process(*argv, **kwargs):
 		
 			gencoord_list += sorted(glob.glob("CASE-" + `j` + "/*xyz.gen"))
 			resulttg_list += sorted(glob.glob("CASE-" + `j` + "/*.results.tag"))
+			dftb_out_list += sorted(glob.glob("CASE-" + `j` + "/*.dftb.out"))
 			
+			if len(gencoord_list) != len(resulttg_list):
+				print "ERROR: In dftbplus_driver.post_process on case",j
+				print "       Number of .gen files and .results.tag files do not match"
+				print "       Something went wrong with DFTB calculations..."
+				exit()
+				
 		for j in xrange(len(resulttg_list)):
 
 			dftbgen_to_xyz.dftbgen_to_xyzf(gencoord_list[j], resulttg_list[j], args_properties)
 			
 			outfile = gencoord_list[j].split(".xyz.gen")
 			outfile = ''.join(outfile) + ".xyz.xyzf"
+			
+			# Figure out the temperature
+			
+			tmpfile = open(dftb_out_list[j],'r')
+			tmpdata = tmpfile.readlines()
+			tmpfile.close()
+			
+			tmp_temp = None
+
+			for line in tmpdata:
+				
+				if "Electronic temperature:" in line:
+				
+					tmp_temp = str(int(float(line.split()[-1])*315777.09))
+					break
+
+			tmpfile = gencoord_list[j].split(".xyz.gen")
+			tmpfile = ''.join(outfile) + ".xyz.temps"
+			tmpstream = open(tmpfile,'w')
+			tmpstream.write(tmp_temp + '\n')
+			tmpstream.close()
+			
+			###
 			
 			if "ENERGY" in args_properties: # Make sure the configuration energy is less than or equal to zero
 			
@@ -399,11 +510,14 @@ def post_process(*argv, **kwargs):
 			
 				if os.path.isfile("OUTCAR.xyzf"):
 			
-					helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf", outfile])
+					helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf",  outfile])
+					helpers.cat_specific("tmp.tmp", ["OUTCAR.temps", tmpfile])
 				else:
 					helpers.cat_specific("tmp.dat", [outfile])
+					helpers.cat_specific("tmp.tmp", [tmpfile])
 				
-				helpers.run_bash_cmnd("mv tmp.dat OUTCAR.xyzf")
+				helpers.run_bash_cmnd("mv tmp.dat OUTCAR.xyzf" )
+				helpers.run_bash_cmnd("mv tmp.tmp OUTCAR.temps")
 		
 		os.chdir("..")
 		
@@ -631,23 +745,26 @@ def setup_dftb(my_ALC, *argv, **kwargs):
 		job_task.append("module load " + args["modules"] + '\n')
 
 		job_task.append("for j in $(ls *xyz.gen)	          ")	
-		job_task.append("do				  ")
+		job_task.append("do	")
+		job_task.append("	rm -f charges.bin tmp-broyden* dftb_pin.hsd dftbjob.gen geo_end.*")
 		job_task.append("	if [[ $j == \"dftbjob.gen\" ]] ; then continue; fi")
 		job_task.append("	TAG=${j%*.gen}	          ")	
 		job_task.append("	cp ${TAG}.gen dftbjob.gen ")
 		job_task.append("	CHECK=${TAG}.results.tag  ")
 		job_task.append("	if [ -e ${CHECK} ] ; then ")	
-		job_task.append("		continue	")	
+		job_task.append("		l=`wc -l ${TAG}.dftb.out | awk '{print $1}'` ")	
+		job_task.append("		if [ $l -gt 0 ] ; then  ")			
+		job_task.append("			continue	")	
+		job_task.append("		fi 		")	
 		job_task.append("	fi			")
 		job_task.append("	TEMP=`awk '{if(NR==2){print int($(NF-1)); exit}}' dftbjob.gen`")
 		job_task.append("	cp " + args["basefile_dir" ] + "/${TEMP}.dftb_in.hsd dftb_in.hsd		")	
 		job_task.append("	srun -N " + str(args["job_nodes" ]) + " -n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")		
-		job_task.append("	cp results.tag ${TAG}.results.tag")
-		job_task.append("	cp md.out      ${TAG}.md.out	 ")
-		job_task.append("	cp geo_end.xyz ${TAG}.geo_end.xyz")
-		job_task.append("	cp geo_end.gen ${TAG}.geo_end.gen")
-		job_task.append("	rm -f charges.bin tmp-broyden* dftb_pin.hsd dftbjob.gen geo_end.*")	
+		job_task.append("	mv results.tag ${TAG}.results.tag")
+		job_task.append("	mv md.out      ${TAG}.md.out	 ")
 		job_task.append("done	")
+		job_task.append("rm -f charges.bin tmp-broyden* dftb_pin.hsd dftbjob.gen geo_end.*")	
+
 		
 		this_jobid = helpers.create_and_launch_job(job_task,
 			job_name       =          "dftb_spcalcs"  ,

@@ -189,8 +189,7 @@ def main(args):
 			restart_controller.reinit_vars()
 
 		if (THIS_ALC == 0) and 	(not config.DO_CLUSTER):
-			print "config.DO_CLUSTER was set false."
-			print "Skipping ALC-0"
+			print "config.DO_CLUSTER was set false - skipping ALC-0"
 			continue
 		
 		
@@ -228,6 +227,14 @@ def main(args):
 				# Note: Stress tensor inclusion controlled by contents of config.ALC0_FILES
 			
 				active_job = gen_ff.build_amat(THIS_ALC,
+						do_hierarch        = config.DO_HIERARCH,
+						hierarch_files     = config.HIERARCH_PARAM_FILES,	
+						hierarch_exe       = config.CHIMES_MD_SER,
+						do_correction      = config.FIT_CORRECTION,
+						correction_method  = config.CORRECTED_TYPE,
+						correction_files   = config.CORRECTED_TYPE_FILES,
+						correction_exe     = config.CORRECTED_TYPE_EXE,
+						correction_temps   = config.CORRECTED_TEMPS_BY_FILE,						
 						prev_gen_path      = config.ALC0_FILES,
 						job_email          = config.HPC_EMAIL,
 						job_ppn            = str(config.HPC_PPN),
@@ -245,8 +252,7 @@ def main(args):
 				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "BUILD_AMAT: COMPLETE ")	
 			else:
 				restart_controller.update_file("BUILD_AMAT: COMPLETE" + '\n')
-				
-			
+
 			if not restart_controller.SOLVE_AMAT:
 			
 				if not gen_ff.solve_amat_started(): 
@@ -254,6 +260,8 @@ def main(args):
 					print "Starting solve_amat from scratch"			
 			
 					active_job = gen_ff.solve_amat(THIS_ALC, 
+						weights_set_alc_0  = config.WEIGHTS_SET_ALC_0,
+						weights_alc_0      = config.WEIGHTS_ALC_0,
 						weights_force      = config.WEIGHTS_FORCE,
 						weights_force_gas  = config.WEIGHTS_FGAS,
 						weights_energy     = config.WEIGHTS_ENER,
@@ -309,8 +317,19 @@ def main(args):
 					print "Cannot post-process. Exiting."
 					
 					exit()
+					
+				# If needed, combine existing parameter files with newly generated one
+					
+				if config.DO_HIERARCH:
+					
+					gen_ff.combine("GEN_FF/params.txt", config.HIERARCH_PARAM_FILES)				
 
-				helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
+					helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " hierarch.params.txt")
+					
+					helpers.run_bash_cmnd("mv  hierarch.params.txt.reduced GEN_FF/params.txt.reduced")
+					
+				else:
+					helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
 			
 				restart_controller.update_file("SOLVE_AMAT: COMPLETE" + '\n')	
 				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "SOLVE_AMAT: COMPLETE ")
@@ -632,7 +651,15 @@ def main(args):
 				if (not config.DO_CLUSTER) and (THIS_ALC == 1):	
 				
 					active_job = gen_ff.build_amat(THIS_ALC,
-							do_cluster       = config.DO_CLUSTER,
+							do_hierarch        = config.DO_HIERARCH,
+							hierarch_files     = config.HIERARCH_PARAM_FILES,
+							hierarch_exe       = config.CHIMES_MD_SER,
+							do_correction      = config.FIT_CORRECTION,
+							correction_method  = config.CORRECTED_TYPE,
+							correction_files   = config.CORRECTED_TYPE_FILES,
+							correction_exe     = config.CORRECTED_TYPE_EXE,							
+							correction_temps   = config.CORRECTED_TEMPS_BY_FILE,							
+							do_cluster         = config.DO_CLUSTER,
 							prev_gen_path      = config.ALC0_FILES,
 							job_email          = config.HPC_EMAIL,
 							job_ppn            = str(config.HPC_PPN),
@@ -647,6 +674,14 @@ def main(args):
 					active_job = gen_ff.build_amat(THIS_ALC, 
 						prev_qm_all_path = qm_all_path,
 						prev_qm_20_path  = qm_20F_path,
+						do_hierarch      = config.DO_HIERARCH,
+						hierarch_files   = config.HIERARCH_PARAM_FILES,	
+						hierarch_exe     = config.CHIMES_MD_SER,
+						do_correction      = config.FIT_CORRECTION,
+						correction_method  = config.CORRECTED_TYPE,
+						correction_files   = config.CORRECTED_TYPE_FILES,
+						correction_exe     = config.CORRECTED_TYPE_EXE,							
+						correction_temps   = config.CORRECTED_TEMPS_BY_FILE,						
 						do_cluster       = config.DO_CLUSTER,
 						include_stress   = do_stress,	
 						stress_style     = config.STRS_STYLE,
@@ -667,7 +702,7 @@ def main(args):
 			else:
 				restart_controller.update_file("BUILD_AMAT: COMPLETE" + '\n')
 						
-				
+	
 			if not restart_controller.SOLVE_AMAT:	
 			
 				# Check whether we have previously started 
@@ -679,6 +714,8 @@ def main(args):
 			
 					active_job = gen_ff.solve_amat(THIS_ALC, 
 						do_cluster       = config.DO_CLUSTER,
+						weights_set_alc_0  = config.WEIGHTS_SET_ALC_0,
+						weights_alc_0      = config.WEIGHTS_ALC_0,						
 						weights_force      = config.WEIGHTS_FORCE,
 						weights_force_gas  = config.WEIGHTS_FGAS,
 						weights_energy     = config.WEIGHTS_ENER,
@@ -710,10 +747,6 @@ def main(args):
 					print "solve amat job incomplete... restarting for the ", n_restarts, "st/nd/th time"
 					
 					active_job = gen_ff.restart_solve_amat(THIS_ALC,
-						weights_force      = config.WEIGHTS_FORCE,
-						weights_energy     = config.WEIGHTS_ENER,
-						weights_energy_gas = config.WEIGHTS_EGAS,
-						weights_stress     = config.WEIGHTS_STRES,
 						regression_alg     = config.REGRESS_ALG,
 						regression_nrm     = config.REGRESS_NRM,
 						regression_var     = config.REGRESS_VAR,	
@@ -737,9 +770,17 @@ def main(args):
 					print "Cannot post-process. Exiting."
 					
 					exit()
-	
-
-				helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
+					
+				if config.DO_HIERARCH:
+					gen_ff.combine("GEN_FF/params.txt", config.HIERARCH_PARAM_FILES)	
+					helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " hierarch.params.txt")					
+					helpers.run_bash_cmnd("mv  hierarch.params.txt.reduced GEN_FF/params.txt.reduced")				
+				else:
+					
+					helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
+			
+				restart_controller.update_file("SOLVE_AMAT: COMPLETE" + '\n')	
+				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "SOLVE_AMAT: COMPLETE ")					
 				
 				restart_controller.update_file("SOLVE_AMAT: COMPLETE" + '\n')	
 				
@@ -763,24 +804,26 @@ def main(args):
 				active_jobs = []
 				
 				#print "running for cases:", config.NO_CASES
-			
+
 				for THIS_CASE in xrange(config.NO_CASES):
 
-					active_job = run_md.run_md(THIS_ALC, THIS_CASE, THIS_INDEP,
-						basefile_dir   = config.CHIMES_MDFILES, 
+					active_job = run_md.run_md(THIS_ALC, THIS_CASE, THIS_INDEP, config.MD_STYLE,
+						basefile_dir   = config.MDFILES, 
 						driver_dir     = config.DRIVER_DIR,
 						penalty_pref   = 1.0E6,		
 						penalty_dist   = 0.02, 		
+						chimes_exe     = config.CHIMES_MD_SER,
 						job_name       = "ALC-"+ str(THIS_ALC) +"-md-c" + str(THIS_CASE) +"-i" + str(THIS_INDEP),
 						job_email      = config.HPC_EMAIL,	   	 
 						job_ppn        = config.HPC_PPN,	   	 
-						job_nodes      = config.CHIMES_MD_NODES[THIS_CASE],
-						job_walltime   = config.CHIMES_MD_TIME [THIS_CASE],      
-						job_queue      = config.CHIMES_MD_QUEUE[THIS_CASE],      
+						job_nodes      = config.MD_NODES[THIS_CASE],
+						job_walltime   = config.MD_TIME [THIS_CASE],	  
+						job_queue      = config.MD_QUEUE[THIS_CASE],	  
 						job_account    = config.HPC_ACCOUNT, 
 						job_executable = config.CHIMES_MD_MPI,	 
 						job_system     = "slurm",  	 
 						job_file       = "run.cmd")
+						
 		
 					active_jobs.append(active_job.split()[0])	
 									
@@ -798,12 +841,13 @@ def main(args):
 			
 					# Post-process the MD job
 			
-					run_md.post_proc(THIS_ALC, THIS_CASE, THIS_INDEP, config.MOLANAL_SPECIES,
-						basefile_dir   = config.CHIMES_MDFILES, 
+					run_md.post_proc(THIS_ALC, THIS_CASE, THIS_INDEP, config.MD_STYLE, 
+						config.MOLANAL_SPECIES,
+						basefile_dir   = config.MDFILES, 
 						driver_dir     = config.DRIVER_DIR,
 						penalty_pref   = config.CHIMES_PEN_PREFAC,	  
 						penalty_dist   = config.CHIMES_PEN_DIST,		  
-						molanal_dir    = config.CHIMES_MOLANAL, 
+						molanal_dir    = config.MOLANAL, 
 						local_python   = config.HPC_PYTHON, 	
 						do_cluster     = config.DO_CLUSTER,	
 						tight_crit     = config.TIGHT_CRIT,	

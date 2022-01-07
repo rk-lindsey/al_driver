@@ -11,15 +11,18 @@ import os
 
 """ Small helper functions and utilities general to the ALC process. """
 
-def readlines(infile):
+def readlines(infile,start_line=0, nlines=-1):
 
 	""" 
 	
 	A one-liner wrapper to open, readlines, and close a file
 	
-	Usage: readlines("my_file.txt")
+	Usage: readlines("my_file.txt") or readlines("my_file.txt",10)
+	       or readlines("my_file.txt",0,10)
 	
 	Notes: Outputs a list of lines corresponding to the contents of my_file.txt
+	       last two parameters specify which line to start read from (from zero),
+	       and how many lines to read
 	
 	WARNING: Entire file is read into memory - do not use with large files
 	
@@ -29,15 +32,43 @@ def readlines(infile):
 	contents = ifstream.readlines()
 	ifstream.close()
 	
-	return contents
+	if nlines<0:
+		return contents
+	else:
+		return contents[start_line:nlines]
+
+def appendlines(outfile,contents, nlines=-1):
+
+	""" 
 	
-def writelines(outfile, contents):
+	A one-liner wrapper to open, append all contents of a list, and close a file
+	
+	Usage: writelines("my_file.txt") or writelines("my_file.txt",10)
+	
+	Notes: Make sure lines contain '\n'
+
+	"""	
+	
+	ofstream = open(outfile,'a')
+	
+	idx = 1
+	
+	for line in contents:
+		ofstream.write(line)
+		idx += 1
+		
+		if (nlines > 0) and (idx > nlines):
+			break
+		
+	ofstream.close()
+	
+def writelines(outfile, contents, nlines=-1):
 
 	""" 
 	
 	A one-liner wrapper to open, write all contents of a list, and close a file
 	
-	Usage: writelines("my_file.txt")
+	Usage: writelines("my_file.txt") or writelines("my_file.txt",10)
 	
 	Notes: Make sure lines contain '\n'
 
@@ -45,8 +76,14 @@ def writelines(outfile, contents):
 	
 	ofstream = open(outfile,'w')
 	
+	idx = 1
+	
 	for line in contents:
 		ofstream.write(line)
+		idx += 1
+		
+		if (nlines > 0) and (idx > nlines):
+			break
 		
 	ofstream.close()
 
@@ -290,19 +327,77 @@ def count_xyzframes_general(infile):
 	
 	Counts the number of frames in a .xyz(f) file 
 	
-	Usage: count_xyzframes_general("my_file.txt")
+	Usage: count_xyzframes_general("my_file.xyz")
 	
 	Notes: Linux wildcards will not work as expected. Use the glob if needed.
 	
 	"""	
 
 	nframes = 0
+	natoms  = []
+	nlines  = 0
 	
 	with open(infile, "r") as ifstream:
 		for line in ifstream:
+			
+			nlines +=1
+		
 			if len(line.split()) == 1:
+				
+				# Try/except for cases where print isn't finished
+				
+				try:
+					natoms.append(int(line.split()[0]))
+				except:
+					break
 				nframes += 1
+				
+	sanity = len(natoms)*2 + sum(natoms)
+	
+	# Check whether frame finished printing
+	
+	if sanity > nlines:
+		nframes -= 1 
+	
+	
 	return nframes	
+	
+def count_genframes_general(infile):
+
+	""" 
+	
+	Counts the number of frames in a .gen file 
+	
+	Usage: count_xyzframes_general("my_file.gen")
+	
+	Notes: Linux wildcards will not work as expected. Use the glob if needed.
+	
+	"""	
+
+	nframes = 0
+	natoms  = []
+	nlines  = 0
+	
+	with open(infile, "r") as ifstream:
+		for line in ifstream:
+			
+			nlines +=1
+			
+			splitline = line.split()
+		
+			if (len(splitline) == 2) and (splitline[-1] == "S"):
+				nframes += 1
+				natoms.append(int(line.split()[0]))
+				
+	sanity = len(natoms)*6 + sum(natoms)
+	
+	# Check whether frame finished printing
+	
+	if sanity > nlines:
+		nframes -= 1 
+	
+	
+	return nframes		
 	
 def list_natoms(infile):
 
@@ -321,7 +416,7 @@ def list_natoms(infile):
 	with open(infile, "r") as ifstream:
 		for line in ifstream:
 			if len(line.split()) == 1:
-				natoms.append(int(line[0]))
+				natoms.append(int(line.split()[0]))
 	return natoms		
 	
 	
@@ -589,6 +684,21 @@ def str2bool(v):
 	"""
 
 	return v.lower() in ("true")
+	
+def bool2str(v):
+
+	""" 
+	
+	Converts a boolean type variable to the corresponding strings "true" or "false"
+	
+	Usage: bool2str(True)
+	
+	"""
+	
+	if v:
+		return "true"
+	else:
+		return "false"
 
 def break_apart_xyz(*argv):
 
@@ -634,7 +744,6 @@ def break_apart_xyz(*argv):
 	#########
 
 	ZEROES = len(str(FRAMES))+1
-
 
 	for f in xrange(FRAMES):
 
@@ -731,7 +840,65 @@ def break_apart_xyz(*argv):
 	                FRSTREAM.write(`float(LINE[6])*(627.50960803*1.889725989)` + '\n')    
 	return
 
+def xyz_to_dftbgen(xyzfile):
 
+	frames   = count_xyzframes_general(xyzfile)
+	ifstream = open(xyzfile,'r')
+	
+	# Write the .gen file
+
+	genfile  = '.'.join(xyzfile.split('.')[0:-1]) + ".gen"
+	ofstream = open(genfile,'w')
+	
+	for f in xrange(frames):
+
+		natoms  = int(ifstream.readline())
+		boxline = ifstream.readline().split()
+		
+		a = [0.0]*3
+		b = [0.0]*3
+		c = [0.0]*3
+
+		if boxline[0] == "NON_ORTHO":
+			a[0] = float(boxline[1])
+			b[1] = float(boxline[5])
+			c[2] = float(boxline[9])
+		
+		else:
+			a[0] = float(boxline[0])
+			b[1] = float(boxline[1])
+			c[2] = float(boxline[2])
+
+		atom_types        = []
+		unique_atom_types = []
+		coords            = []		
+		
+		for i in xrange(natoms):
+		
+			line = ifstream.readline().split()
+			atom_types.append(line[0])
+			coords.append(' '.join(line[1:4]))
+				
+			unique_atom_types = list(set(atom_types))
+
+		ofstream.write(str(natoms) + ' S\n')
+		ofstream.write(' '.join(unique_atom_types) + '\n')
+
+		for i in xrange(natoms):
+
+			ofstream.write(str(i+1) + " " + str(unique_atom_types.index(atom_types[i])+1) + " " + coords[i] + "\n")
+			
+		ofstream.write("0.0 0.0 0.0\n")
+		ofstream.write(' '.join(map(str, a)) + '\n')
+		ofstream.write(' '.join(map(str, b)) + '\n')
+		ofstream.write(' '.join(map(str, c)) + '\n')
+
+	ifstream.close()
+	ofstream.close()
+
+	return genfile
+	
+	
 def dftbgen_to_xyz(*argv):
 
 	""" 

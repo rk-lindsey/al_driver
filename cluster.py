@@ -394,7 +394,7 @@ def get_pared_trajs(do_cluster):
 
 		#helpers.run_bash_cmnd("cd INDEP-" + args["my_indep"])
 	
-		frames = helpers.run_bash_cmnd("grep Step traj.gen").count("Step")
+		frames = helpers.count_genframes_general("traj.gen")
 
 		helpers.dftbgen_to_xyz(frames, "traj.gen")
 	
@@ -415,7 +415,7 @@ def get_pared_trajs(do_cluster):
 					ofstream.write(box)
 		ofstream.close()
 		
-		helpers.run_bash_cmnd("mv traj.xyz traj_bad_r.ge.rin+dp_dftbfrq.xyz")
+		helpers.run_bash_cmnd("mv traj+box.xyz traj_bad_r.ge.rin+dp_dftbfrq.xyz")
 		
 	else:
 		with open("traj_bad_r.ge.rin+dp_dftbfrq.xyz") as ifstream:

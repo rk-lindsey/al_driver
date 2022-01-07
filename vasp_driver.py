@@ -291,6 +291,10 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		
 		print "Found",len(base_list),"incomplete jobs"
 		
+		if len(base_list) == 0:
+			os.chdir("..")
+			continue
+		
 		total_failed += len(base_list)
 		
 		# Delete corresponding .OUTCAR files
@@ -320,19 +324,27 @@ def check_convergence(my_ALC, *argv, **kwargs):
 			
 			# Get index of line containing "IALGO"
 			
-			targ = next(i for i, w in enumerate(contents) if "IALGO" in w)
+			targ = next(i for i, w in enumerate(contents) if "ALGO" in w)
 			line = contents[targ].split()
 			
-			# Make sure it contains the expected value
+			# Make sure it contains the expected value, then replace with 38/Normal
 			
-			if int(line[2]) != 48:
-				print "ERROR: Expeted IALGO = 48, got",line[2]
-				print "Would have replaced with 38"
-				exit()
-				
-			# Replace with 38, write to file
+			if "IALGO" in line[0]:
 			
-			line[2] = "38"
+				if int(line[2]) != 48:
+					print "ERROR: Expected IALGO = 48, got",line[2]
+					print "Would have replaced with 38"
+					exit()		
+				line[2] = "38"						
+			
+			elif "ALGO" in line[0]:
+			
+				if "Fast" not in line[2]:
+					print "ERROR: Expected ALGO = Fast or ALGO = VeryFast, got",line[2]
+					print "Would have replaced with Normal"
+					exit()	
+				line[2] = "Normal"								
+			
 			contents[targ] = ' '.join(line)+'\n'
 	
 			helpers.writelines(incars[j],contents)
@@ -525,6 +537,22 @@ def post_process(*argv, **kwargs):
 
 			print helpers.run_bash_cmnd(args["vasp_postproc"] + " " + outcar_list[j] + " 1 " + args_properties + " | grep ERROR ")
 			
+						
+			
+			#print "Working on: ", outcar_list[j] # CASE-0/case_0.indep_0.traj_20F_#000.xyz.OUTCAR
+			
+			# Figure out the temperature
+			
+			
+			tmpfile = ''.join(outcar_list[j].split("OUTCAR"))+"POSCAR"
+			tmp_temp =  helpers.head(tmpfile,1)[0].split()[2]
+			
+			tmpfile = outcar_list[j]
+			tmpfile = tmpfile + ".xyz.temps"
+			tmpstream = open(tmpfile,'w')
+			tmpstream.write(tmp_temp + '\n')
+			tmpstream.close()		
+			
 			# Make sure the configuration energy is less than or equal to zero
 			
 			if "ENERGY" in args_properties:
@@ -534,13 +562,6 @@ def post_process(*argv, **kwargs):
 				
 				if tmp_ener >= 0.0:
 					
-					#print "THIS IS A TEST WARNING: "
-					#print "DETECTED A VASP CONFIGURATION ENERGY GREATER THAN 0.0"
-					#print "FOR DEBUG PURPOSES, KILLING THE SCRIPT"
-					#print "IF THIS IS THE EXPECTED FUNCTIONALITY, FIX THIS DEBUG EXIT IN vasp_driver.py"
-					#print "FYI, THIS IS NOT IN THE GIT VERSION YET"
-					#exit()
-					
 					print "Warning: VASP energy is positive energy for job name", outcar_list[j], ":", tmp_ener, "...skipping."
 					continue
 			
@@ -549,10 +570,14 @@ def post_process(*argv, **kwargs):
 				if os.path.isfile("OUTCAR.xyzf"):
 			
 					helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf", outcar_list[j] + ".xyzf"])
+					helpers.cat_specific("tmp.tmp", ["OUTCAR.temps", tmpfile])					
 				else:
 					helpers.cat_specific("tmp.dat", [outcar_list[j] + ".xyzf"])
+					helpers.cat_specific("tmp.tmp", [tmpfile])					
 				
 				helpers.run_bash_cmnd("mv tmp.dat OUTCAR.xyzf")
+				helpers.run_bash_cmnd("mv tmp.tmp OUTCAR.temps")
+				
 		
 		os.chdir("..")
 

@@ -197,6 +197,7 @@ else:
 # Start printing the .xyz file
 
 OFSTREAM = open(OUTCAR + ".xyzf",'w')
+TMSTREAM = open(OUTCAR + ".temps",'w')
 
 IFSTREAM = open(OUTCAR, 'r')
 
@@ -213,6 +214,7 @@ TENSOR_ZZ = 0
 TENSOR_XY = 0
 TENSOR_YZ = 0
 TENSOR_ZX = 0
+SIGMA     = 0
 
 
 for LINE in IFSTREAM:
@@ -221,6 +223,10 @@ for LINE in IFSTREAM:
 		
 		print "ERROR: End of file reached"
 		exit()
+		
+	if "Fermi-smearing in eV        SIGMA" in LINE:
+		SIGMA = float(LINE.split()[-1])*11604.588577015096 # Convert to kelvin
+		
 
 	if "in kB" in LINE:
 		if TOTAL_FRAMES%SKIP == 0: # Then we should print this frame -- Convert kbar to GPa
@@ -251,6 +257,8 @@ for LINE in IFSTREAM:
 		if TOTAL_FRAMES%SKIP == 0: # Then we should print this frame
 			START_READ = 2
 			PRINTED_FRAMES += 1
+			
+			TMSTREAM.write(`SIGMA` + '\n')
 
 			# Print the xyz file headers
 		
@@ -299,6 +307,8 @@ for LINE in IFSTREAM:
 		START_READ = 0
 		READ_ATOMS = 0
 
+OFSTREAM.close()
+TMSTREAM.close()
 
 print "Counted total frames             : " + `TOTAL_FRAMES`
 print "Printed total frames             : " + `PRINTED_FRAMES`

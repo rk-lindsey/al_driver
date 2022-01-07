@@ -22,7 +22,15 @@ def print_help():
 	PARAM.append("DRIVER_DIR");                     VARTYP.append("str");           DETAILS.append("Path to the al_driver code")
 	PARAM.append("WORKING_DIR");                    VARTYP.append("str");           DETAILS.append("Path to directory in which code is being run")
 	PARAM.append("CHIMES_SRCDIR");                  VARTYP.append("str");           DETAILS.append("Path to directory containing the ChIMES_MD source code")
-	PARAM.append("HPC_PPN");                        VARTYP.append("int");           DETAILS.append("The number of processors per node on the machine code is launched on")
+	PARAM.append("DO_HIERARCH");			VARTYP.append("bool");		DETAILS.append("Is this a hierarchical fit (i.e., building on existing parameters?") 
+	PARAM.append("HIERARCH_PARAM_FILES");		VARTYP.append("str list");	DETAILS.append("List of parameter files to build on, which chould be in ALL_BASE_FILES/HIERARCH_PARAMS") 	
+	PARAM.append("HIERARCH_EXE");			VARTYP.append("str");		DETAILS.append("Executable to use when subtracting existing parameter contributions") 	
+	PARAM.append("FIT_CORRECTION");			VARTYP.append("bool");  	DETAILS.append("Is this ChIMES model being fit as a correction to another method?") 
+	PARAM.append("CORRECTED_TYPE");		        VARTYP.append("str");	        DETAILS.append("Method type being corrected. Currently only \"DFTB\" is supported")	
+	PARAM.append("CORRECTED_TYPE_FILES");		VARTYP.append("str");		DETAILS.append("Files needed to run simulations/single points with the method to be corrected")	
+	PARAM.append("CORRECTED_TYPE_EXE");		VARTYP.append("str");		DETAILS.append("Executable to use when subtracting existing forces/energies/stresses from method to be corrected")	
+	PARAM.append("CORRECTED_TEMPS_BY_FILE");	VARTYP.append("bool");		DETAILS.append("Should electron temperatures be set to values in traj_list.dat (false) or in specified file location, for correction calculation? Only needed if correction method is QM-based. ")
+	PARAM.append("HPC_PPN");                        VARTYP.append("int");           DETAILS.append("The number of processors per node on the machine code is launched on")	
 	PARAM.append("HPC_ACCOUNT");                    VARTYP.append("str");           DETAILS.append("Charge bank name on machine code is launched on (e.g. \"pbronze\")")
 	PARAM.append("HPC_SYSTEM");                     VARTYP.append("str");           DETAILS.append("Job scheduler on machine code is launched on (only \"slurm\" is supported currently)")
 	PARAM.append("HPC_PYTHON");                     VARTYP.append("str");           DETAILS.append("Path to python executable (2.X required for now)")
@@ -31,7 +39,9 @@ def print_help():
 	PARAM.append("CHIMES_LSQ");                     VARTYP.append("str");           DETAILS.append("ChIMES_lsq executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_lsq\")")
 	PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"lsq2.py\")")
 	PARAM.append("CHIMES_POSTPRC");                 VARTYP.append("str");           DETAILS.append("post_proc_lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"post_proc_lsq2.py\")")
-	PARAM.append("WEIGHTS_FORCE");                  VARTYP.append("listt");         DETAILS.append("Weight/method to apply to bulk forces during A-matrix solution ")
+	PARAM.append("WEIGHTS_SET_ALC_0");              VARTYP.append("bool");          DETAILS.append("Should ALC-0 (or 1 if no clustering) weights be read directly from a user specified file? ")
+	PARAM.append("WEIGHTS_ALC_0");                  VARTYP.append("str");           DETAILS.append("Set if WEIGHTS_SET_ALC_0 is true; path to user specified ALC-0 (or ALC-1) weights ")
+	PARAM.append("WEIGHTS_FORCE");                  VARTYP.append("list");          DETAILS.append("Weight/method to apply to bulk forces during A-matrix solution ")
 	PARAM.append("WEIGHTS_FGAS");                   VARTYP.append("list");          DETAILS.append("Weight/method to apply to gas forces during A-matrix solution")
 	PARAM.append("WEIGHTS_ENER");                   VARTYP.append("list");          DETAILS.append("Weight/method to apply to bulk energies during A-matrix solution")
 	PARAM.append("WEIGHTS_EGAS");                   VARTYP.append("list");          DETAILS.append("Weight/method to apply to gas energies during A-matrix solution")
@@ -46,15 +56,17 @@ def print_help():
 	PARAM.append("CHIMES_SOLVE_PPN");               VARTYP.append("int");           DETAILS.append("Number of procs per node to use when running lsq2.py/DLARS (lassolars)")
 	PARAM.append("CHIMES_SOLVE_QUEUE");             VARTYP.append("str");           DETAILS.append("Queue to submit the lsq2.py/DLARS (lassolars) job to")
 	PARAM.append("CHIMES_SOLVE_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for lsq2.py/DLARS (lassolars) job (e.g. \"04:00:00\")")
-	PARAM.append("CHIMES_MD_ser");                  VARTYP.append("str");           DETAILS.append("Serial ChIMES_md executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-serial\")")
-	PARAM.append("CHIMES_MD_MPI");                  VARTYP.append("str");           DETAILS.append("MPI-compatible ChIMES_md exectuable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-mpi\")")
-	PARAM.append("CHIMES_MOLANAL");                 VARTYP.append("str");           DETAILS.append("Absolute path to the molanal src directory")
-	PARAM.append("CHIMES_MDFILES");                 VARTYP.append("str");           DETAILS.append("Absolute path to ChIMES_MD input files like case-0.indep-0.run_md.in (e.g. WORKING_DIR + \"ALL_BASE_FILES/CHIMESMD_FILES\")")
+	PARAM.append("MD_STYLE");                       VARTYP.append("str");           DETAILS.append("Should MD simulations be run as ChIMES-only (\"CHIMES\") or DFTB+ChIMES (\"DFTB\")?")	
+	PARAM.append("MOLANAL");		        VARTYP.append("str");  	        DETAILS.append("Absolute path to the molanal src directory")
+	PARAM.append("MDFILES");		        VARTYP.append("str");  	        DETAILS.append("Absolute path to MD input files like case-0.indep-0.run_md.in (e.g. WORKING_DIR + \"ALL_BASE_FILES/CHIMESMD_FILES\")")
+	PARAM.append("MD_NODES");		        VARTYP.append("int");  	        DETAILS.append("Number of nodes to use when running md simulations")
+	PARAM.append("MD_QUEUE");		        VARTYP.append("str");  	        DETAILS.append("Queue to submit md simulations to to")
+	PARAM.append("MD_TIME");		        VARTYP.append("str");  	        DETAILS.append("Walltime for md simulations (e.g. \"04:00:00\")")
+	PARAM.append("DFTB_MD_SER");                    VARTYP.append("str");           DETAILS.append("DFTBplus executable absolute path")
+	PARAM.append("CHIMES_MD_SER");                  VARTYP.append("str");           DETAILS.append("Serial ChIMES_md executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-serial\")")
+	PARAM.append("CHIMES_MD_MPI");                  VARTYP.append("str");           DETAILS.append("MPI-compatible ChIMES_md exectuable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-mpi\")")	
 	PARAM.append("CHIMES_PEN_PREFAC");              VARTYP.append("float");         DETAILS.append("ChIMES penalty function prefactor")
 	PARAM.append("CHIMES_PEN_DIST");                VARTYP.append("float");         DETAILS.append("ChIMES pentalty function kick-in distance")
-	PARAM.append("CHIMES_MD_NODES");                VARTYP.append("int");           DETAILS.append("Number of nodes to use when running chimes_md")
-	PARAM.append("CHIMES_MD_QUEUE");                VARTYP.append("str");           DETAILS.append("Queue to submit chimes_md to")
-	PARAM.append("CHIMES_MD_TIME");                 VARTYP.append("str");           DETAILS.append("Walltime for chimes_md (e.g. \"04:00:00\")")
 	PARAM.append("DO_CLUSTER");                     VARTYP.append("bool");          DETAILS.append("If false, AL-driver only considers bulk configurations. Otherwise, cluster extraction, etc. is performed")
 	PARAM.append("MAX_CLUATM");                     VARTYP.append("int");           DETAILS.append("Maximum number of atoms a cluster is allowed to contain (ignores clusters with more atoms)")
 	PARAM.append("TIGHT_CRIT");                     VARTYP.append("str");           DETAILS.append("Absolute path to tight cutoff criteria file for clustering")
@@ -501,6 +513,109 @@ def verify(user_config):
 		
 		exit()
 
+	if not hasattr(user_config,'DO_HIERARCH'):
+
+		# Determines whether to build on existing parameter files
+		
+		print "Warning: Option config.DO_HIERARCH was not set"
+		print "         Will use \"False\""
+		
+		user_config.DO_HIERARCH = False
+		
+	if not hasattr(user_config,'HIERARCH_PARAM_FILES'):
+
+		# Determines whether to build on existing parameter files
+		
+		if user_config.DO_HIERARCH:
+		
+			print "ERROR: Option config.DO_HIERARCH was set to \"True\", but"
+			print "config.HIERARCH_PARAM_FILES not specified"
+		
+			exit()
+	else:
+		for i in xrange(len(user_config.HIERARCH_PARAM_FILES)):
+			user_config.HIERARCH_PARAM_FILES[i] = user_config.WORKING_DIR + "ALL_BASE_FILES/HIERARCH_PARAMS/" + user_config.HIERARCH_PARAM_FILES[i]
+			
+		print "WARNING: config.HIERARCH_PARAM_FILES special cutoffs must" 
+		print "         be specified with \"SPECIFIC\" and not \"ALL\""
+		
+	if not hasattr(user_config,'HIERARCH_EXE'):
+
+		# Determines whether to build on existing parameter files
+		
+		if user_config.DO_HIERARCH:
+		
+			print "ERROR: Option config.DO_HIERARCH was set to \"True\", but"
+			print "config.HIERARCH_EXE not specified"
+		
+			exit()					
+
+
+	################################
+	##### Correction fitting options
+	################################
+
+	if not hasattr(user_config,'FIT_CORRECTION'):
+
+		# Determines whether to build on existing parameter files
+		
+		print "Warning: Option config.FIT_CORRECTION was not set"
+		print "         Will use \"False\""
+		
+		user_config.FIT_CORRECTION = False
+		
+	if not hasattr(user_config,'CORRECTED_TYPE'):
+
+		# Determines whether to build on existing parameter files
+		
+		if user_config.FIT_CORRECTION:
+		
+			print "ERROR: Option config.FIT_CORRECTION was set to \"True\", but"
+			print "config.CORRECTED_TYPE not specified"
+		
+			exit()					
+		
+	if not hasattr(user_config,'CORRECTED_TYPE_FILES'):
+
+		# Determines whether to build on existing parameter files
+		
+		if user_config.FIT_CORRECTION:
+		
+			print "ERROR: Option config.FIT_CORRECTION was set to \"True\", but"
+			print "config.CORRECTED_TYPE_FILES not specified"
+		
+			exit()
+			
+	if not hasattr(user_config,'CORRECTED_TYPE_EXE'):
+
+		# Determines whether to build on existing parameter files
+		
+		if user_config.FIT_CORRECTION:
+		
+			print "ERROR: Option config.FIT_CORRECTION was set to \"True\", but"
+			print "config.CORRECTED_TYPE_EXE not specified"
+		
+			exit()	
+	
+	if not hasattr(user_config,'CORRECTED_TEMPS_BY_FILE'):
+
+		# Determines whether to build on existing parameter files
+		
+		if user_config.FIT_CORRECTION and (user_config.CORRECTED_TYPE == "DFTB"):
+		
+			print "WARNING: No explicit electron temperature file listed for correction generation."
+			print "         Will attempt to use values in traj_list.dat"
+		
+			exit()	
+	elif hasattr(user_config,'CORRECTED_TYPE_EXE') and (user_config.CORRECTED_TYPE == "DFTB"):
+	
+		if user_config.CORRECTED_TEMPS_BY_FILE:
+			print "Will attempt to use electron temperatures specified in CORRECTED_TYPE_FILES"
+		else:
+			print "Will use electron temperatures specified in traj_list.dat"
+			
+			
+
 	################################
 	##### General HPC options
 	################################
@@ -593,7 +708,27 @@ def verify(user_config):
 		print "         Will use config.CHIMES_SRCDIR + \"post_proc_lsq2.py\""
 		
 		user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "post_proc_lsq2.py"
+
+
+	if not hasattr(user_config,'WEIGHTS_SET_ALC_0'):
+
+		# Should a file of user-specified weights be used to set ALC-0
+		# (or ALC-1, if no clustering) weights?
+
+		print "WARNING: Option config.WEIGHTS_SET_ALC_0 was not set"
+		print "         Will set to False"
 		
+		user_config.WEIGHTS_SET_ALC_0 = False	
+
+	if not hasattr(user_config,'WEIGHTS_ALC_0'):
+
+		# File of user-specified weights - only used if WEIGHTS_SET_ALC_0 true
+
+		print "WARNING: Option config.WEIGHTS_ALC_0 was not set"
+		print "         Will set to None"
+		
+		user_config.WEIGHTS_ALC_0 = None	
+	
 	if not hasattr(user_config,'WEIGHTS_FORCE'):
 
 		# Weights for bulk frame forces
@@ -746,6 +881,17 @@ def verify(user_config):
 	################################
 	##### ChIMES MD
 	################################
+
+	if not hasattr(user_config,'MD_STYLE'):
+
+		# Simulation method, i.e. ChIMES MD or DFTBplus+ChIMES
+
+		print "ERROR: Simulation mode not specified!"
+		print "         config.MD_STYLE must be set to \"CHIMES\" or \"DFTB\""
+		exit()
+	else:
+		print "Will run simulations using method: ", user_config.MD_STYLE
+	
 	
 	if hasattr(user_config,'CHIMES_MD'):
 
@@ -762,33 +908,49 @@ def verify(user_config):
 		print "         Will use config.CHIMES_SRCDIR + \"chimes_md-serial\""
 		
 		user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "chimes_md-serial"		
+	
+	if user_config.MD_STYLE == "CHIMES":
 		
-	if not hasattr(user_config,'CHIMES_MD_MPI'):
+		if not hasattr(user_config,'CHIMES_MD_MPI'):
 
-		# Path to chimes_md executable
+			# Path to chimes_md executable
 
-		print "WARNING: Option config.CHIMES_MD_MPI was not set"
-		print "         Will use config.CHIMES_SRCDIR + \"chimes_md-mpi\""
+			print "WARNING: Option config.CHIMES_MD_MPI was not set"
+			print "         Will use config.CHIMES_SRCDIR + \"chimes_md-mpi\""
 		
-		user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"		
+			user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"
+
+	elif user_config.MD_STYLE == "DFTB":
+	
+		if not hasattr(user_config,'DFTB_MD_SER'):
+
+			# Path to chimes_md executable
+
+			print "ERROR: Option config.DFTB_MD_SER was not set"
+			print "       Must be set as path to serial DFTBplus executable"
+			
+			exit()
+		else:
 		
-	if not hasattr(user_config,'CHIMES_MOLANAL'):
+			user_config.CHIMES_MD_MPI = user_config.DFTB_MD_SER	
+		
+	if not hasattr(user_config,'MOLANAL'):
 
 		# Path to molanal executable
 
-		print "Error: Option config.CHIMES_MOLANAL was not set"
+		print "Error: Option config.MOLANAL was not set"
 		print "       Acceptable settings are of the form of an absolute path (Unix)"
 		
 		exit()
 		
-	if not hasattr(user_config,'CHIMES_MDFILES'):
+	if not hasattr(user_config,'MDFILES'):
 
 		# Path to the base chimes_md files (i.e. input.xyz's and run_md.in's)
 
-		print "WARNING: Option config.CHIMES_MDFILES was not set"
+		print "WARNING: Option config.MDFILES was not set"
 		print "         Will use config.WORKING_DIR + \"ALL_BASE_FILES/CHIMESMD_BASEFILES/\""
 		
-		user_config.CHIMES_MD = user_config.WORKING_DIR + "ALL_BASE_FILES/CHIMESMD_BASEFILES/"
+		user_config.MDFILES = user_config.WORKING_DIR + "ALL_BASE_FILES/CHIMESMD_BASEFILES/"
 
 	if not hasattr(user_config,'CHIMES_PEN_PREFAC'):
 
@@ -808,45 +970,45 @@ def verify(user_config):
 		
 		user_config.CHIMES_PEN_DIST = 0.02		
 
-	if not hasattr(user_config,'CHIMES_MD_NODES'):
+	if not hasattr(user_config,'MD_NODES'):
 
 		# Number of nodes to use for MD jobs
 
-		print "WARNING: Option config.CHIMES_MD_NODES was not set"
+		print "WARNING: Option config.MD_NODES was not set"
 		print "         Will use a value of 8 for all cases"
 		
-		user_config.CHIMES_MD_NODES = [8]*user_config.NO_CASES
+		user_config.MD_NODES = [8]*user_config.NO_CASES
 		
-	elif hasattr(user_config,'CHIMES_MD_NODES') and (len(user_config.CHIMES_MD_NODES) != user_config.NO_CASES):
-		print "ERROR: Option config.CHIMES_MD_NODES should be provided in the "
+	elif hasattr(user_config,'MD_NODES') and (len(user_config.MD_NODES) != user_config.NO_CASES):
+		print "ERROR: Option config.MD_NODES should be provided in the "
 		print "       form of a NO_CASES long list, e.g. [8]*NO_CASES."
 		exit()				
 		
-	if not hasattr(user_config,'CHIMES_MD_QUEUE'):
+	if not hasattr(user_config,'MD_QUEUE'):
 
 		# Queue to use for MD jobs
 
-		print "WARNING: Option config.CHIMES_MD_QUEUE was not set"
+		print "WARNING: Option config.MD_QUEUE was not set"
 		print "         Will use pbatch for all cases"
 		
-		user_config.CHIMES_MD_QUEUE = ["pbatch"]*user_config.NO_CASES
+		user_config.MD_QUEUE = ["pbatch"]*user_config.NO_CASES
 		
-	elif hasattr(user_config,'CHIMES_MD_QUEUE') and (len(user_config.CHIMES_MD_QUEUE) != user_config.NO_CASES):
-		print "ERROR: Option config.CHIMES_MD_QUEUE should be provided in the "
+	elif hasattr(user_config,'MD_QUEUE') and (len(user_config.MD_QUEUE) != user_config.NO_CASES):
+		print "ERROR: Option config.MD_QUEUE should be provided in the "
 		print "       form of a NO_CASES long list, e.g. [\"pbatch\"]*NO_CASES."
 		exit()		
 		
-	if not hasattr(user_config,'CHIMES_MD_TIME'):
+	if not hasattr(user_config,'MD_TIME'):
 
 		# Time to request for MD jobs (hours)
 
-		print "WARNING: Option config.CHIMES_MD_TIME was not set"
+		print "WARNING: Option config.MD_TIME was not set"
 		print "         Will use a value of \"4:00:00\" for all cases"
 		
-		user_config.CHIMES_MD_TIME = ["4:00:00"]*user_config.NO_CASES
+		user_config.MD_TIME = ["4:00:00"]*user_config.NO_CASES
 		
-	elif hasattr(user_config,'CHIMES_MD_TIME') and (len(user_config.CHIMES_MD_TIME) != user_config.NO_CASES):
-		print "ERROR: Option config.CHIMES_MD_TIME should be provided in the "
+	elif hasattr(user_config,'MD_TIME') and (len(user_config.MD_TIME) != user_config.NO_CASES):
+		print "ERROR: Option config.MD_TIME should be provided in the "
 		print "       form of a NO_CASES long list, e.g. [\"4:00:00\"]*NO_CASES."
 		exit()
 
