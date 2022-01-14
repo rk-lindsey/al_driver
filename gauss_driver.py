@@ -8,6 +8,12 @@ import os
 import helpers
 import process_gaussian
 
+
+######
+# Note: Implementation is based on Gaussian 16
+######
+
+
 def NoneIsInf(val):
 	if val is None:
 		return float("inf")
@@ -211,9 +217,9 @@ def check_convergence(my_ALC, *argv, **kwargs):
 	
 	Checks whether Gaussian jobs have completed within their requested SCF steps
 	
-	Usage: check_convergence(my_ALC, no. cases, Gaussin_job_types)
+	Usage: check_convergence(my_ALC, no. cases, Gaussian_job_types)
 	
-	Notes: Gaussin_job_types can only be ["all"]
+	Notes: Gaussian_job_types can only be ["all"]
 	 
 	# WARNING: This functionality is not used right now. If the Gaussian job
 	#          doesn't converge, we will declare the problem "impossible" and ignore it
@@ -222,6 +228,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
 	
 	"""
 	
+	# These notes are outdated:
 	# Developer notes: gaus_driver.continue_job counts *.coms and *.logs.
 	# If !=, then simply resubs the .cmd file and lets the .cmd file take care 
 	# of the rest of the logic. The .cmd file also looks to see if *.log 
@@ -355,7 +362,9 @@ def post_process(*argv, **kwargs):
 	default_keys   = [""]*1
 	default_values = [""]*1
 	
-	# Not needed.. .py postproc file is in ALDriver:  default_keys[0 ] = "vasp_postproc"  ; default_values[0 ] = ""
+	# Not needed.. .py postproc file is in ALDriver:  
+	
+	default_keys[0 ] = "refdatafile"  ; default_values[0 ] = None
 
 	args = dict(zip(default_keys, default_values))
 	args.update(kwargs)	
@@ -459,7 +468,7 @@ def post_process(*argv, **kwargs):
 		
 			print "Working on:",job_log[stable]
 	
-			xyzfname = process_gaussian.get_xyzf(job_log[stable], job_com[stable], natoms, boxlens)
+			xyzfname = process_gaussian.get_xyzf(job_log[stable], job_com[stable], natoms, boxlens, args["refdatafile"])
 
 			print "\tConfiguration",i,"completed:", job_log[stable]
 		
@@ -470,8 +479,10 @@ def post_process(*argv, **kwargs):
 					if os.path.isfile("OUTCAR.xyzf"):
 			
 						helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf", xyzfname])
+						helpers.appendlines("OUTCAR.temps" ["0.0"])
 					else:
 						helpers.cat_specific("tmp.dat", [xyzfname])
+						helpers.writelines("OUTCAR.temps" ["0.0"])
 						
 					helpers.run_bash_cmnd("mv tmp.dat OUTCAR.xyzf")	
 

@@ -1,11 +1,15 @@
 # Global (python) modules
 
-import glob # Warning: glob is unserted... set my_list = sorted(glob.glob(<str>)) if sorting needed
+import glob # Warning: glob is unsorted... set my_list = sorted(glob.glob(<str>)) if sorting needed
 import os
 
 # Localmodules
 
 import helpers
+
+######
+# NOTE: Implementation is based on VASP 5.4.1
+######
 
 def cleanup_and_setup(*argv, **kwargs):
 
@@ -177,6 +181,7 @@ def continue_job(*argv, **kwargs):
 			print helpers.run_bash_cmnd("pwd")
 
 	return job_list	
+	
 
 def check_convergence(my_ALC, *argv, **kwargs):
 
@@ -247,9 +252,14 @@ def check_convergence(my_ALC, *argv, **kwargs):
 	
 		os.chdir("VASP-" + args_targets[i])
 		
+		# Clear out the "tries" file so we try to achieve convergence one more time
+
+		helpers.run_bash_cmnd("rm -f *.tries")
+		
 		# Build the list of failed jobs for the current VASP job type (i.e. "all" or "20")
 	
 		base_list = []
+		base_case = []
 		
 		for j in xrange(args_cases):
 		
@@ -279,8 +289,14 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		        	
 		        	if last_rmm >= NELM:
 		        		base_list.append('.'.join(tmp_list[k].split('.')[:-1])) # Won't include the final extension (e.g. POSCAR, OSZICAR, OUTCAR, etc)
-		
+					base_case.append(int(tmp_list[k].split('.')[0].split('_')[-1]))
+					
+
 		print "Found",len(base_list),"incomplete jobs"
+		
+		if len(base_list) == 0:
+			os.chdir("..")
+			continue
 		
 		total_failed += len(base_list)
 		
@@ -295,12 +311,12 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		
 		incars = []
 
-		for j in xrange(args_cases):
+		for j in base_case: # Only update INCARs for failed cases
 			incars += glob.glob("CASE-" + `j` + "/*.INCAR")
 	
 		for j in xrange(len(incars)):
 			
-			#print "Working on:",incars[j]
+			print "Working on:",incars[j]
 			
 			if os.path.exists(incars[j] + ".bck"):
 				helpers.run_bash_cmnd("cp " + incars[j] + ".bck " + incars[j])
@@ -311,19 +327,27 @@ def check_convergence(my_ALC, *argv, **kwargs):
 			
 			# Get index of line containing "IALGO"
 			
-			targ = next(i for i, w in enumerate(contents) if "IALGO" in w)
+			targ = next(i for i, w in enumerate(contents) if "ALGO" in w)
 			line = contents[targ].split()
 			
-			# Make sure it contains the expected value
+			# Make sure it contains the expected value, then replace with 38/Normal
 			
-			if int(line[2]) != 48:
-				print "ERROR: Expeted IALGO = 48, got",line[2]
-				print "Would have replaced with 38"
-				exit()
-				
-			# Replace with 38, write to file
+			if "IALGO" in line[0]:
+
+				if int(line[2]) != 48:
+					print "ERROR: Expected IALGO = 48, got",line[2]
+					print "Would have replaced with 38"
+					exit()		
+				line[2] = "38"						
 			
-			line[2] = "38"
+			elif "ALGO" in line[0]:
+			
+				if "Fast" not in line[2]:
+					print "ERROR: Expected ALGO = Fast or ALGO = VeryFast, got",line[2]
+					print "Would have replaced with Normal"
+					exit()	
+				line[2] = "Normal"								
+			
 			contents[targ] = ' '.join(line)+'\n'
 	
 			helpers.writelines(incars[j],contents)
@@ -346,8 +370,10 @@ def generate_POSCAR(inxyz, *argv):
 	Notes: The second argument is list of atom types
 	       The final argument is the smearing temperature, in Kelvin
 		      
-	WARNING: Assumes an orthorhombic box
-	       	
+	WARNING: Assumes the inxyz comment line is formatted like:
+	         <boxl_x> <boxl_y> <boxl_z> .....
+		 or
+		 NON_ORTHO <a_x> <a_y> <a_z> <b_x> <b_y> <b_z> <c_x> <c_y> <c_z> ... 
 	"""
 
 	atm_types = argv[0] # pointer!
@@ -357,18 +383,9 @@ def generate_POSCAR(inxyz, *argv):
 	
 	
 	# Set up the header portion
-	
-	#ofstream.write(' '.join(atm_types) + " ( " + `smearing` + " K)" + '\n') 
-	#ofstream.write("1.0" + '\n')
-	
+
 	box = ifstream.readline()		# No. atoms
 	box = ifstream.readline().split()	# Box lengths
-	
-	
-	#ofstream.write(box[0] + " 0.000       0.000" + '\n')
-	#ofstream.write("0.000 " + box[1]  + " 0.000" + '\n')
-	#ofstream.write("0.000     0.000 " +   box[2] + '\n')
-	
 	
 	# Count up the number of atoms of each type
 	
@@ -407,9 +424,14 @@ def generate_POSCAR(inxyz, *argv):
 	ofstream.write(' '.join(atm_types) + " ( " + `smearing` + " K)" + '\n') 
 	ofstream.write("1.0" + '\n')
 	
-	ofstream.write(box[0] + " 0.000       0.000" + '\n')
-	ofstream.write("0.000 " + box[1]  + " 0.000" + '\n')
-	ofstream.write("0.000     0.000 " +   box[2] + '\n')
+	if box[0] == "NON_ORTHO":
+		ofstream.write(box[1] + " " +  box[2] + " " +  box[3] + '\n')
+		ofstream.write(box[4] + " " +  box[5] + " " +  box[6] + '\n')
+		ofstream.write(box[7] + " " +  box[8] + " " +  box[9] + '\n')
+	else:
+		ofstream.write(box[0] + " 0.000       0.000" + '\n')
+		ofstream.write("0.000 " + box[1]  + " 0.000" + '\n')
+		ofstream.write("0.000     0.000 " +   box[2] + '\n')
 	
 	ofstream.write( ' '.join(atm_types ) +'\n')
 	ofstream.write( ' '.join(natm_types) +'\n')
@@ -488,22 +510,60 @@ def post_process(*argv, **kwargs):
 			outcar_list += sorted(glob.glob("CASE-" + `j` + "/*.OUTCAR"))
 			
 		for j in xrange(len(outcar_list)):
+		
+			# Make sure the job completed within requested NELM
+			
+			
+		        # Get max NELM
+		        
+		        NELM = None
+			
+		        with open(outcar_list[j]) as ifstream:
+		        
+		        	for line in ifstream:
+		        		
+		        		if "   NELM   =    " in line:
+		        		
+		        			NELM = int(line.split()[2].strip(';'))
+		        			break			
+			
+			# Determine if job failed because NELM reached
+			
+			oszicar = '.'.join(outcar_list[j].split('.')[:-1]) + ".OSZICAR"
+			last_rmm = int(helpers.tail(oszicar,2)[0].split()[1])
+			
+			if last_rmm >= NELM:
+				
+				print "Warning: VASP job never converged within requested NELM", outcar_list[j], ":", NELM
+				continue			
+			
 
 			print helpers.run_bash_cmnd(args["vasp_postproc"] + " " + outcar_list[j] + " 1 " + args_properties + " | grep ERROR ")
 			
-			if "ENERGY" in args_properties: # Make sure the configuration energy is less than or equal to zero
+						
+			
+			#print "Working on: ", outcar_list[j] # CASE-0/case_0.indep_0.traj_20F_#000.xyz.OUTCAR
+			
+			# Figure out the temperature
+			
+			
+			tmpfile = ''.join(outcar_list[j].split("OUTCAR"))+"POSCAR"
+			tmp_temp =  helpers.head(tmpfile,1)[0].split()[2]
+			
+			tmpfile = outcar_list[j]
+			tmpfile = tmpfile + ".xyz.temps"
+			tmpstream = open(tmpfile,'w')
+			tmpstream.write(tmp_temp + '\n')
+			tmpstream.close()		
+			
+			# Make sure the configuration energy is less than or equal to zero
+			
+			if "ENERGY" in args_properties:
 			
 				tmp_ener = helpers.head(outcar_list[j] + ".xyzf",2)
 				tmp_ener = float(tmp_ener[1].split()[-1])
 				
 				if tmp_ener >= 0.0:
-					
-					#print "THIS IS A TEST WARNING: "
-					#print "DETECTED A VASP CONFIGURATION ENERGY GREATER THAN 0.0"
-					#print "FOR DEBUG PURPOSES, KILLING THE SCRIPT"
-					#print "IF THIS IS THE EXPECTED FUNCTIONALITY, FIX THIS DEBUG EXIT IN vasp_driver.py"
-					#print "FYI, THIS IS NOT IN THE GIT VERSION YET"
-					#exit()
 					
 					print "Warning: VASP energy is positive energy for job name", outcar_list[j], ":", tmp_ener, "...skipping."
 					continue
@@ -513,10 +573,14 @@ def post_process(*argv, **kwargs):
 				if os.path.isfile("OUTCAR.xyzf"):
 			
 					helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf", outcar_list[j] + ".xyzf"])
+					helpers.cat_specific("tmp.tmp", ["OUTCAR.temps", tmpfile])					
 				else:
 					helpers.cat_specific("tmp.dat", [outcar_list[j] + ".xyzf"])
+					helpers.cat_specific("tmp.tmp", [tmpfile])					
 				
 				helpers.run_bash_cmnd("mv tmp.dat OUTCAR.xyzf")
+				helpers.run_bash_cmnd("mv tmp.tmp OUTCAR.temps")
+				
 		
 		os.chdir("..")
 
@@ -627,7 +691,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 
 			# Need to figure out the possible temperatures ... 
 			
-			ifstream = open("../../../ALC-0/GEN_FF/" + args["traj_list"], 'r')
+			ifstream = ""
+			
+			try:
+				ifstream = open("../../../ALC-0/GEN_FF/" + args["traj_list"], 'r')
+			except:
+				ifstream = open("../../../ALC-1/GEN_FF/" + args["traj_list"], 'r')
+				
 
 			temps    = ifstream.readlines()[1:]
 
@@ -721,6 +791,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 		# Grab the necessary files
 	
 		helpers.run_bash_cmnd("cp " + ' '.join(glob.glob(args["basefile_dir"] + "/*")) + " .")
+		
+		# Delete any not for this case (temperature)
+		
+		incars = sorted(glob.glob("*.INCAR"))
+		temp   = helpers.head(glob.glob("*000*POSCAR")[0],1)[0].split()[2]
+		incars.remove(temp +".INCAR")
+		helpers.run_bash_cmnd("rm -f " + ' '.join(incars))
 	
 		# Create the task string
 				
@@ -728,9 +805,9 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 		job_task.append("module load " + args["modules"] + '\n')
 	
 	
-		for i in xrange(len(atm_types)):
+		for k in xrange(len(atm_types)):
 	
-			job_task.append("ATOMS[" + `i` + "]=" + atm_types[i] + '\n')
+			job_task.append("ATOMS[" + `k` + "]=" + atm_types[k] + '\n')
 	
 		job_task.append("for j in $(ls *.POSCAR)	")	
 		job_task.append("do				")
@@ -740,8 +817,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 		job_task.append("	if [ -e ${CHECK} ] ; then ")	
 		job_task.append("		continue	")	
 		job_task.append("	fi			")
+		job_task.append("	prev_tries=`wc -l ${TAG}.tries`")
+		job_task.append("	if [ $prev_tries -ge 2 ]; then ")
+		job_task.append("		continue        ")
+		job_task.append("	fi                      ")				
+		job_task.append("	echo \"Attempt\" >> ${TAG}.tries")
 		job_task.append("	TEMP=`awk '{print $(NF-1); exit}' POSCAR`")
-		job_task.append("	cp ${TEMP}.INCAR INCAR		")	
+		job_task.append("	cp ${TEMP}.INCAR INCAR	")	
 		job_task.append("	rm -f POTCAR		")
 		job_task.append("	for k in ${ATOMS[@]}	")
 		job_task.append("	do			")

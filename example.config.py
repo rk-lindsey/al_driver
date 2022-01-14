@@ -87,7 +87,6 @@ CHIMES_SOLVE_TIME  = "24:00:00" # "08:00:00" # "01:00:00" "00:30:00"	# Hours
 ##### ChIMES MD
 ################################
 
-CHIMES_MD     = CHIMES_SRCDIR + "chimes_md"
 CHIMES_MD_MPI = CHIMES_SRCDIR + "chimes_md-mpi"
 CHIMES_MD_SER = CHIMES_SRCDIR + "chimes_md-serial"  # Executable for serial chimes_md compilation (i.e. using g++ rather than mpicxx)
 CHIMES_MOLANAL= "/g/g17/rlindsey/CURR_TRACKED-GEN/contrib/molanlal/"  
@@ -127,10 +126,9 @@ CALC_REPO_ENER_TIME  =  "4:00:00"
 
 # ***** NEW VARIABLES AS OF 06/19/20 ***** #
 
-BULK_QM_METHOD = "VASP"     # Currently supported options are "VASP" ... coming soon-ish: DFTB+, CP2K
+BULK_QM_METHOD = "VASP"     # Currently supported options are "VASP" and "DFTB+"... coming soon-ish: CP2K
 IGAS_QM_METHOD = "Gaussian" # Currently supported options are "VASP or Gaussian" ... coming soon-ish: NWChem
 
-GAUS_POSTPRC = CHIMES_SRCDIR + "gaussian2xyzf.py" # THIS NEEDS TO BE WRITTEN
 GAUS_NODES   = 4
 GAUS_TIME    = "04:00:00"
 GAUS_QUEUE   = "pbatch"
@@ -146,6 +144,18 @@ VASP_TIME    = "04:00:00"
 VASP_QUEUE   = "pbatch"
 VASP_EXE     = "/usr/gapps/emc-vasp/vasp.5.4.1/build/std/vasp"
 VASP_MODULES = "mkl" # Currently unused, but should be included
+
+# ***** # 
+
+DFTB_FILES   = VASP_FILES # For now the code assumes all QM-related input files are in the same location, set by VASP_FILES
+DFTB_POSTPRC = CHIMES_SRCDIR + "../contrib/vasp/dftb+2xyzf.py" # This script can only process 1 frame at a time
+DFTB_NODES   = 1
+DFTB_PPN     = 1 
+DFTB_TIME    = "04:00:00"
+DFTB_QUEUE   = "pbatch"
+DFTB_EXE     = "/usr/gapps/polymers/dftbplus-17.1/_build/prog/dftb+/dftb+"
+DFTB_MODULES = "mkl" # Currently unused but should be, esp if thread parallism is requested
+
 
 
 

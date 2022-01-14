@@ -394,7 +394,7 @@ def get_pared_trajs(do_cluster):
 
 		#helpers.run_bash_cmnd("cd INDEP-" + args["my_indep"])
 	
-		frames = helpers.run_bash_cmnd("grep Step traj.gen").count("Step")
+		frames = helpers.count_genframes_general("traj.gen")
 
 		helpers.dftbgen_to_xyz(frames, "traj.gen")
 	
@@ -415,7 +415,7 @@ def get_pared_trajs(do_cluster):
 					ofstream.write(box)
 		ofstream.close()
 		
-		helpers.run_bash_cmnd("mv traj.xyz traj_bad_r.ge.rin+dp_dftbfrq.xyz")
+		helpers.run_bash_cmnd("mv traj+box.xyz traj_bad_r.ge.rin+dp_dftbfrq.xyz")
 		
 	else:
 		with open("traj_bad_r.ge.rin+dp_dftbfrq.xyz") as ifstream:
@@ -429,13 +429,23 @@ def get_pared_trajs(do_cluster):
 	
 	print "Generating 20 evenly spaced frames"
 	
+	if frames == 0:
+		print "ERROR: No frames in traj.gen or traj_bad_r.ge.rin+dp_dftbfrq.xyz"
+		print "Try decreasing timestep and starting over."
+		exit()
+	
 	skip = int(frames / 20)
+	
+	if frames <= 20: # Then skip would be 0
+	
+		helpers.cat_specific("traj_20F.xyz", ["traj_bad_r.ge.rin+dp_dftbfrq.xyz"])
+	else:
 
-	helpers.break_apart_xyz(20*skip, "traj_bad_r.ge.rin+dp_dftbfrq.xyz", skip, True) # First arg was: frames
+		helpers.break_apart_xyz(20*skip, "traj_bad_r.ge.rin+dp_dftbfrq.xyz", skip, True) # First arg was: frames
 	
-	# Cat the resulting files, add penalty frames
+		# Cat the resulting files, add penalty frames
 	
-	helpers.cat_pattern("traj_20F.xyz", "traj_bad_r.ge.rin+dp_dftbfrq_#*")
+		helpers.cat_pattern("traj_20F.xyz", "traj_bad_r.ge.rin+dp_dftbfrq_#*")
 	
 	print "Adding up to 20 traj_bad_r.lt.rin+dp.xyz frames"
 	
@@ -478,12 +488,15 @@ def get_pared_trajs(do_cluster):
 		print "Generating 250 evenly spaced frames"
 
 		skip = int(frames / 250)
+		
+		if frames <= 250:
+			helpers.cat_specific("traj_250F.xyz", ["traj_bad_r.ge.rin+dp_dftbfrq.xyz"])
+		else:
+			helpers.break_apart_xyz(250*skip, "traj_bad_r.ge.rin+dp_dftbfrq.xyz", skip, True)  # First arg was: frames
 
-		helpers.break_apart_xyz(250*skip, "traj_bad_r.ge.rin+dp_dftbfrq.xyz", skip, True)  # First arg was: frames
+			# Cat the resulting files, add penalty frames
 
-		# Cat the resulting files, add penalty frames
-
-		helpers.cat_pattern("traj_250F.xyz", "traj_bad_r.ge.rin+dp_dftbfrq_#*")
+			helpers.cat_pattern("traj_250F.xyz", "traj_bad_r.ge.rin+dp_dftbfrq_#*")
 		
 		print "Adding up to 20 traj_bad_r.lt.rin+dp.xyz frames"
 		

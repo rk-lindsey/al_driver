@@ -63,20 +63,20 @@ def main(args):
 	WARNING: AL does not (yet) support different stress/energy options for different cases
 
 	WARNING: This driver does NOT support SPLITFI functionality in fm_setup.in file. A-matrix
-	         is handled by the driver itself, based on CHIMES_SOLVE_NODES and CHIMES_SOLVE_QUEUE
+	         is handled by the driver itself, based on CHIMES_SOLVE_NODES, CHIMES_SOLVE_PPN,
+		 and CHIMES_SOLVE_QUEUE. Note that number of files is CHIMES_SOLVE_NODES*CHIMES_SOLVE_PPN.
+		 To allow more memory per task, increase nodes and decrease ppn. Script will still request
+		 full nodes.
 
 	WARNING: Per-atom energies will be incorrect if number of atoms for multiple types is 
 	         identical across the entire A-mat (i.e. for a CO system) ... This can be/is
 		 rectified by running additional AL cycles that extracts individual molecules
 		 
 	To Do: 
-	
-	       - Add ability to do full-frame ALC only (no clustering) ... this would require
-		 either the ability to start at ALC-1, or the ability to run MD for ALC-0
-	
-	       - Add a utility to check/fix data types set in config      
+		       
+	       - Update/improve vasp2xyzf.py
 	       
-	       - Continue updating test suite		
+	       - Add a test suite		
 	       
 	       - Add an ability to go back and run additional independent simulations for various ALC's/cases	
 	       
@@ -109,6 +109,14 @@ def main(args):
 		print "Exiting."
 		
 		exit()
+		
+	# Check whether the user just requested help
+	
+	if "--help" in args:
+		verify_config.print_help()
+		exit()
+	
+	verify_config.verify(config)
 	
 	print "The following has been set as the working directory:"
 	print '\t', config.WORKING_DIR
@@ -122,9 +130,11 @@ def main(args):
 
 	config.CHIMES_SOLVER  = config.HPC_PYTHON + " " + config.CHIMES_SOLVER
 	config.CHIMES_POSTPRC = config.HPC_PYTHON + " " + config.CHIMES_POSTPRC
-
-	config.VASP_POSTPRC   = config.HPC_PYTHON + " " + config.VASP_POSTPRC
-	config.GAUS_POSTPRC   = config.HPC_PYTHON + " " + config.GAUS_POSTPRC
+	
+	if ((config.BULK_QM_METHOD == "VASP") or (config.IGAS_QM_METHOD == "VASP")):
+		config.VASP_POSTPRC   = config.HPC_PYTHON + " " + config.VASP_POSTPRC
+	if ((config.BULK_QM_METHOD == "DFTB+") or (config.IGAS_QM_METHOD == "DFTB+")):
+		config.DFTB_POSTPRC   = config.HPC_PYTHON + " " + config.DFTB_POSTPRC
 	
 	if config.EMAIL_ADD:
 		EMAIL_ADD = config.EMAIL_ADD	
@@ -171,13 +181,16 @@ def main(args):
 	for THIS_ALC in ALC_LIST:
 
 		THIS_ALC = int(THIS_ALC)
-		
-		
+				
 		# Let the ALC process know whether this is a restarted cycle or a completely new cycle
 		
 		if THIS_ALC != restart_controller.last_ALC:
 		
 			restart_controller.reinit_vars()
+
+		if (THIS_ALC == 0) and 	(not config.DO_CLUSTER):
+			print "config.DO_CLUSTER was set false - skipping ALC-0"
+			continue
 		
 		
 		# Prepare the restart file
@@ -214,6 +227,14 @@ def main(args):
 				# Note: Stress tensor inclusion controlled by contents of config.ALC0_FILES
 			
 				active_job = gen_ff.build_amat(THIS_ALC,
+						do_hierarch        = config.DO_HIERARCH,
+						hierarch_files     = config.HIERARCH_PARAM_FILES,	
+						hierarch_exe       = config.CHIMES_MD_SER,
+						do_correction      = config.FIT_CORRECTION,
+						correction_method  = config.CORRECTED_TYPE,
+						correction_files   = config.CORRECTED_TYPE_FILES,
+						correction_exe     = config.CORRECTED_TYPE_EXE,
+						correction_temps   = config.CORRECTED_TEMPS_BY_FILE,						
 						prev_gen_path      = config.ALC0_FILES,
 						job_email          = config.HPC_EMAIL,
 						job_ppn            = str(config.HPC_PPN),
@@ -231,8 +252,7 @@ def main(args):
 				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "BUILD_AMAT: COMPLETE ")	
 			else:
 				restart_controller.update_file("BUILD_AMAT: COMPLETE" + '\n')
-				
-			
+
 			if not restart_controller.SOLVE_AMAT:
 			
 				if not gen_ff.solve_amat_started(): 
@@ -240,6 +260,8 @@ def main(args):
 					print "Starting solve_amat from scratch"			
 			
 					active_job = gen_ff.solve_amat(THIS_ALC, 
+						weights_set_alc_0  = config.WEIGHTS_SET_ALC_0,
+						weights_alc_0      = config.WEIGHTS_ALC_0,
 						weights_force      = config.WEIGHTS_FORCE,
 						weights_force_gas  = config.WEIGHTS_FGAS,
 						weights_energy     = config.WEIGHTS_ENER,
@@ -250,6 +272,7 @@ def main(args):
 						regression_var     = config.REGRESS_VAR,
 						job_email          = config.HPC_EMAIL,
 						job_ppn            = str(config.HPC_PPN),
+						node_ppn           = config.HPC_PPN,
 						job_nodes          = config.CHIMES_SOLVE_NODES,
 						job_walltime       = config.CHIMES_SOLVE_TIME,	
 						job_queue          = config.CHIMES_SOLVE_QUEUE,					
@@ -271,15 +294,12 @@ def main(args):
 					print "solve amat job incomplete... restarting for the ", n_restarts, "st/nd/th time"
 					
 					active_job = gen_ff.restart_solve_amat(THIS_ALC,
-						weights_force      = config.WEIGHTS_FORCE,
-						weights_energy     = config.WEIGHTS_ENER,
-						weights_energy_gas = config.WEIGHTS_EGAS,
-						weights_stress     = config.WEIGHTS_STRES,
 						regression_alg     = config.REGRESS_ALG,
 						regression_nrm     = config.REGRESS_NRM,
 						regression_var     = config.REGRESS_VAR,	
 						job_email          = config.HPC_EMAIL,		
-						job_ppn            = str(config.HPC_PPN),
+						job_ppn            = config.CHIMES_SOLVE_PPN,
+						node_ppn           = config.HPC_PPN,
 						job_nodes          = config.CHIMES_SOLVE_NODES,
 						job_walltime       = config.CHIMES_SOLVE_TIME,	
 						job_queue          = config.CHIMES_SOLVE_QUEUE,	
@@ -297,8 +317,19 @@ def main(args):
 					print "Cannot post-process. Exiting."
 					
 					exit()
+					
+				# If needed, combine existing parameter files with newly generated one
+					
+				if config.DO_HIERARCH:
+					
+					gen_ff.combine("GEN_FF/params.txt", config.HIERARCH_PARAM_FILES)				
 
-				helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
+					helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " hierarch.params.txt")
+					
+					helpers.run_bash_cmnd("mv  hierarch.params.txt.reduced GEN_FF/params.txt.reduced")
+					
+				else:
+					helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
 			
 				restart_controller.update_file("SOLVE_AMAT: COMPLETE" + '\n')	
 				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "SOLVE_AMAT: COMPLETE ")
@@ -456,11 +487,18 @@ def main(args):
 						loose_crit     = config.LOOSE_CRIT,
 						clu_code       = config.CLU_CODE,  
 						compilation    = "g++ -std=c++11 -O3",
-						basefile_dir   = config.VASP_FILES,
+						basefile_dir   = config.QM_FILES,
 						VASP_exe       = config.VASP_EXE,
 						VASP_nodes     = config.VASP_NODES,
 						VASP_time      = config.VASP_TIME,
 						VASP_queue     = config.VASP_QUEUE,
+						VASP_modules   = config.VASP_MODULES,
+						DFTB_nodes     = config.DFTB_NODES,  
+						DFTB_ppn       = config.DFTB_PPN,    
+						DFTB_time      = config.DFTB_TIME,   
+						DFTB_queue     = config.DFTB_QUEUE,  
+						DFTB_exe       = config.DFTB_EXE,    
+						DFTB_modules   = config.DFTB_MODULES,
 						Gaussian_exe   = config.GAUS_EXE,
 						Gaussian_scr   = config.GAUS_SCR,
 						Gaussian_nodes = config.GAUS_NODES,
@@ -557,7 +595,9 @@ def main(args):
 			
 				qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY",
 					vasp_postproc = config.VASP_POSTPRC,
-					gaus_postproc = config.GAUS_POSTPRC)
+					dftb_postproc = config.DFTB_POSTPRC, # ) #,
+					gaus_reffile  = config.GAUS_REF)
+					# gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 
 			os.chdir("..")
 			
@@ -583,6 +623,8 @@ def main(args):
 			
 			if config.IGAS_QM_METHOD == "VASP":
 				qm_all_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/VASP-all/"
+			elif config.IGAS_QM_METHOD == "DFTB+":
+				qm_all_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/DFTB-all/"
 			elif config.IGAS_QM_METHOD == "Gaussian":
 				qm_all_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/GAUS-all/"
 			else:
@@ -593,30 +635,64 @@ def main(args):
 			
 				if config.BULK_QM_METHOD == "VASP":
 					qm_20F_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/VASP-20/"
+				elif config.BULK_QM_METHOD == "DFTB+":
+					qm_20F_path = config.WORKING_DIR + "/ALC-" + `THIS_ALC-1` + "/DFTB-20/"			
 				else:
 					print "Error in main driver while building Amat: unkown BULK QM method:", config.BULK_QM_METHOD
 					exit()
-	
+
 			if not restart_controller.BUILD_AMAT:
 			
 				do_stress = False
 				
 				if THIS_ALC >= config.USE_AL_STRS:
-					do_stress = True		
+					do_stress = True
+				
+				if (not config.DO_CLUSTER) and (THIS_ALC == 1):	
+				
+					active_job = gen_ff.build_amat(THIS_ALC,
+							do_hierarch        = config.DO_HIERARCH,
+							hierarch_files     = config.HIERARCH_PARAM_FILES,
+							hierarch_exe       = config.CHIMES_MD_SER,
+							do_correction      = config.FIT_CORRECTION,
+							correction_method  = config.CORRECTED_TYPE,
+							correction_files   = config.CORRECTED_TYPE_FILES,
+							correction_exe     = config.CORRECTED_TYPE_EXE,							
+							correction_temps   = config.CORRECTED_TEMPS_BY_FILE,							
+							do_cluster         = config.DO_CLUSTER,
+							prev_gen_path      = config.ALC0_FILES,
+							job_email          = config.HPC_EMAIL,
+							job_ppn            = str(config.HPC_PPN),
+							job_nodes          = config.CHIMES_BUILD_NODES,
+							job_walltime       = config.CHIMES_BUILD_TIME,	
+							job_queue          = config.CHIMES_BUILD_QUEUE,		
+							job_account        = config.HPC_ACCOUNT, 
+							job_system         = config.HPC_SYSTEM,
+							job_executable     = config.CHIMES_LSQ)	
+				else:
 			
-				active_job = gen_ff.build_amat(THIS_ALC, 
-					prev_qm_all_path = qm_all_path,
-					prev_qm_20_path  = qm_20F_path,
-					include_stress     = do_stress,	
-					stress_style       = config.STRS_STYLE,
-					job_email          = config.HPC_EMAIL,
-					job_ppn            = str(config.HPC_PPN),
-					job_nodes          = config.CHIMES_BUILD_NODES,
-					job_walltime       = config.CHIMES_BUILD_TIME,	
-					job_queue          = config.CHIMES_BUILD_QUEUE,						
-					job_account        = config.HPC_ACCOUNT, 
-					job_system         = config.HPC_SYSTEM,
-					job_executable     = config.CHIMES_LSQ)
+					active_job = gen_ff.build_amat(THIS_ALC, 
+						prev_qm_all_path = qm_all_path,
+						prev_qm_20_path  = qm_20F_path,
+						do_hierarch      = config.DO_HIERARCH,
+						hierarch_files   = config.HIERARCH_PARAM_FILES,	
+						hierarch_exe     = config.CHIMES_MD_SER,
+						do_correction      = config.FIT_CORRECTION,
+						correction_method  = config.CORRECTED_TYPE,
+						correction_files   = config.CORRECTED_TYPE_FILES,
+						correction_exe     = config.CORRECTED_TYPE_EXE,							
+						correction_temps   = config.CORRECTED_TEMPS_BY_FILE,						
+						do_cluster       = config.DO_CLUSTER,
+						include_stress   = do_stress,	
+						stress_style     = config.STRS_STYLE,
+						job_email        = config.HPC_EMAIL,
+						job_ppn          = str(config.HPC_PPN),
+						job_nodes        = config.CHIMES_BUILD_NODES,
+						job_walltime     = config.CHIMES_BUILD_TIME,	
+						job_queue        = config.CHIMES_BUILD_QUEUE,						
+						job_account      = config.HPC_ACCOUNT, 
+						job_system       = config.HPC_SYSTEM,
+						job_executable   = config.CHIMES_LSQ)
 			
 				helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")
 			
@@ -626,7 +702,7 @@ def main(args):
 			else:
 				restart_controller.update_file("BUILD_AMAT: COMPLETE" + '\n')
 						
-				
+	
 			if not restart_controller.SOLVE_AMAT:	
 			
 				# Check whether we have previously started 
@@ -637,6 +713,9 @@ def main(args):
 					print "Starting solve_amat from scratch"
 			
 					active_job = gen_ff.solve_amat(THIS_ALC, 
+						do_cluster       = config.DO_CLUSTER,
+						weights_set_alc_0  = config.WEIGHTS_SET_ALC_0,
+						weights_alc_0      = config.WEIGHTS_ALC_0,						
 						weights_force      = config.WEIGHTS_FORCE,
 						weights_force_gas  = config.WEIGHTS_FGAS,
 						weights_energy     = config.WEIGHTS_ENER,
@@ -646,7 +725,8 @@ def main(args):
 						regression_nrm     = config.REGRESS_NRM,
 						regression_var     = config.REGRESS_VAR,	
 						job_email          = config.HPC_EMAIL,					
-						job_ppn            = str(config.HPC_PPN),
+						job_ppn            = config.CHIMES_SOLVE_PPN,
+						node_ppn           = config.HPC_PPN,
 						job_nodes          = config.CHIMES_SOLVE_NODES,
 						job_walltime       = config.CHIMES_SOLVE_TIME,	
 						job_queue          = config.CHIMES_SOLVE_QUEUE,							
@@ -667,15 +747,12 @@ def main(args):
 					print "solve amat job incomplete... restarting for the ", n_restarts, "st/nd/th time"
 					
 					active_job = gen_ff.restart_solve_amat(THIS_ALC,
-						weights_force      = config.WEIGHTS_FORCE,
-						weights_energy     = config.WEIGHTS_ENER,
-						weights_energy_gas = config.WEIGHTS_EGAS,
-						weights_stress     = config.WEIGHTS_STRES,
 						regression_alg     = config.REGRESS_ALG,
 						regression_nrm     = config.REGRESS_NRM,
 						regression_var     = config.REGRESS_VAR,	
 						job_email          = config.HPC_EMAIL,		
-						job_ppn            = str(config.HPC_PPN),
+						job_ppn            = config.CHIMES_SOLVE_PPN,
+						node_ppn           = config.HPC_PPN,	
 						job_nodes          = config.CHIMES_SOLVE_NODES,
 						job_walltime       = config.CHIMES_SOLVE_TIME,	
 						job_queue          = config.CHIMES_SOLVE_QUEUE,	
@@ -693,9 +770,17 @@ def main(args):
 					print "Cannot post-process. Exiting."
 					
 					exit()
-	
-
-				helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
+					
+				if config.DO_HIERARCH:
+					gen_ff.combine("GEN_FF/params.txt", config.HIERARCH_PARAM_FILES)	
+					helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " hierarch.params.txt")					
+					helpers.run_bash_cmnd("mv  hierarch.params.txt.reduced GEN_FF/params.txt.reduced")				
+				else:
+					
+					helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
+			
+				restart_controller.update_file("SOLVE_AMAT: COMPLETE" + '\n')	
+				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "SOLVE_AMAT: COMPLETE ")					
 				
 				restart_controller.update_file("SOLVE_AMAT: COMPLETE" + '\n')	
 				
@@ -719,24 +804,26 @@ def main(args):
 				active_jobs = []
 				
 				#print "running for cases:", config.NO_CASES
-			
+
 				for THIS_CASE in xrange(config.NO_CASES):
 
-					active_job = run_md.run_md(THIS_ALC, THIS_CASE, THIS_INDEP,
-						basefile_dir   = config.CHIMES_MDFILES, 
+					active_job = run_md.run_md(THIS_ALC, THIS_CASE, THIS_INDEP, config.MD_STYLE,
+						basefile_dir   = config.MDFILES, 
 						driver_dir     = config.DRIVER_DIR,
 						penalty_pref   = 1.0E6,		
 						penalty_dist   = 0.02, 		
+						chimes_exe     = config.CHIMES_MD_SER,
 						job_name       = "ALC-"+ str(THIS_ALC) +"-md-c" + str(THIS_CASE) +"-i" + str(THIS_INDEP),
 						job_email      = config.HPC_EMAIL,	   	 
 						job_ppn        = config.HPC_PPN,	   	 
-						job_nodes      = config.CHIMES_MD_NODES,
-						job_walltime   = config.CHIMES_MD_TIME,      
-						job_queue      = config.CHIMES_MD_QUEUE,      
+						job_nodes      = config.MD_NODES[THIS_CASE],
+						job_walltime   = config.MD_TIME [THIS_CASE],	  
+						job_queue      = config.MD_QUEUE[THIS_CASE],	  
 						job_account    = config.HPC_ACCOUNT, 
 						job_executable = config.CHIMES_MD_MPI,	 
 						job_system     = "slurm",  	 
 						job_file       = "run.cmd")
+						
 		
 					active_jobs.append(active_job.split()[0])	
 									
@@ -754,13 +841,13 @@ def main(args):
 			
 					# Post-process the MD job
 			
-					run_md.post_proc(THIS_ALC, THIS_CASE, THIS_INDEP,
-					        config.MOLANAL_SPECIES,
-						basefile_dir   = config.CHIMES_MDFILES, 
+					run_md.post_proc(THIS_ALC, THIS_CASE, THIS_INDEP, config.MD_STYLE, 
+						config.MOLANAL_SPECIES,
+						basefile_dir   = config.MDFILES, 
 						driver_dir     = config.DRIVER_DIR,
 						penalty_pref   = config.CHIMES_PEN_PREFAC,	  
 						penalty_dist   = config.CHIMES_PEN_DIST,		  
-						molanal_dir    = config.CHIMES_MOLANAL, 
+						molanal_dir    = config.MOLANAL, 
 						local_python   = config.HPC_PYTHON, 	
 						do_cluster     = config.DO_CLUSTER,	
 						tight_crit     = config.TIGHT_CRIT,	
@@ -773,101 +860,109 @@ def main(args):
 				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "POST_PROC: COMPLETE ")
 			else:
 				restart_controller.update_file("POST_PROC: COMPLETE" + '\n')	
-			
-			if not restart_controller.CLUSTER_EXTRACTION:
-			
-				# list ... remember, we only do clustering/active learning on a single indep (0)
-			
-				cat_xyzlist_cmnd    = ""
-				cat_ts_xyzlist_cmnd = ""		
-			
-				for THIS_CASE in xrange(config.NO_CASES):
-				        
-				        repo = "CASE-" + str(THIS_CASE) + "_INDEP_" + str(THIS_INDEP) + "/CFG_REPO/"
-
-					if config.MAX_CLUATM:
-			
-						cluster.list_clusters(repo, config.ATOM_TYPES, config.MAX_CLUATM)
-					else:
-						cluster.list_clusters(repo, config.ATOM_TYPES)		
-		
-				        helpers.run_bash_cmnd("mv xyzlist.dat	 " + "CASE-" + str(THIS_CASE) + ".xyzlist.dat"   )
-				        helpers.run_bash_cmnd("mv ts_xyzlist.dat " + "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat")
-
-				        cat_xyzlist_cmnd    += "CASE-" + str(THIS_CASE) + ".xyzlist.dat "
-				        cat_ts_xyzlist_cmnd += "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat "
-
-				helpers.cat_specific("xyzlist.dat"   , cat_xyzlist_cmnd   .split())
-				helpers.cat_specific("ts_xyzlist.dat", cat_ts_xyzlist_cmnd.split())
-
-				helpers.run_bash_cmnd("rm -f " + cat_xyzlist_cmnd   )
-				helpers.run_bash_cmnd("rm -f " + cat_ts_xyzlist_cmnd)
 				
-				restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')	
 				
-				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUSTER_EXTRACTION: COMPLETE ")				
-			else:
-				restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')					
+			if config.DO_CLUSTER:
 			
+				if not restart_controller.CLUSTER_EXTRACTION:
+				
+					# list ... remember, we only do clustering/active learning on a single indep (0)
+				
+					cat_xyzlist_cmnd    = ""
+					cat_ts_xyzlist_cmnd = ""		
+				
+					for THIS_CASE in xrange(config.NO_CASES):
+					        
+					        repo = "CASE-" + str(THIS_CASE) + "_INDEP_" + str(THIS_INDEP) + "/CFG_REPO/"
+            	
+						if config.MAX_CLUATM:
+				
+							cluster.list_clusters(repo, config.ATOM_TYPES, config.MAX_CLUATM)
+						else:
+							cluster.list_clusters(repo, config.ATOM_TYPES)		
+		    	
+					        helpers.run_bash_cmnd("mv xyzlist.dat	 " + "CASE-" + str(THIS_CASE) + ".xyzlist.dat"   )
+					        helpers.run_bash_cmnd("mv ts_xyzlist.dat " + "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat")
+            	
+					        cat_xyzlist_cmnd    += "CASE-" + str(THIS_CASE) + ".xyzlist.dat "
+					        cat_ts_xyzlist_cmnd += "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat "
+            	
+					helpers.cat_specific("xyzlist.dat"   , cat_xyzlist_cmnd   .split())
+					helpers.cat_specific("ts_xyzlist.dat", cat_ts_xyzlist_cmnd.split())
+            	
+					helpers.run_bash_cmnd("rm -f " + cat_xyzlist_cmnd   )
+					helpers.run_bash_cmnd("rm -f " + cat_ts_xyzlist_cmnd)
 					
-			if not restart_controller.CLUENER_CALC:
-			
-				# Compute cluster energies
-			
-				gen_selections.cleanup_repo(THIS_ALC)	
-			
-				active_jobs = cluster.get_repo_energies(
-						calc_central   = True,
-						base_runfile   = config.WORKING_DIR + "ALL_BASE_FILES/" + "run_md.cluster",
-						driver_dir     = config.DRIVER_DIR,
-						job_email      = config.HPC_EMAIL,
-						job_ppn        = str(config.HPC_PPN),
-						job_queue      = config.CALC_REPO_ENER_QUEUE,
-						job_walltime   = str(config.CALC_REPO_ENER_TIME),				  
-						job_cent_queue    = config.CALC_REPO_ENER_CENT_QUEUE,
-						job_cent_walltime = str(config.CALC_REPO_ENER_CENT_TIME), 
-						job_account    = config.HPC_ACCOUNT, 
-						job_system     = config.HPC_SYSTEM,
-						job_executable = config.CHIMES_MD_SER)	
+					restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')	
+					
+					helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUSTER_EXTRACTION: COMPLETE ")				
+				else:
+					restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')					
+				
 						
-				helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
-
-				restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')	
+				if not restart_controller.CLUENER_CALC:
 				
-				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUENER_CALC: COMPLETE ")	
-			else:
-				restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')	
-
-
-			if not restart_controller.CLU_SELECTION:
-
-				# Generate cluster sub-selection and store in central repository
-
-				gen_selections.gen_subset(
-						 repo	  = "../CENTRAL_REPO/full_repo.energies_normed",
-						 nsel	  = config.MEM_NSEL, # Number of selections to make    
-						 nsweep   = config.MEM_CYCL, # Number of MC sqeeps	       
-						 nbins    = config.MEM_BINS, # Number of histogram bins 	 
-						 ecut	  = config.MEM_ECUT) # Maximum energy to consider	
-						 
-				gen_selections.populate_repo(THIS_ALC)   
-						 
-				restart_controller.update_file("CLU_SELECTION: COMPLETE" + '\n')
+					# Compute cluster energies
 				
-				helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLU_SELECTION: COMPLETE ")
-			else:
-				restart_controller.update_file("CLU_SELECTION: COMPLETE" + '\n')
-								 
-
+					gen_selections.cleanup_repo(THIS_ALC)	
+				
+					active_jobs = cluster.get_repo_energies(
+							calc_central   = True,
+							base_runfile   = config.WORKING_DIR + "ALL_BASE_FILES/" + "run_md.cluster",
+							driver_dir     = config.DRIVER_DIR,
+							job_email      = config.HPC_EMAIL,
+							job_ppn        = str(config.HPC_PPN),
+							job_queue      = config.CALC_REPO_ENER_QUEUE,
+							job_walltime   = str(config.CALC_REPO_ENER_TIME),				  
+							job_cent_queue    = config.CALC_REPO_ENER_CENT_QUEUE,
+							job_cent_walltime = str(config.CALC_REPO_ENER_CENT_TIME), 
+							job_account    = config.HPC_ACCOUNT, 
+							job_system     = config.HPC_SYSTEM,
+							job_executable = config.CHIMES_MD_SER)	
+							
+					helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
+            	
+					restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')	
+					
+					helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUENER_CALC: COMPLETE ")	
+				else:
+					restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')	
+            	
+            	
+				if not restart_controller.CLU_SELECTION:
+            	
+					# Generate cluster sub-selection and store in central repository
+            	
+					gen_selections.gen_subset(
+							 repo	  = "../CENTRAL_REPO/full_repo.energies_normed",
+							 nsel	  = config.MEM_NSEL, # Number of selections to make    
+							 nsweep   = config.MEM_CYCL, # Number of MC sqeeps	       
+							 nbins    = config.MEM_BINS, # Number of histogram bins 	 
+							 ecut	  = config.MEM_ECUT) # Maximum energy to consider	
+							 
+					gen_selections.populate_repo(THIS_ALC)   
+							 
+					restart_controller.update_file("CLU_SELECTION: COMPLETE" + '\n')
+					
+					helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLU_SELECTION: COMPLETE ")
+				else:
+					restart_controller.update_file("CLU_SELECTION: COMPLETE" + '\n')
+									 
+            	
 			################################
 			# Launch QM
 			################################
 			
 			# Note: If multiple cases are being used, only run clean/setup once!
 			
+			tasks = ["20"]
+			
+			if config.DO_CLUSTER:
+				tasks = ["20","all"]
+			
 			if not restart_controller.CLEANSETUP_QM:
 			
-				qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD,["20","all"], build_dir=".")
+				qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, build_dir=".")
 			
 				restart_controller.update_file("CLEANSETUP_QM: COMPLETE" + '\n')	
 			else:
@@ -877,14 +972,14 @@ def main(args):
 			
 				active_jobs = []
 
-				qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["20", "all"], build_dir=".")
+				qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, build_dir=".")
 				
 				for THIS_CASE in xrange(config.NO_CASES):
 
-					qm_driver  .cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD,["20", "all"], THIS_CASE, build_dir=".") # Always clean up, just in case
+					qm_driver  .cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE, build_dir=".") # Always clean up, just in case
 										
 					active_job = qm_driver.setup_qm(THIS_ALC,config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
-						["20", "all"], 
+						tasks, 
 						config.ATOM_TYPES,
 						THIS_CASE, 
 						SMEARING,
@@ -893,14 +988,22 @@ def main(args):
 						loose_crit     = config.LOOSE_CRIT,
 						clu_code       = config.CLU_CODE,  
 						compilation    = "g++ -std=c++11 -O3",
-						basefile_dir   = config.VASP_FILES,
+						basefile_dir   = config.QM_FILES,
 						VASP_exe       = config.VASP_EXE,
 						VASP_nodes     = config.VASP_NODES,
+						VASP_ppn       = config.VASP_PPN,
 						VASP_time      = config.VASP_TIME,
 						VASP_queue     = config.VASP_QUEUE,
+						DFTB_exe       = config.DFTB_EXE,
+						DFTB_nodes     = config.DFTB_NODES,
+						DFTB_ppn       = config.DFTB_PPN,
+						DFTB_time      = config.DFTB_TIME,
+						DFTB_modules   = config.DFTB_MODULES,
+						DFTB_queue     = config.DFTB_QUEUE,						
 						Gaussian_exe   = config.GAUS_EXE,
 						Gaussian_scr   = config.GAUS_SCR,
 						Gaussian_nodes = config.GAUS_NODES,
+						Gaussian_ppn   = config.GAUS_PPN,
 						Gaussian_time  = config.GAUS_TIME,
 						Gaussian_queue = config.GAUS_QUEUE,
 						job_ppn        = config.HPC_PPN,
@@ -927,9 +1030,8 @@ def main(args):
 				
 					for THIS_CASE in xrange(config.NO_CASES):
 
-						active_job = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
-								["all","20"], THIS_CASE, 
-								job_system     = config.HPC_SYSTEM)
+						active_job = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE, 
+								job_system = config.HPC_SYSTEM)
 								
 						active_jobs += active_job
 								
@@ -950,9 +1052,7 @@ def main(args):
 			else:
 				restart_controller.update_file("ALL_QMJOBS: COMPLETE" + '\n')
 				
-			total_failed = qm_driver.check_convergence(THIS_ALC, config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
-									config.NO_CASES,
-									["all","20"])
+			total_failed = qm_driver.check_convergence(THIS_ALC, config.BULK_QM_METHOD, config.IGAS_QM_METHOD, config.NO_CASES, tasks)
 			
 			print "Detected",total_failed,"unconverged QM jobs"	
 										
@@ -968,9 +1068,8 @@ def main(args):
 				
 						for THIS_CASE in xrange(config.NO_CASES):
 
-							active_jobs = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
-									["all","20"], THIS_CASE, 
-									job_system     = config.HPC_SYSTEM)
+							active_jobs = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE,
+								job_system = config.HPC_SYSTEM)
 									
 							active_jobs += active_job
 									
@@ -995,15 +1094,19 @@ def main(args):
 			
 			if not restart_controller.THIS_ALC:
 
-				# Post-process the vasp jobs
+				# Post-process the vasp/DFTB jobs
 			
 				print "post-processing..."	
 
-				# Do all first... extract only forces and energies
+				if config.DO_CLUSTER:
 				
-				qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY", config.NO_CASES,
+					# Do all first... extract only forces and energies
+				
+					qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY", config.NO_CASES,
 						vasp_postproc = config.VASP_POSTPRC,
-						gaus_postproc = config.GAUS_POSTPRC)
+						dftb_postproc = config.DFTB_POSTPRC, # )#,
+						gaus_reffile  = config.GAUS_REF)
+						#gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 						
 				# Now do full frames... may or may not need to extract stress tensors as well. This descision is based on whether the *next* ALC requires stresses!
 
@@ -1018,7 +1121,9 @@ def main(args):
 				
 				qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["20"], extract, config.NO_CASES,
 					vasp_postproc = config.VASP_POSTPRC,
-					gaus_postproc = config.GAUS_POSTPRC)				
+					dftb_postproc = config.DFTB_POSTPRC, # ) #,
+					gaus_reffile  = config.GAUS_REF)
+					#gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 						
 						
 			os.chdir("..")

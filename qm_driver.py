@@ -7,6 +7,7 @@ import copy
 import helpers
 import vasp_driver
 import gauss_driver
+import dftbplus_driver
 
 
 def cleanup_and_setup(bulk_qm_method, igas_qm_method, *argv, **kwargs):
@@ -33,7 +34,7 @@ def cleanup_and_setup(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 
 	### ...kwargs
 	
-	default_keys   = [""]*1        ; default_values = [""]*1
+	default_keys     = [""]*1      ; default_values     = [""]*1
 	default_keys[0 ] = "build_dir" ; default_values[0 ] = "."
 
 	args = dict(zip(default_keys, default_values))
@@ -44,9 +45,13 @@ def cleanup_and_setup(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	if (len(args_targets) == 1) and (args_targets[-1] == "20"):
 		is_just_bulk = True
 
-	if (bulk_qm_method == igas_qm_method) or is_just_bulk: # Then it's all VASP, just submit as normal
+	if (bulk_qm_method == igas_qm_method) or is_just_bulk: # Then it's all VASP or DFTB, just submit as normal
 		if bulk_qm_method == "VASP":
+			print "WARNING: VASP as a gas phase method is untested!"
 			vasp_driver.cleanup_and_setup(*argv, **kwargs)
+		elif bulk_qm_method == "DFTB+":
+			print "WARNING: DFTB+ as a gas phase method is untested!"
+			dftbplus_driver.cleanup_and_setup(*argv, **kwargs)
 		else:
 			print "ERROR: Unknown bulk/igas_qm_method in qm_driver.cleanup_and_setup:", bulk_qm_method
 	
@@ -59,13 +64,18 @@ def cleanup_and_setup(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 			if i == "20":
 				if bulk_qm_method == "VASP":
 					vasp_driver.cleanup_and_setup(*tmp_args, build_dir = args["build_dir"])
+				elif bulk_qm_method == "DFTB+":
+					dftbplus_driver.cleanup_and_setup(*tmp_args, build_dir = args["build_dir"])
 				else:
 					print "ERROR: Unknown bulk_qm_method in qm_driver.cleanup_and_setup:", bulk_qm_method
 			else:
 				if igas_qm_method == "VASP":
+					print "WARNING: VASP as a gas phase method is untested!"
 					vasp_driver.cleanup_and_setup(*tmp_args, **kwargs)
+				elif igas_qm_method == "DFTB+":
+					print "WARNING: DFTB+ as a gas phase method is untested!"
+					dftbplus_driver.cleanup_and_setup(*tmp_args, **kwargs)
 				elif igas_qm_method == "Gaussian":
-
 					gauss_driver.cleanup_and_setup(*tmp_args, **kwargs)
 				else:
 					print "ERROR: Unknown igas_qm_method in qm_driver.cleanup_and_setup:", igas_qm_method
@@ -85,7 +95,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	       Requries a list of atom types.
 	       For VASP jobs:
 	         - Expects a POSCAR file for all atom types, named like: X.POSCAR
-	         - All other input files (INCAR, KPOINTS, etc) are taken from config.VASP_FILES.
+	         - All other input files (INCAR, KPOINTS, etc) are taken from config.QM_FILES.
 	       Returns a SLURM jobid
 	       See setup_vasp functions in <qm_code>_driver.py for additional details
 
@@ -95,37 +105,49 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	
 	### ...kwargs
 	
-	default_keys   = [""]*18
-	default_values = [""]*18
+	default_keys   = [""]*25
+	default_values = [""]*25
 
+
+	default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../QM_BASEFILES/"		# VASP and DFTB+ input files
 
 	# VASP specific controls
 	
-	default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../VASP_BASEFILES/"		# POTCAR, KPOINTS, and INCAR
 	default_keys[1 ] = "VASP_exe" 	   ; default_values[1 ] = ""				# Path to VASP executable
-	default_keys[2 ] = "VASP_nodes"    ; default_values[2 ] = "4" 				# Requested VASP  job nodes
-	default_keys[3 ] = "VASP_time" 	   ; default_values[3 ] = "00:30:00"			# Requested max walltime for VASP job
-	default_keys[4 ] = "VASP_queue"    ; default_values[4 ] = "pdebug"			# Requested VASP job queue
+	default_keys[2 ] = "VASP_nodes"    ; default_values[2 ] = "4"				# Requested VASP  job nodes
+	default_keys[3 ] = "VASP_ppn"      ; default_values[3 ] = "36"  			# Requested VASP  job proc per node	
+	default_keys[4 ] = "VASP_time" 	   ; default_values[4 ] = "00:30:00"			# Requested max walltime for VASP job
+	default_keys[5 ] = "VASP_queue"    ; default_values[5 ] = "pdebug"			# Requested VASP job queue
 	
 	# Gaussian specific controls
 	
-	default_keys[5 ] = "Gaussian_exe"  ; default_values[5 ] = ""				# Path to Gaussian executable
-	default_keys[6 ] = "Gaussian_nodes"; default_values[6 ] = "1"				# Requested Gaussian  job nodes
-	default_keys[7 ] = "Gaussian_time" ; default_values[7 ] = "00:30:00"			# Requested max walltime for Gaussian job
-	default_keys[8 ] = "Gaussian_queue"; default_values[8 ] = "pdebug"			# Requested Gaussian job queue
-	default_keys[9 ] = "Gaussian_scr  "; default_values[9 ] = ""				# Requested Gaussian scratch directory
+	default_keys[6 ] = "Gaussian_exe"  ; default_values[6 ] = ""				# Path to Gaussian executable
+	default_keys[7 ] = "Gaussian_nodes"; default_values[7 ] = "1"				# Requested Gaussian  job nodes
+	default_keys[8 ] = "Gaussian_ppn"  ; default_values[8 ] = "36"  			# Requested Gaussian  job proc per node
+	default_keys[9 ] = "Gaussian_time" ; default_values[9 ] = "00:30:00"			# Requested max walltime for Gaussian job
+	default_keys[10] = "Gaussian_queue"; default_values[10] = "pdebug"			# Requested Gaussian job queue
+	default_keys[11] = "Gaussian_scr  "; default_values[11] = ""				# Requested Gaussian scratch directory
 	
-	default_keys[10] = "tight_crit"  ; default_values[10] = "../../../../tight_bond_crit.dat"			      # File with tight bonding criteria for clustering
-	default_keys[11] = "loose_crit"  ; default_values[11] = "../../../../loose_bond_crit.dat"			      # File with loose bonding criteria for clustering
-	default_keys[12] = "clu_code"	 ; default_values[12] = "/p/lscratchrza/rlindsey/RC4B_RAG/11-12-18/new_ts_clu.cpp"	# Clustering code	
-	default_keys[13] = "compilation" ; default_values[13] = "g++ -std=c++11 -O3"
+	# DFTB specific controls
+	
+	default_keys[12] = "DFTB_exe"  ; default_values[12] = ""			       # Path to DFTB+ executable
+	default_keys[13] = "DFTB_nodes"; default_values[13] = "1"			       # Requested DFTB+  job nodes
+	default_keys[14] = "DFTB_ppn"  ; default_values[14] = "1"			       # Requested DFTB+  job proc per node
+	default_keys[15] = "DFTB_time" ; default_values[15] = "00:30:00"		       # Requested max walltime for Gaussian job
+	default_keys[16] = "DFTB_queue"; default_values[16] = "pdebug"  		       # Requested DFTB+ job queue
+	
+	
+	default_keys[17] = "tight_crit"  ; default_values[17] = "../../../../tight_bond_crit.dat"			      # File with tight bonding criteria for clustering
+	default_keys[18] = "loose_crit"  ; default_values[18] = "../../../../loose_bond_crit.dat"			      # File with loose bonding criteria for clustering
+	default_keys[19] = "clu_code"	 ; default_values[19] = "/p/lscratchrza/rlindsey/RC4B_RAG/11-12-18/new_ts_clu.cpp"	# Clustering code	
+	default_keys[20] = "compilation" ; default_values[20] = "g++ -std=c++11 -O3"
 
 	# Overall job controls	
 	
-	default_keys[14] = "job_ppn"	  ; default_values[14] = "36"			     # Number of processors per node for ChIMES md job
-	default_keys[15] = "job_account"  ; default_values[15] = "pbronze"		     # Account for ChIMES md job
-	default_keys[16] = "job_system"   ; default_values[16] = "slurm"		     # slurm or torque       
-	default_keys[17] = "job_email"	  ; default_values[17] = True			     # Send slurm emails?
+	default_keys[21] = "job_ppn"	  ; default_values[21] = "36"			     # Number of processors per node for ChIMES md job
+	default_keys[22] = "job_account"  ; default_values[22] = "pbronze"		     # Account for ChIMES md job
+	default_keys[23] = "job_system"   ; default_values[23] = "slurm"		     # slurm or torque       
+	default_keys[24] = "job_email"	  ; default_values[24] = True			     # Send slurm emails?
 	
 	args = dict(zip(default_keys, default_values))
 	args.update(kwargs)	
@@ -143,17 +165,35 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	if (bulk_qm_method == igas_qm_method) or is_just_bulk: # Then it's all VASP, just submit as normal
 
 		if bulk_qm_method == "VASP":
-			run_qm_jobid.append(vasp_driver.setup_vasp(my_ALC, *argv,
+			print "WARNING: VASP as a gas phase method is untested!"
+			run_qm_jobids += vasp_driver.setup_vasp(my_ALC, *argv,
 				first_run      = True,		     
 				basefile_dir   = args  ["basefile_dir"],
 				job_executable = args  ["VASP_exe"],
-				job_email      = config.HPC_EMAIL,
+				job_email      = args  ["job_email"],
 				job_nodes      = args  ["VASP_nodes"],
-				job_ppn        = config.HPC_PPN,
+				job_ppn        = args  ["VASP_ppn"],
 				job_walltime   = args  ["VASP_time"],
 				job_queue      = args  ["VASP_queue"],
-				job_account    = config.HPC_ACCOUNT, 
-				job_system     = config.HPC_SYSTEM))
+				job_account    = args  ["job_account"], 
+				job_system     = args  ["job_system"])
+				
+		elif bulk_qm_method == "DFTB+":
+		
+			if not is_just_bulk:
+				print "WARNING: DFTB+ as a gas phase method is untested!"
+				
+			run_qm_jobids += dftbplus_driver.setup_dftb(my_ALC, *argv,
+				first_run      = True,		     
+				basefile_dir   = args  ["basefile_dir"],
+				job_executable = args  ["DFTB_exe"],
+				job_email      = args  ["job_email"],
+				job_nodes      = args  ["DFTB_nodes"],
+				job_ppn        = args  ["DFTB_ppn"],
+				job_walltime   = args  ["DFTB_time"],
+				job_queue      = args  ["DFTB_queue"],
+				job_account    = args  ["job_account"], 
+				job_system     = args  ["job_system"])
 		else:
 			print "ERROR: Unknown bulk/igas_qm_method in qm_driver.setup_qm:", bulk_qm_method
 	
@@ -173,16 +213,30 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 						job_executable = args  ["VASP_exe"],
 						job_email      = args  ["job_email"],
 						job_nodes      = args  ["VASP_nodes"],
-						job_ppn        = args  ["job_ppn"],
+						job_ppn        = args  ["VASP_ppn"],
 						job_walltime   = args  ["VASP_time"],
 						job_queue      = args  ["VASP_queue"],
 						job_account    = args  ["job_account"],
 						job_system     = args  ["job_system"])
+				elif bulk_qm_method == "DFTB+":
+					run_qm_jobids += dftbplus_driver.setup_dftb(my_ALC, *tmp_args,
+						first_run      = True,		     
+						basefile_dir   = args  ["basefile_dir"],
+						job_executable = args  ["DFTB_exe"],
+						job_email      = args  ["job_email"],
+						job_nodes      = args  ["DFTB_nodes"],
+						job_ppn        = args  ["DFTB_ppn"],
+						job_walltime   = args  ["DFTB_time"],
+						job_queue      = args  ["DFTB_queue"],
+						job_account    = args  ["job_account"],
+						job_system     = args  ["job_system"])						
 				else:
 					print "ERROR: Unknown bulk_qm_method in qm_driver.setup_qm:", bulk_qm_method
 			else:
 			
 				if igas_qm_method == "VASP":
+				
+					print "WARNING: VASP as a gas phase method is untested!"
 
 					run_qm_jobids += vasp_driver.setup_vasp(my_ALC, *tmp_args,
 						first_run      = True,		     
@@ -190,9 +244,25 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 						job_executable = args  ["VASP_exe"],
 						job_email      = args  ["job_email"],
 						job_nodes      = args  ["VASP_nodes"],
-						job_ppn        = args  ["job_ppn"],
+						job_ppn        = args  ["VASP_ppn"],
 						job_walltime   = args  ["VASP_time"],
 						job_queue      = args  ["VASP_queue"],
+						job_account    = args  ["job_account"],
+						job_system     = args  ["job_system"])
+						
+				elif igas_qm_method == "DFTB+":
+				
+					print "WARNING: DFTB+ as a gas phase method is untested!"
+
+					run_qm_jobids += dftbplus_driver.setup_dftb(my_ALC, *tmp_args,
+						first_run      = True,		     
+						basefile_dir   = args  ["basefile_dir"],
+						job_executable = args  ["DFTB_exe"],
+						job_email      = args  ["job_email"],
+						job_nodes      = args  ["DFTB_nodes"],
+						job_ppn        = args  ["DFTB_ppn"],
+						job_walltime   = args  ["DFTB_time"],
+						job_queue      = args  ["DFTB_queue"],
 						job_account    = args  ["job_account"],
 						job_system     = args  ["job_system"])
 						
@@ -205,7 +275,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 						scratch_dir    = args  ["Gaussian_scr"],
 						job_email      = args  ["job_email"],
 						job_nodes      = args  ["Gaussian_nodes"],
-						job_ppn        = args  ["job_ppn"],
+						job_ppn        = args  ["Gaussian_ppn"],
 						job_walltime   = args  ["Gaussian_time"],
 						job_queue      = args  ["Gaussian_queue"],
 						job_account    = args  ["job_account"],
@@ -242,12 +312,13 @@ def continue_job(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	
 	any_VASP     = []
 	any_Gaussian = []
+	any_DFTB     = []
 	
 
 	if ((bulk_qm_method == "VASP") and ("20"  in job_types)):
 		any_VASP.append("20")
 	if ((igas_qm_method == "VASP") and ("all" in job_types)):
-		any_VASP.append("all")
+		any_VASP.append("all")	
 		
 	if len(any_VASP) > 0:
 	
@@ -256,6 +327,19 @@ def continue_job(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 		active_jobs += vasp_driver.continue_job(*tmp_args, **kwargs)
 		
 		found_match += 1
+		
+	if ((bulk_qm_method == "DFTB+") and ("20"  in job_types)):
+		any_DFTB.append("20")
+	if ((igas_qm_method == "DFTB+") and ("all" in job_types)):
+		any_DFTB.append("all")			
+		
+	if len(any_DFTB) > 0:
+	
+		tmp_args[0] = any_DFTB
+	
+		active_jobs += dftbplus_driver.continue_job(*tmp_args, **kwargs)
+		
+		found_match += 1		
 
 	if ((bulk_qm_method == "Gaussian") and ("20"  in job_types)):
 		print "ERROR: Continue requested condensed phase job for Gaussian"
@@ -304,22 +388,29 @@ def check_convergence(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	if (len(args_targets) == 1) and (args_targets[-1] == "20"):
 		is_just_bulk = True
 	
-	if (bulk_qm_method == igas_qm_method) or is_just_bulk: # Then it's all VASP, just submit as normal
+	if (bulk_qm_method == igas_qm_method) or is_just_bulk: # Then it's all VASP or DFTB, just submit as normal
 		if bulk_qm_method == "VASP":
 			total_failed += vasp_driver.check_convergence(my_ALC, *argv, **kwargs)
+		elif bulk_qm_method == "DFTB+":
+			total_failed += dftbplus_driver.check_convergence(my_ALC, *argv, **kwargs)
 		else:
-			print "ERROR: Unknown bulk/igas_qm_method in qm_driver.check_convergence:", bulk_qm_method
+			print "ERROR: Unknown bulk/igas_qm_method in qm_driver.check_convergence:", bulk_qm_method			
+			
 	
 	else: # Need to submit each differently 
 		for i in args_targets:
 			if i == "20":
 				if bulk_qm_method == "VASP":
 					total_failed += vasp_driver.check_convergence(my_ALC, args_cases,["20"])
+				elif bulk_qm_method == "DFTB+":
+					total_failed += dftbplus_driver.check_convergence(my_ALC, args_cases,["20"])					
 				else:
 					print "ERROR: Unknown bulk_qm_method in qm_driver.check_convergence:", bulk_qm_method
 			else:
 				if igas_qm_method == "VASP":
 					total_failed += vasp_driver.check_convergence(my_ALC, args_cases,["all"])
+				elif igas_qm_method == "DFTB":
+					total_failed += dftbplus_driver.check_convergence(my_ALC, args_cases,["all"])					
 				elif igas_qm_method == "Gaussian":
 					total_failed += gauss_driver.check_convergence(my_ALC, args_cases,["all"])
 				else:
@@ -339,8 +430,8 @@ def post_process(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	       	
 	"""	
 	
-	default_keys   = [""]*2
-	default_values = [""]*2
+	default_keys   = [""]*4
+	default_values = [""]*4
 
 
 	# VASP specific controls
@@ -350,15 +441,14 @@ def post_process(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	# Gaussian specific controls
 	
 	default_keys[1 ] = "gaus_postproc"  ; default_values[1 ] = "" # Python file for post-processing Gausian output
+	default_keys[2 ] = "gaus_reffile"   ; default_values[2 ] = None # Single atom energy corrections
+
+	# DFTB+ specific controls
 	
+	default_keys[3 ] = "dftb_postproc"  ; default_values[1 ] = "" # Python file for post-processing DFTB+ output	
 
 	args = dict(zip(default_keys, default_values))
 	args.update(kwargs)
-	
-	
-	
-	
-		
 	
 	is_just_bulk = False
 	
@@ -368,6 +458,8 @@ def post_process(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 	if (bulk_qm_method == igas_qm_method) or is_just_bulk: # Then it's all VASP, just submit as normal
 		if bulk_qm_method == "VASP":
 			vasp_driver.post_process(*argv, vasp_postproc = args["vasp_postproc"])
+		elif bulk_qm_method == "DFTB+":
+			dftbplus_driver.post_process(*argv, dftb_postproc = args["dftb_postproc"])			
 		else:
 			print "ERROR: Unknown bulk/igas_qm_method in qm_driver.post_process:", bulk_qm_method
 		
@@ -382,12 +474,16 @@ def post_process(bulk_qm_method, igas_qm_method, *argv, **kwargs):
 			if i == "20":
 				if bulk_qm_method == "VASP":
 					vasp_driver.post_process(*tmp_args, vasp_postproc = args["vasp_postproc"])
+				elif bulk_qm_method == "DFTB+":
+					dftbplus_driver.post_process(*tmp_args, dftb_postproc = args["dftb_postproc"])					
 				else:
 					print "ERROR: Unknown bulk_qm_method in qm_driver.post_process:", bulk_qm_method
 			else:
 				if igas_qm_method == "VASP":
 					vasp_driver.post_process(*tmp_args, vasp_postproc = args["vasp_postproc"])
+				elif igas_qm_method == "DFTB+":
+					dftbplus_driver.post_process(*tmp_args, dftb_postproc = args["dftb_postproc"])					
 				elif igas_qm_method == "Gaussian":
-					gauss_driver.post_process(*tmp_args, gaus_postproc = args["gaus_postproc"])
+					gauss_driver.post_process(*tmp_args, gaus_postproc = args["gaus_postproc"], refdatafile = args["gaus_reffile"])
 				else:
 					print "ERROR: Unknown igas_qm_method in qm_driver.post_process:", igas_qm_method	

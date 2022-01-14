@@ -1,5 +1,60 @@
 import os
 
+def parse_refdatafile(infile):
+
+	""" 
+	
+	Parses a file containing Gaussian and planewave-code
+	single atom energies. Format should be:
+		
+		# Comment lines start with \"#\"
+		<chemical symbol> <Gaussian energy> <planewave code energy>
+		
+	Energies are expected in kcal/mol, and there should be an entry for each
+	atom type of itnerest	
+	
+	"""
+
+	# Read file contents 
+
+	ifstream = open(infile,'r')
+	contents = ifstream.readlines()
+	ifstream.close()
+	
+	# Remove comment lines
+	
+	tmp = []
+	
+	for i in xrange(len(contents)):
+	
+		if "#" in contents[i]:
+			continue
+			
+		tmp.append(contents[i].rstrip())
+		
+	# Break up into atom type, Gaussian energy, and VASP energy
+	
+	atyps = []
+	Gener = []
+	Vener = []
+	
+	for i in xrange(len(tmp)):
+	
+		contents = tmp[i].split()
+		
+		if len(contents) < 1:
+			continue
+		
+		atyps    .append(contents[0])
+		Gener    .append(float(contents[1]))
+		Vener    .append(float(contents[2]))
+		
+	# Output results
+	
+	return atyps, Gener, Vener 
+		 
+	
+
 def check_job_success(infile):
 
 	""" 
@@ -78,7 +133,7 @@ def get_final_energy(infile,method):
 
 	
 	
-def get_xyzf(logfile, comfile, natoms, boxls):
+def get_xyzf(logfile, comfile, natoms, boxls, refdatafile):
 
 	"""
 	
@@ -136,37 +191,36 @@ def get_xyzf(logfile, comfile, natoms, boxls):
 	
 	energy   = float(get_final_energy(logfile,"HF"))*627.509608030592 # This is the Gaussian energy in kcal/mol... need to correct for reference state
 
-	# Gaussian Atom Offset Energies (kcal/mol):
-	E_GAUSS_C = -23716.035500449343
-	E_GAUSS_N = -34217.444307885125
-	E_GAUSS_O = -47066.163622356100
 
-	# Vasp Atom Offset Energies (kcal/mol):
-	E_VASP_C = -29.848029661940735
-	E_VASP_N = -72.0692392257318
-	E_VASP_O = -44.01350025037822
+	atm_typs, E_GAUSS, E_VASP = parse_refdatafile(refdatafile)
 	
-	n_C = 0
-	n_N = 0
-	n_O = 0
-	
-	
+	natm_typ = [1.0]*len(atm_typs)
+
 	for i in xrange(int(natoms)):
-		if coords[i].split()[0] == "C":
-			n_C += 1
-		if coords[i].split()[0] == "N":
-			n_N += 1
-		if coords[i].split()[0] == "O":
-			n_O += 1
-			
-	#print "Counted the following C N and O:", n_C, n_N, n_O
+	
+		found = False
+		
+		for j in xrange(len(natm_typ)):
+		
+			tmp_typ = coords[i].split()[0]
+
+			if tmp_typ == atm_typs[j]:
+				natm_typ[j] += 1
+				found = True
+				
+		if not found:
+			print "ERROR: Could not find reference energies for atom type:", tmp_typ
+			print "       Check Gaussian energy to planewave input file"
+			exit() 
+
 	#print "Gaussian energy was:", energy
-			
-	energy = energy - n_C*E_GAUSS_C - n_N*E_GAUSS_N - n_O*E_GAUSS_O
 	
+	for i in xrange(len(natm_typ)):
+
+		energy -= natm_typ[i]*E_GAUSS[i]
+		energy += natm_typ[i]*E_VASP[i]
+				
 	#print "Gauss energy minus atom contributions is:",energy
-	
-	energy = energy + n_C*E_VASP_C  + n_N*E_VASP_N  + n_O*E_VASP_O	
 	
 	#print "VASP energy is:", energy
 	
