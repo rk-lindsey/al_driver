@@ -259,6 +259,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		# Build the list of failed jobs for the current VASP job type (i.e. "all" or "20")
 	
 		base_list = []
+		base_case = []
 		
 		for j in xrange(args_cases):
 		
@@ -288,7 +289,9 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		        	
 		        	if last_rmm >= NELM:
 		        		base_list.append('.'.join(tmp_list[k].split('.')[:-1])) # Won't include the final extension (e.g. POSCAR, OSZICAR, OUTCAR, etc)
-		
+					base_case.append(int(tmp_list[k].split('.')[0].split('_')[-1]))
+					
+
 		print "Found",len(base_list),"incomplete jobs"
 		
 		if len(base_list) == 0:
@@ -308,12 +311,12 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		
 		incars = []
 
-		for j in xrange(args_cases):
+		for j in base_case: # Only update INCARs for failed cases
 			incars += glob.glob("CASE-" + `j` + "/*.INCAR")
 	
 		for j in xrange(len(incars)):
 			
-			#print "Working on:",incars[j]
+			print "Working on:",incars[j]
 			
 			if os.path.exists(incars[j] + ".bck"):
 				helpers.run_bash_cmnd("cp " + incars[j] + ".bck " + incars[j])
@@ -330,7 +333,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
 			# Make sure it contains the expected value, then replace with 38/Normal
 			
 			if "IALGO" in line[0]:
-			
+
 				if int(line[2]) != 48:
 					print "ERROR: Expected IALGO = 48, got",line[2]
 					print "Would have replaced with 38"
@@ -788,6 +791,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 		# Grab the necessary files
 	
 		helpers.run_bash_cmnd("cp " + ' '.join(glob.glob(args["basefile_dir"] + "/*")) + " .")
+		
+		# Delete any not for this case (temperature)
+		
+		incars = sorted(glob.glob("*.INCAR"))
+		temp   = helpers.head(glob.glob("*000*POSCAR")[0],1)[0].split()[2]
+		incars.remove(temp +".INCAR")
+		helpers.run_bash_cmnd("rm -f " + ' '.join(incars))
 	
 		# Create the task string
 				
@@ -795,9 +805,9 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 		job_task.append("module load " + args["modules"] + '\n')
 	
 	
-		for i in xrange(len(atm_types)):
+		for k in xrange(len(atm_types)):
 	
-			job_task.append("ATOMS[" + `i` + "]=" + atm_types[i] + '\n')
+			job_task.append("ATOMS[" + `k` + "]=" + atm_types[k] + '\n')
 	
 		job_task.append("for j in $(ls *.POSCAR)	")	
 		job_task.append("do				")
