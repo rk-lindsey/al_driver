@@ -92,10 +92,10 @@ def get_repo_energies(*argv, **kwargs):
 	
 	curr_dir = helpers.run_bash_cmnd("pwd").rstrip()
 
-	run_cmnd  = "msub -l nodes=" + args["job_nodes"] + ":ppn=" + args["job_ppn"] + " -l walltime=" + args["job_walltime"] + " -N dmb_enr " + " -q " +  args["job_queue"] + " " + " -A " +  args["job_account"] + " "
+	run_cmnd  = "sbatch  -N " + args["job_nodes"] + " -n " + args["job_ppn"] + " -t " + args["job_walltime"] + " -J " + "dmb_enr" + " -p " + args["job_queue"] + " -A " + args["job_account"] + " "	
 	
 	if args["job_email"]:
-		run_cmnd += " -m abe "
+		run_cmnd += " --mail-type=ALL "
 	run_cmnd += " new-get_dumb_ener.sh GEN_FF/params.txt.reduced "  + args["job_executable"] + " " + curr_dir + "/run_md.cluster " + args["driver_dir"]
 	
 	# Submit and monitor the jobs
@@ -155,7 +155,7 @@ def get_repo_energies(*argv, **kwargs):
 		
 		helpers.run_bash_cmnd("cp full_repo.xyzlist xyzlist.dat")
 	
-		run_cmnd  = "msub -l nodes=" + args["job_nodes"] + ":ppn=" + args["job_ppn"] + " -l walltime=" + args["job_cent_walltime"] + " -N dmb_enr " + " -q " +  args["job_cent_queue"] + " " + " -A " +  args["job_account"] + " "		
+		run_cmnd  = "sbatch  -N " + args["job_nodes"] + " -n " + args["job_ppn"] + " -t " + args["job_cent_walltime"] + " -J " + "dmb_enr" + " -p " + args["job_cent_queue"] + " -A " + args["job_account"] + " "
 		run_cmnd += " new-get_dumb_ener.sh params.txt.reduced "  + args["job_executable"] + " " + args["base_runfile"] + " " + args["driver_dir"]
 		run_cmnd += " REPO"
 	

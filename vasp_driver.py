@@ -166,9 +166,9 @@ def continue_job(*argv, **kwargs):
 				print "			Resubmitting."
 
 				if args["job_system"] == "slurm":
-					job_list.append(helpers.run_bash_cmnd("msub run_vasp.cmd").replace('\n', ''))
+					job_list.append(helpers.run_bash_cmnd("sbatch run_vasp.cmd").split()[-1])
 				else:	
-					job_list.append(helpers.run_bash_cmnd("msub run_vasp.cmd").replace('\n', ''))
+					job_list.append(helpers.run_bash_cmnd("qsub run_vasp.cmd").replace('\n', ''))
 
 			else:
 				print "			Not resubmitting."
@@ -266,7 +266,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		        tmp_list = sorted(glob.glob("CASE-" + `j` + "/*.OUTCAR")) # list of all .outcar files for the current ALC's VASP-20 or VASP-all specific t/p case
 		        
 		        for k in xrange(len(tmp_list)):
-		        
+					        
 		        	# Get max NELM
 		        
 		        	NELM = None
@@ -291,7 +291,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
 		        		base_list.append('.'.join(tmp_list[k].split('.')[:-1])) # Won't include the final extension (e.g. POSCAR, OSZICAR, OUTCAR, etc)
 					base_case.append(int(tmp_list[k].split('.')[0].split('_')[-1]))
 					
-
+		
 		print "Found",len(base_list),"incomplete jobs"
 		
 		if len(base_list) == 0:
@@ -315,7 +315,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
 			incars += glob.glob("CASE-" + `j` + "/*.INCAR")
 	
 		for j in xrange(len(incars)):
-			
+		
 			print "Working on:",incars[j]
 			
 			if os.path.exists(incars[j] + ".bck"):
@@ -336,7 +336,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
 
 				if int(line[2]) != 48:
 					print "ERROR: Expected IALGO = 48, got",line[2]
-					print "Would have replaced with 38"
+					print "Would have replaced with 38"				
 					exit()		
 				line[2] = "38"						
 			
@@ -548,7 +548,7 @@ def post_process(*argv, **kwargs):
 			
 			
 			tmpfile = ''.join(outcar_list[j].split("OUTCAR"))+"POSCAR"
-			tmp_temp =  helpers.head(tmpfile,1)[0].split()[2]
+			tmp_temp =  helpers.head(tmpfile,1)[0].split()[-2]
 			
 			tmpfile = outcar_list[j]
 			tmpfile = tmpfile + ".xyz.temps"
@@ -793,9 +793,10 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 		helpers.run_bash_cmnd("cp " + ' '.join(glob.glob(args["basefile_dir"] + "/*")) + " .")
 		
 		# Delete any not for this case (temperature)
-		
+
 		incars = sorted(glob.glob("*.INCAR"))
-		temp   = helpers.head(glob.glob("*000*POSCAR")[0],1)[0].split()[2]
+		temp   = helpers.head(glob.glob("*000*POSCAR")[0],1)[0].split()[-2]
+
 		incars.remove(temp +".INCAR")
 		helpers.run_bash_cmnd("rm -f " + ' '.join(incars))
 	

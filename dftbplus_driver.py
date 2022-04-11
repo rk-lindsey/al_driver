@@ -165,9 +165,9 @@ def continue_job(*argv, **kwargs):
 				print "			Resubmitting."
 
 				if args["job_system"] == "slurm":
-					job_list.append(helpers.run_bash_cmnd("msub run_dftb.cmd").replace('\n', ''))
+					job_list.append(helpers.run_bash_cmnd("sbatch run_dftb.cmd").split()[-1])
 				else:	
-					job_list.append(helpers.run_bash_cmnd("msub run_dftb.cmd").replace('\n', ''))
+					job_list.append(helpers.run_bash_cmnd("qsub run_dftb.cmd").replace('\n', ''))
 
 			else:
 				print "			Not resubmitting."

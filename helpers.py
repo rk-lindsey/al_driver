@@ -486,12 +486,13 @@ def create_and_launch_job(*argv, **kwargs):
 	run_bash_cmnd("rm -f " + args["job_file"])
 	
 	JOB = []
-	JOB.append(" -N " + args["job_name"])
-	JOB.append(" -l " + "nodes=" + args["job_nodes"] + ":ppn=" + args["job_ppn"])
-	JOB.append(" -l " + "walltime=" + args["job_walltime"])# + ":00:00")	  	   
-	JOB.append(" -q " + args["job_queue"])
+	JOB.append(" -J " + args["job_name"])
+	JOB.append(" -N " + args["job_nodes"])
+	JOB.append(" -n " + args["job_ppn"])
+	JOB.append(" -t " + args["job_walltime"])	  	   
+	JOB.append(" -p " + args["job_queue"])
 	if args["job_email"]:
-		JOB.append(" -m abe")   
+		JOB.append(" --mail-type=ALL")   
 	JOB.append(" -A " + args["job_account"])  
 	JOB.append(" -V " )
 	JOB.append(" -o " + "stdoutmsg")
@@ -502,7 +503,7 @@ def create_and_launch_job(*argv, **kwargs):
 	for i in xrange(len(JOB)):
 	
 		if args["job_system"] == "slurm":
-			JOB[i] = "#MSUB" + JOB[i]
+			JOB[i] = "#SBATCH" + JOB[i]
 		elif args["job_system"] == "torque":
 			JOB[i] = "#PBS"  + JOB[i]
 		else:
@@ -530,7 +531,7 @@ def create_and_launch_job(*argv, **kwargs):
 	jobid = None
 	
 	if args["job_system"] == "slurm":
-		jobid = run_bash_cmnd("msub " + args["job_file"])
+		jobid = run_bash_cmnd("sbatch " + args["job_file"]).split()[-1]
 	else:	
 		jobid = run_bash_cmnd("qsub " + args["job_file"])
 

@@ -8,14 +8,17 @@ import helpers
 class bool_block:
 
 	def __init__(self):
-		self.keys = [["USECOUL:", None], ["FITCOUL:", None], ["USEPOVR:", None], ["FITPOVR:", None], ["USE3BCH:", None],  ["USE4BCH:", None]]
+		self.keys = [["USECOUL:", None], ["FITCOUL:", None], ["USEPOVR:", None], ["FITPOVR:", None], ["USE3BCH:", None],  ["USE4BCH:", None], ["EXCL1B:", "False"], ["EXCL2B:", "False"]]
 		
 	def set_block(self,param_data):
 		
 		for i in xrange(len(param_data)):
 			for j in xrange(len(self.keys)):
 				if self.keys[j][0] in param_data[i]:
-					self.keys[j][1] = param_data[i].split()[-1]
+					if "EXCL" in self.keys[j][0]:
+						self.keys[j][1] = ' '.join(param_data[i].split()[2:])
+					else:
+						self.keys[j][1] = param_data[i].split()[-1]
 	def print_block(self,to="stdout"):
 
 		if to == "stdout":
@@ -736,20 +739,46 @@ class map_3b_block:
 		for i in xrange(int(self.ntrip)):
 	
 			tmp =  param_data[i+type_line].split()
-	
+				
 			self.labels  .append(tmp[0])
 			self.clusters.append(tmp[1])
 			
-		# Figure out how many unique types there are and what the labels should have been
+		
+		idx=-1
 		
 		for i in xrange(int(self.ntrip)):
-			self.sort_clus.append(''.join(sorted(self.clusters[i])))
-		self.sort_clus = list(set(self.sort_clus))
+			if int(self.labels[i])<0:
+				idx += 1
+				self.eff_labels.append(str(idx))
+			else:
+				idx = int(self.labels[i])
+				self.eff_labels.append(self.labels[i])
+				
+		#print "Sorted the lables",self.labels
+		#print "Set eff labels:",self.eff_labels
+		#print "For:",self.clusters				
+				
 		
-		for i in xrange(int(self.ntrip)):
-			for j in xrange(len(self.sort_clus)):
-				if ''.join(sorted(self.clusters[i])) == self.sort_clus[j]:
-					self.eff_labels.append(str(j))
+		return
+		
+		if False:
+				
+			
+			# Figure out how many unique types there are and what the labels should have been
+		
+			for i in xrange(int(self.ntrip)):
+				self.sort_clus.append(''.join(sorted(self.clusters[i])))
+			self.sort_clus = list(set(self.sort_clus))
+			
+			print "SAN:",self.sort_clus 
+			
+			for i in xrange(int(self.ntrip)):
+				for j in xrange(len(self.sort_clus)):
+					if ''.join(sorted(self.clusters[i])) == self.sort_clus[j]:
+						self.eff_labels.append(str(j))
+			print "Sorted the lables",self.labels
+			print "Set eff labels:",self.eff_labels
+			print "For:",self.clusters
 					
 	def print_block(self,to="stdout"):
 	
@@ -759,12 +788,14 @@ class map_3b_block:
 		if to == "stdout":
 			print "TRIPMAPS: " + self.ntrip
 			for i in xrange(int(self.ntrip)):
-				print self.labels[i] + " " + self.clusters[i]
+				#print self.labels[i] + " " + self.clusters[i]
+				print self.eff_labels[i] + " " + self.clusters[i]
 			print ""
 		else:
 			to.write("TRIPMAPS: " + self.ntrip + '\n')
 			for i in xrange(int(self.ntrip)):
-				to.write(self.labels[i] + " " + self.clusters[i] + '\n')
+				#to.write(self.labels[i] + " " + self.clusters[i] + '\n')
+				to.write(self.eff_labels[i] + " " + self.clusters[i] + '\n')
 			to.write("\n")	
 class map_4b_block:
 
@@ -794,16 +825,35 @@ class map_4b_block:
 			self.labels  .append(tmp[0])
 			self.clusters.append(tmp[1])
 			
-		# Figure out how many unique types there are and what the labels should have been
+		idx=-1
 		
 		for i in xrange(int(self.nquad)):
-			self.sort_clus.append(''.join(sorted(self.clusters[i])))
-		self.sort_clus = list(set(self.sort_clus))
+			if int(self.labels[i])<0:
+				idx += 1
+				self.eff_labels.append(str(idx))
+			else:
+				idx = int(self.labels[i])
+				self.eff_labels.append(self.labels[i])
+				
+		#print "Sorted the lables",self.labels
+		#print "Set eff labels:",self.eff_labels
+		#print "For:",self.clusters				
+				
 		
-		for i in xrange(int(self.nquad)):
-			for j in xrange(len(self.sort_clus)):
-				if ''.join(sorted(self.clusters[i])) == self.sort_clus[j]:
-					self.eff_labels.append(str(j))			
+		return	
+		
+		if False:		
+			
+			# Figure out how many unique types there are and what the labels should have been
+			
+			for i in xrange(int(self.nquad)):
+				self.sort_clus.append(''.join(sorted(self.clusters[i])))
+			self.sort_clus = list(set(self.sort_clus))
+			
+			for i in xrange(int(self.nquad)):
+				for j in xrange(len(self.sort_clus)):
+					if ''.join(sorted(self.clusters[i])) == self.sort_clus[j]:
+						self.eff_labels.append(str(j))			
 				
 	def print_block(self,to="stdout"):
 	
@@ -870,7 +920,9 @@ class energy_offset_block:
 		
 class param_file():
 
-	def __init__(self,template):
+	def __init__(self,template,name=""):
+	
+		self.name             = name
 
 		self.bool_block       = bool_block()
 		self.comp_block       = complexity_block()
@@ -944,26 +996,26 @@ class param_file():
 		if self.bool_block.keys[3][1] != other.bool_block.keys[3][1]:
 			print "ERROR: FITPOVR mismatch"	
 		if self.bool_block.keys[4][1] != other.bool_block.keys[4][1]:
-			print "WARNING: USE3BCH mismatch - setting true!"
+			print "     WARNING: USE3BCH mismatch - setting true!"
 			self.bool_block.keys[4][1] = helpers.bool2str(True)
 		if self.bool_block.keys[5][1] != other.bool_block.keys[5][1]:
-			print "WARNING: USE4BCH mismatch - setting true!"
+			print "     WARNING: USE4BCH mismatch - setting true!"
 			self.bool_block.keys[5][1] = helpers.bool2str(True)	
 			
 		# Update the model complexity block -- see below for rules
 		
 		self_orders  = [int(self.comp_block.O2B), int(self.comp_block.O3B), int(self.comp_block.O4B)]
-		other_orders = [int(self.comp_block.O2B), int(self.comp_block.O3B), int(self.comp_block.O4B)]
+		other_orders = [int(other.comp_block.O2B), int(other.comp_block.O3B), int(other.comp_block.O4B)]
 		
 		if self_orders[0] != other_orders[0]: # O2B
 			self.comp_block.O2B = str(max(self_orders[0], other_orders[0]))
-			print "WARNING: O2B mismatch - setting to", self.comp_block.O2B
+			print "     WARNING: O2B mismatch - setting to", self.comp_block.O2B
 		if self_orders[1] != other_orders[1]: # O3B
 			self.comp_block.O3B = str(max(self_orders[1], other_orders[1]))
-			print "WARNING: O3B mismatch - setting to", self.comp_block.O3B
+			print "     WARNING: O3B mismatch - setting to", self.comp_block.O3B
 		if self_orders[2] != other_orders[2]: # O4B
 			self.comp_block.O4B = str(max(self_orders[2], other_orders[2]))
-			print "WARNING: O4B mismatch - setting to", self.comp_block.O4B						
+			print "     WARNING: O4B mismatch - setting to", self.comp_block.O4B						
 			
 		# Update the atom types block 
 		
@@ -1026,9 +1078,9 @@ class param_file():
 				
 					# Update cutoffs
 					
-					self.s3b_block.cut1[i] = other.s3b_block.cut1[j]
-					self.s3b_block.cut2[i] = other.s3b_block.cut2[j]
-					self.s3b_block.cut3[i] = other.s3b_block.cut3[j]
+					self.s3b_block.cut1[j] = other.s3b_block.cut1[i]
+					self.s3b_block.cut2[j] = other.s3b_block.cut2[i]
+					self.s3b_block.cut3[j] = other.s3b_block.cut3[i]
 					
 				else:
 					# Append other to self
@@ -1071,12 +1123,12 @@ class param_file():
 				
 					# Update cutoffs
 					
-					self.s4b_block.cut1[i] = other.s4b_block.cut1[j]
-					self.s4b_block.cut2[i] = other.s4b_block.cut2[j]
-					self.s4b_block.cut3[i] = other.s4b_block.cut3[j]
-					self.s4b_block.cut4[i] = other.s4b_block.cut4[j]
-					self.s4b_block.cut5[i] = other.s4b_block.cut5[j]
-					self.s4b_block.cut6[i] = other.s4b_block.cut6[j]
+					self.s4b_block.cut1[j] = other.s4b_block.cut1[i]
+					self.s4b_block.cut2[j] = other.s4b_block.cut2[i]
+					self.s4b_block.cut3[j] = other.s4b_block.cut3[i]
+					self.s4b_block.cut4[j] = other.s4b_block.cut4[i]
+					self.s4b_block.cut5[j] = other.s4b_block.cut5[i]
+					self.s4b_block.cut6[j] = other.s4b_block.cut6[i]
 				else:
 					# Append other to self
 					
@@ -1106,94 +1158,99 @@ class param_file():
 			exit()
 		if self.clu_count_block.nquads < other.clu_count_block.nquads:
 			print "ERROR: supplement file has more quadruplet types than template file"
-			exit()			
+			exit()	
+			
+		# Update the maps ... actually, no updating should be necessary, since all possible pairs should already be in the template file		
 			
 		# Update the 2b maps
 		
-		for i in xrange(int(self.maps_2b.npair)):
-			
-			# Check if this is even a possible pair for supplement model 
-			
-			skip = False
-			
-			for j in xrange(int(other.atm_types_block.ntype)):
-				for k in xrange(int(other.atm_types_block.ntype)):
-				
-					check = sorted(self.atm_types_block.type[j] + self.atm_types_block.type[k])
-
-					if check not in self.maps_2b.clusters:
-						skip = True # Then this cannot possibly be a mapped pair - skip!	
-
-			if skip:
-				continue
-			for j in xrange(int(other.maps_2b.npair)):
-				if self.maps_2b.clusters[i] == other.maps_2b.clusters[j]:
-					continue
+		if False:
 		
-			print "WARNING: No 2b map match found for template type",self.maps_2b.clusters[i],"... setting label to -1"
-			self.maps_2b.labels[i] = -1
-			
-		# Update the 3b maps	
+			for i in xrange(int(self.maps_2b.npair)):
 				
-		for i in xrange(int(self.maps_3b.ntrip)):
-			
-			# Check if this is even a possible pair for supplement model 
-			
-			skip = False
-			
-			for j in xrange(int(other.atm_types_block.ntype)):
-				for k in xrange(int(other.atm_types_block.ntype)):
-					for l in xrange(int(other.atm_types_block.ntype)):
-			
-						check = sorted(
-						self.atm_types_block.type[j] + self.atm_types_block.type[k] + 
-						self.atm_types_block.type[j] + self.atm_types_block.type[l] +
-						self.atm_types_block.type[k] + self.atm_types_block.type[l])
-						
-						if check not in self.maps_3b.clusters:
-							skip = True # Then this cannot possibly be a mapped pair - skip!							
-
-			if skip:
-				continue
-			for j in xrange(int(other.maps_3b.ntrip)):
-				if self.maps_3b.clusters[i] == other.maps_3b.clusters[j]:
-					continue
+				# Check if this is even a possible pair for supplement model 
+				
+				skip = False
+				
+				for j in xrange(int(other.atm_types_block.ntype)):
+					for k in xrange(int(other.atm_types_block.ntype)):
 					
-			print "WARNING: No 3b map match found for template type",self.maps_3b.clusters[i],"... setting label to -1"
-			self.maps_3b.labels[i] = -1				
+						check = sorted(self.atm_types_block.type[j] + self.atm_types_block.type[k])
+
+						if check not in self.maps_2b.clusters:
+							skip = True # Then this cannot possibly be a mapped pair - skip!	
+
+				if skip:
+					continue
+				for j in xrange(int(other.maps_2b.npair)):
+					if self.maps_2b.clusters[i] == other.maps_2b.clusters[j]:
+						continue
 		
-		# Update the 4b maps
-
-		for i in xrange(int(self.maps_4b.nquad)):
-			
-			# Check if this is even a possible pair for supplement model 
-			
-			skip = False
-			
-			for j in xrange(int(other.atm_types_block.ntype)):
-				for k in xrange(int(other.atm_types_block.ntype)):
-					for l in xrange(int(other.atm_types_block.ntype)):
-						for m in xrange(int(other.atm_types_block.ntype)):
-
+				print "WARNING: No 2b map match found for template type",self.maps_2b.clusters[i],"... setting label to -1"
+				self.maps_2b.labels[i] = -1
+				
+			# Update the 3b maps	
+					
+			for i in xrange(int(self.maps_3b.ntrip)):
+				
+				# Check if this is even a possible pair for supplement model 
+				
+				skip = False
+				
+				for j in xrange(int(other.atm_types_block.ntype)):
+					for k in xrange(int(other.atm_types_block.ntype)):
+						for l in xrange(int(other.atm_types_block.ntype)):
+				
 							check = sorted(
 							self.atm_types_block.type[j] + self.atm_types_block.type[k] + 
 							self.atm_types_block.type[j] + self.atm_types_block.type[l] +
-							self.atm_types_block.type[j] + self.atm_types_block.type[m] +
-							self.atm_types_block.type[k] + self.atm_types_block.type[l] +
-							self.atm_types_block.type[k] + self.atm_types_block.type[m] +
-							self.atm_types_block.type[l] + self.atm_types_block.type[m])
+							self.atm_types_block.type[k] + self.atm_types_block.type[l])
 							
-							if check not in self.maps_4b.clusters:
-								skip = True # Then this cannot possibly be a mapped pair - skip!							
+							if check not in self.maps_3b.clusters:
+								skip = True # Then this cannot possibly be a mapped pair - skip!				
 
-			if skip:
-				continue
-			for j in xrange(int(other.maps_4b.ntrip)):
-				if self.maps_4b.clusters[i] == other.maps_4b.clusters[j]:
+				if skip:
 					continue
-					
-			print "WARNING: No 4b map match found for template type",self.maps_4b.clusters[i],"... setting label to -1"
-			self.maps_4b.labels[i] = -1	
+				for j in xrange(int(other.maps_3b.ntrip)):
+					if self.maps_3b.clusters[i] == other.maps_3b.clusters[j]:
+						continue
+						
+				print "WARNING: No 3b map match found for template type",self.maps_3b.clusters[i],"... setting label to -1"
+				self.maps_3b.labels[i] = -1				
+		
+			# Update the 4b maps
+
+			for i in xrange(int(self.maps_4b.nquad)):
+				
+				# Check if this is even a possible pair for supplement model 
+				
+				skip = False
+				
+				for j in xrange(int(other.atm_types_block.ntype)):
+					for k in xrange(int(other.atm_types_block.ntype)):
+						for l in xrange(int(other.atm_types_block.ntype)):
+							for m in xrange(int(other.atm_types_block.ntype)):
+
+								check = sorted(
+								self.atm_types_block.type[j] + self.atm_types_block.type[k] + 
+								self.atm_types_block.type[j] + self.atm_types_block.type[l] +
+								self.atm_types_block.type[j] + self.atm_types_block.type[m] +
+								self.atm_types_block.type[k] + self.atm_types_block.type[l] +
+								self.atm_types_block.type[k] + self.atm_types_block.type[m] +
+								self.atm_types_block.type[l] + self.atm_types_block.type[m])
+								
+								if check not in self.maps_4b.clusters:
+									skip = True # Then this cannot possibly be a mapped pair - skip!			
+
+				if skip:
+					continue
+				for j in xrange(int(other.maps_4b.ntrip)):
+					if self.maps_4b.clusters[i] == other.maps_4b.clusters[j]:
+						continue
+						
+				print "WARNING: No 4b map match found for template type",self.maps_4b.clusters[i],"... setting label to -1"
+		
+				self.maps_4b.labels[i] = -1	
 			
 		# Update 2b params
 		
@@ -1204,9 +1261,11 @@ class param_file():
 				if (other.params_2b.par2b[i].atm1 == self.params_2b.par2b[j].atm1) and (other.params_2b.par2b[i].atm2 == self.params_2b.par2b[j].atm2):
 					if other.params_2b.order > self.params_2b.order:
 						print "ERROR: Supplement has greater 2b orders than template"
+						print "template:",self.params_2b.order
+						print "other:",other.params_2b.order
 						exit()
 					elif other.params_2b.order < self.params_2b.order:
-						print "WARNING: Template has more 2b params than other - setting extras to zero"
+						print "     WARNING: Template has more 2b params than other - setting extras to zero"
 					
 					for k in xrange(int(self.params_2b.order)):
 					
@@ -1387,17 +1446,17 @@ def main(base_file=None, new_files=None ):
 		outname  = "hierarch." + str(i) + ".params.txt"
 		ofstream = open(outname,'w')
 		
-		print "\t\t+ outname is:", outname
+		print "\t+ outname is:", outname
 		
 		# Parse the template/supplement files
-		
-		template_file   = param_file(template)
-		supplement_file = param_file(supplement)
+				
+		template_file   = param_file(template, base_file)
+		supplement_file = param_file(supplement, new_files[i])
 		
 		# Update the template with the supplemental info
 		
 		template_file.update_from(supplement_file)
-
+		
 		# Save the updated template to a new file
 		
 		template_file.print_file(to=ofstream)
