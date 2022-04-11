@@ -42,6 +42,7 @@ def subtract(**kwargs):
 	default_keys   = [""]*5
 	default_values = [""]*5
 
+
 	default_keys[0 ] = "md_driver"		; default_values[0 ] = None	# MD code executable to use when evaluating interactions
 	default_keys[1 ] = "method"    		; default_values[1 ] = "CHIMES" # Type of MD code used by executable
 	default_keys[2 ] = "trajectories"	; default_values[2 ] = [] 	# List of trajectory files to modify
@@ -52,11 +53,16 @@ def subtract(**kwargs):
 	args.update(kwargs)	
 	
 	print "Will subtract force, energy, and stress contributions arising from parameters/files at:"
+	
+	print args["parameters"]
 
 	if not isinstance(args["parameters"],list):	
 		args["parameters"] = [args["parameters"]]
 		for i in args["parameters"]:
 			print "\t",i		
+			
+	print args["parameters"]			
+	
 	print "Will subtract from trajectory file(s):"
 	for i in args["trajectories"]:
 		print "\t",i
@@ -65,7 +71,7 @@ def subtract(**kwargs):
 
 	params = args["parameters"]
 	
-	print "Saving original forces to files named like:  b-labeled_full.traj_file_idx-X.dat"
+	print "Saving original forces to files named like:  b-labeled_full.traj_file_idx-X.dat:"
 	
 	modify_FES.write_full_FES(args["trajectories"])
 	
@@ -629,7 +635,7 @@ def build_amat(my_ALC, **kwargs):
 		else:
 			print "FYI: No .xyzf files to copy from basefiles to GEN_FF"
 		
-		if args["do_correction"] and args["correction_temps"]:
+		if (args["do_correction"] and args["correction_temps"]) or (args["do_hierarch"]):
 			helpers.run_bash_cmnd("cp " + ' '.join(glob.glob(args["prev_gen_path"] + "/*temps"  )) + " GEN_FF/")
 			
 		nfiles = int(helpers.head("GEN_FF/traj_list.dat",1)[0])
@@ -786,6 +792,7 @@ def build_amat(my_ALC, **kwargs):
 			md_driver    = args["hierarch_exe"],
 			method       = "CHIMES",
 			trajectories = traj_files,
+			temperatures = temper_file,
 			parameters   = args["hierarch_files"])
 	
 	################################

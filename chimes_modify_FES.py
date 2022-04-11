@@ -82,7 +82,7 @@ def get_FES(xyz_file,param_file, md_driver):
 		
 	# Clean up
 	
-	helpers.run_bash_cmnd("rm -f output.xyz.bak traj_bad_r.lt.rin.xyz traj_bad_r.lt.rin+dp.xyz traj_bad_r.ge.rin+dp_dftbfrq.xyz traj.gen run_md.out output.xyz md_statistics.out forceout.xyzf forceout-labeled.txt")
+	#helpers.run_bash_cmnd("rm -f output.xyz.bak traj_bad_r.lt.rin.xyz traj_bad_r.lt.rin+dp.xyz traj_bad_r.ge.rin+dp_dftbfrq.xyz traj.gen run_md.out output.xyz md_statistics.out forceout.xyzf forceout-labeled.txt")
 	
 	# Return results
 	

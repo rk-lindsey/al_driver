@@ -214,10 +214,10 @@ def subtract_off(param_file, md_driver, method, traj_files, temper_files=None):
 			boxline = contents[1].split()
 			
 			if energy_type == "yes":
-				ener[j] = float(boxline.pop())
+				ener[j] = float(boxline.pop())	# Read energy in kcal/mol from input traj.xyzf file
 				
 			if stress_type == "all":
-				syz[j] = float(boxline.pop())
+				syz[j] = float(boxline.pop())	# Read stress tensor in GPa from input traj.xyzf file
 				sxz[j] = float(boxline.pop())
 				sxy[j] = float(boxline.pop())
 				
@@ -236,16 +236,21 @@ def subtract_off(param_file, md_driver, method, traj_files, temper_files=None):
 			
 			print "\t\t\t Running file:",traj_files[i],"frame",j, "with T = ",int(float(temperatures[j]))
 
+
+			# get overall energy, stress tensor, and forces in kcal/mol, GPa, and kcal/mol/Ang
+
 			tmp_ener, tmp_stress, force_file = get_FES("tmp.xyz",param_file, md_driver, method, int(float(temperatures[j]))) 
 
 			tmp_forces = helpers.readlines(force_file)
 			
+
+
 			# Update the forces, energies, and stresses
 			
 			if energy_type == "yes":
-				ener[j] -= tmp_ener     ; ener[j] = str(ener[j])
+				ener[j] -= tmp_ener     ; ener[j] = str(ener[j])	# Subtract energy -- all units in kcal/mol
 			if stress_type != "no":
-				sxx [j] -= tmp_stress[0]; sxx [j] = str(sxx [j])
+				sxx [j] -= tmp_stress[0]; sxx [j] = str(sxx [j])	# Subtract stress tensor -- all units in GPa
 				syy [j] -= tmp_stress[1]; syy [j] = str(syy [j])
 				szz [j] -= tmp_stress[2]; szz [j] = str(szz [j])
 				if stress_type == "all":
@@ -272,6 +277,8 @@ def subtract_off(param_file, md_driver, method, traj_files, temper_files=None):
 					continue					
 				else:
 					line = contents[contents_idx+2].split()
+					
+					#                 F_orig (H/B)           F_calc (kcal/mol/A)         * co
 					
 					frame_fx[k] = str(float(line[4]) - float(tmp_forces[3*contents_idx  ])*kcalpermolAng2HperB)
 					frame_fy[k] = str(float(line[5]) - float(tmp_forces[3*contents_idx+1])*kcalpermolAng2HperB)
