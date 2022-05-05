@@ -795,7 +795,12 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 		# Delete any not for this case (temperature)
 
 		incars = sorted(glob.glob("*.INCAR"))
-		temp   = helpers.head(glob.glob("*000*POSCAR")[0],1)[0].split()[-2]
+		
+		tag = glob.glob("*#*POSCAR")
+		tag = len(str(len(tag)))
+		tag = "".zfill(tag+1)
+
+		temp   = helpers.head(glob.glob("*" + tag + "*POSCAR")[0],1)[0].split()[-2]
 
 		incars.remove(temp +".INCAR")
 		helpers.run_bash_cmnd("rm -f " + ' '.join(incars))
