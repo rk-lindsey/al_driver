@@ -13,6 +13,7 @@ import gen_selections
 import qm_driver
 import restart
 import verify_config
+import pretty_stuff
 
 # Allow config file to be read from local directory
 
@@ -86,11 +87,11 @@ def main(args):
 		
 	"""	       
 		
-
 	################################
-	# Verify contents of config.py
+	# Print Pretty Stuff
 	################################
 
+	pretty_stuff.print_pretty_stuff()		
 
 	################################
 	# Initialize vars
@@ -109,6 +110,11 @@ def main(args):
 		print "Exiting."
 		
 		exit()
+		
+	################################
+	# Verify contents of config.py
+	################################
+		
 		
 	# Check whether the user just requested help
 	
