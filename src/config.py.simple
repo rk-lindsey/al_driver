@@ -1,0 +1,57 @@
+
+"""
+
+	A configuration file containing all user-specified parameters.
+	
+	Notes: Relative paths will almost certainly break the code.
+	
+"""
+
+################################
+##### General variables
+################################
+
+ATOM_TYPES      = ["H"]
+NO_CASES        = 1
+MOLANAL_SPECIES = ["H1", "H2 1(H-H)", "H3 2(H-H)"]
+
+DRIVER_DIR    = "/usr/workspace/wsb/rlindsey/al_driver_stable"	# This driver's src location
+WORKING_DIR   = "/p/lustre2/rlindsey/DNTF_MODEL-7/"		# Directory from which all ALCs will be run
+CHIMES_SRCDIR = "/usr/workspace/wsb/rlindsey/ChIMES4B_SVN/src/"	# Location of ChIMES src files ... expects also post_proc_lsq2.py there
+
+################################
+##### ChIMES LSQ
+################################
+
+ALC0_FILES    = WORKING_DIR + "ALL_BASE_FILES/ALC-0_BASEFILES/"
+CHIMES_LSQ    = CHIMES_SRCDIR + "chimes_lsq"
+CHIMES_SOLVER = CHIMES_SRCDIR + "lsq2.py"
+CHIMES_POSTPRC= CHIMES_SRCDIR + "post_proc_lsq2.py"
+
+# Generic weight settings
+
+WEIGHTS_FORCE =   1.0s
+WEIGHTS_ENER  =   0.1
+WEIGHTS_STRES = 100.0
+
+REGRESS_ALG   = "dlasso"
+REGRESS_VAR   = "1.0E-8"
+REGRESS_NRM   = True
+
+################################
+##### Molecular Dynamics
+################################
+
+MD_STYLE = "CHIMES"
+CHIMES_MD_MPI = CHIMES_SRCDIR + "chimes_md-mpi"
+
+MOLANAL  = "/g/g17/rlindsey/CURR_TRACKED-GEN/contrib/molanlal/"  
+
+################################
+##### Single-Point QM
+################################
+
+QM_FILES = WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
+VASP_EXE = "/usr/gapps/emc-vasp/vasp.5.4.1/build/gam/vasp"
+
+

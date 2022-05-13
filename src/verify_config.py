@@ -146,7 +146,7 @@ def check_VASP(user_config):
 			print "WARNING: Option config.VASP_POSTPRC was not set"
 			print "         Will use config.CHIMES_SRCDIR + \"vasp2xyzf.py\""
 
-		user_config.VASP_POSTPRC = user_config.CHIMES_SRCDIR + "vasp2xyzf.py"			
+		user_config.VASP_POSTPRC = user_config.DRIVER_DIR + "vasp2xyzf.py"			
 		
 	if not hasattr(user_config,'VASP_NODES'):
 
@@ -164,9 +164,9 @@ def check_VASP(user_config):
 
 		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
 			print "WARNING: Option config.VASP_PPN was not set"
-			print "         Will use a value of 36"
+			print "         Will use a value of config.HPC_PPN"
 
-		user_config.VASP_PPN = 36							
+		user_config.VASP_PPN = user_config.HPC_PPN							
 
 	if not hasattr(user_config,'VASP_TIME'):
 
@@ -187,6 +187,16 @@ def check_VASP(user_config):
 			print "         Will use pbatch"
 
 		user_config.VASP_QUEUE = "pbatch"
+        
+	if not hasattr(user_config,'VASP_MODULES'):
+
+		# Queue for a VASP calculation
+
+		if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+			print "WARNING: Option config.VASP_MODULES was not set"
+			print "         Will use mkl"
+
+		user_config.VASP_MODULES = "mkl"        
 		
 	if not hasattr(user_config,'VASP_EXE'):
 
@@ -229,7 +239,7 @@ def check_DFTB(user_config):
 			print "WARNING: Option config.DFTB_POSTPRC was not set"
 			print "         Will use config.CHIMES_SRCDIR + \"dftb+2xyzf.py\""
 
-		user_config.DFTB_POSTPRC = user_config.CHIMES_SRCDIR + "dftb+2xyzf.py"			
+		user_config.DFTB_POSTPRC = user_config.DRIVER_DIR + "dftbgen_to_xyz.py"			
 	
 	if not hasattr(user_config,'DFTB_NODES'):
 
@@ -276,10 +286,10 @@ def check_DFTB(user_config):
 		# Queue for a DFTB calculation
 
 		if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
-			print "WARNING: Option config.DFTB_QUEUE was not set"
-			print "         Will use pbatch"
+			print "WARNING: Option config.DFTB_MODULES was not set"
+			print "         Will use mkl"
 
-		user_config.DFTB_MODULES = ""		
+		user_config.DFTB_MODULES = "mkl"		
 	
 	if not hasattr(user_config,'DFTB_EXE'):
 
@@ -319,9 +329,9 @@ def check_GAUS(user_config):
 
 		if user_config.IGAS_QM_METHOD == "Gaussian":
 			print "WARNING: Option config.GAUS_PPN was not set"
-			print "         Will use a value of 36"
+			print "         Will use a value of config.HPC_PPN"
 
-		user_config.GAUS_PPN = 36						
+		user_config.GAUS_PPN = user_config.HPC_PPN						
 
 	if not hasattr(user_config,'GAUS_TIME'):
 
@@ -441,12 +451,13 @@ def verify(user_config):
 
 		# Species to track/plot from molanal... only used for post-processing
 
-		MOLANAL_SPECIES = ["C1 O1 1(O-C)",
-	                   "C1 O2 2(O-C)",
-	                   "N2 1(N-N)",
-	                   "N1 O1 1(O-N)",
-			   "N2 O1 1(N-N) 1(O-N)",
-			   "O2 1(O-O)"]
+        MOLANAL_SPECIES
+		#MOLANAL_SPECIES = ["C1 O1 1(O-C)",
+	    #               "C1 O2 2(O-C)",
+	    #               "N2 1(N-N)",
+	    #               "N1 O1 1(O-N)",
+	    #	            "N2 O1 1(N-N) 1(O-N)",
+        #	            "O2 1(O-O)"]#
 
 		print "WARNING: Option config.MOLANAL_SPECIES was not set"
 		print "         Will use:"
@@ -461,9 +472,14 @@ def verify(user_config):
 	       # If no stress tensors are desired, set to False (case sensitive)
 
 		print "WARNING: Option config.USE_AL_STRS was not set"
-		print "         Will use a value of 5"
+		print "         Will use a value of 0"
 		
-		user_config.USE_AL_STRS = 5
+		user_config.USE_AL_STRS = 0
+    else:
+        
+        if user_config.USE_AL_STRS < 0:
+            
+            user_config.USE_AL_STRS = 1000
 
 	if not hasattr(user_config,'STRS_STYLE'):
 
@@ -839,16 +855,16 @@ def verify(user_config):
 		print "WARNING: Option config.CHIMES_SOLVE_NODES was not set"
 		print "         Will use a value of 12"
 		
-		user_config.CHIMES_SOLVE_NODES = 12
+		user_config.CHIMES_SOLVE_NODES = 8
 		
 	if not hasattr(user_config,'CHIMES_SOLVE_PPN'):
 
 		# The number of procs per nodes to use when solving the design matrix
 
 		print "WARNING: Option config.CHIMES_SOLVE_PPN was not set"
-		print "         Will use a value of 36"
+		print "         Will use a value of config.HPC_PPN"
 		
-		user_config.CHIMES_SOLVE_PPN = 36		
+		user_config.CHIMES_SOLVE_PPN = user_config.HPC_PPN		
 
 	if not hasattr(user_config,'CHIMES_SOLVE_QUEUE'):
 
@@ -977,11 +993,11 @@ def verify(user_config):
 		print "WARNING: Option config.MD_NODES was not set"
 		print "         Will use a value of 8 for all cases"
 		
-		user_config.MD_NODES = [8]*user_config.NO_CASES
+		user_config.MD_NODES = [4]*user_config.NO_CASES
 		
 	elif hasattr(user_config,'MD_NODES') and (len(user_config.MD_NODES) != user_config.NO_CASES):
 		print "ERROR: Option config.MD_NODES should be provided in the "
-		print "       form of a NO_CASES long list, e.g. [8]*NO_CASES."
+		print "       form of a NO_CASES long list, e.g. [4]*NO_CASES."
 		exit()				
 		
 	if not hasattr(user_config,'MD_QUEUE'):
