@@ -415,6 +415,8 @@ def verify(user_config):
 		print "WARNING: Option config.EMAIL_ADD was not set"
 		print "         Will not send e-mail updates. " 
 		
+		user_config.EMAIL_ADD = False
+		
 
 	if not hasattr(user_config,'SEED'):
 
@@ -450,14 +452,13 @@ def verify(user_config):
 	if not hasattr(user_config,'MOLANAL_SPECIES'):
 
 		# Species to track/plot from molanal... only used for post-processing
-
-        MOLANAL_SPECIES
+		# MOLANAL_SPECIES
 		#MOLANAL_SPECIES = ["C1 O1 1(O-C)",
-	    #               "C1 O2 2(O-C)",
-	    #               "N2 1(N-N)",
-	    #               "N1 O1 1(O-N)",
-	    #	            "N2 O1 1(N-N) 1(O-N)",
-        #	            "O2 1(O-O)"]#
+		    #               "C1 O2 2(O-C)",
+		    #               "N2 1(N-N)",
+		    #               "N1 O1 1(O-N)",
+		    #               "N2 O1 1(N-N) 1(O-N)",
+		    #               "O2 1(O-O)"]#
 
 		print "WARNING: Option config.MOLANAL_SPECIES was not set"
 		print "         Will use:"
@@ -472,20 +473,20 @@ def verify(user_config):
 	       # If no stress tensors are desired, set to False (case sensitive)
 
 		print "WARNING: Option config.USE_AL_STRS was not set"
-		print "         Will use a value of 0"
+		print "         Will use a value of -1"
 		
-		user_config.USE_AL_STRS = 0
-    else:
-        
-        if user_config.USE_AL_STRS < 0:
-            
-            user_config.USE_AL_STRS = 1000
+		user_config.USE_AL_STRS = -1
+	else:
+
+		if user_config.USE_AL_STRS < 0:
+
+			 user_config.USE_AL_STRS = 1000
 
 	if not hasattr(user_config,'STRS_STYLE'):
 
-	       # This controls how stress tensors are included. DIAG means only the 3 diagonal components will be taken. 
-	       # "ALL" means all 6 unique components are taken.
-	       
+		# This controls how stress tensors are included. DIAG means only the 3 diagonal components will be taken. 
+		# "ALL" means all 6 unique components are taken.
+
 		print "WARNING: Option config.STRS_STYLE was not set"
 		print "         Will use \"ALL\" (i.e. rather than \"DIAG\")"
 
@@ -548,6 +549,11 @@ def verify(user_config):
 			print "config.HIERARCH_PARAM_FILES not specified"
 		
 			exit()
+			
+		print "Warning: Option config.HIERARCH_PARAM_FILES was not set"
+		print "         Will use []"			
+			
+		user_config.HIERARCH_PARAM_FILES = []
 	else:
 		for i in xrange(len(user_config.HIERARCH_PARAM_FILES)):
 			user_config.HIERARCH_PARAM_FILES[i] = user_config.WORKING_DIR + "ALL_BASE_FILES/HIERARCH_PARAMS/" + user_config.HIERARCH_PARAM_FILES[i]
@@ -564,7 +570,9 @@ def verify(user_config):
 			print "ERROR: Option config.DO_HIERARCH was set to \"True\", but"
 			print "config.HIERARCH_EXE not specified"
 		
-			exit()					
+			exit()
+		else:
+			user_config.HIERARCH_EXE = None				
 
 
 	################################
@@ -589,7 +597,12 @@ def verify(user_config):
 			print "ERROR: Option config.FIT_CORRECTION was set to \"True\", but"
 			print "config.CORRECTED_TYPE not specified"
 		
-			exit()					
+			exit()	
+		else:
+		
+			print "Warning: Option config.CORRECTED_TYPE was not set"
+			print "         Will use None"		
+			user_config.CORRECTED_TYPE = None				
 		
 	if not hasattr(user_config,'CORRECTED_TYPE_FILES'):
 
@@ -601,6 +614,10 @@ def verify(user_config):
 			print "config.CORRECTED_TYPE_FILES not specified"
 		
 			exit()
+		else:
+			print "Warning: Option config.CORRECTED_TYPE_FILES was not set"
+			print "         Will use None"		
+			user_config.CORRECTED_TYPE_FILES = None				
 			
 	if not hasattr(user_config,'CORRECTED_TYPE_EXE'):
 
@@ -612,6 +629,11 @@ def verify(user_config):
 			print "config.CORRECTED_TYPE_EXE not specified"
 		
 			exit()	
+		else:
+			print "Warning: Option config.CORRECTED_TYPE_EXE was not set"
+			print "         Will use None"		
+			user_config.CORRECTED_TYPE_EXE = None			
+		
 	
 	if not hasattr(user_config,'CORRECTED_TEMPS_BY_FILE'):
 
@@ -622,7 +644,12 @@ def verify(user_config):
 			print "WARNING: No explicit electron temperature file listed for correction generation."
 			print "         Will attempt to use values in traj_list.dat"
 		
-			exit()	
+			exit()
+		else:
+			print "Warning: Option config.CORRECTED_TEMPS_BY_FILE was not set"
+			print "         Will use None"		
+			user_config.CORRECTED_TEMPS_BY_FILE = None			
+		
 	elif hasattr(user_config,'CORRECTED_TYPE_EXE') and (user_config.CORRECTED_TYPE == "DFTB"):
 	
 		if user_config.CORRECTED_TEMPS_BY_FILE:
@@ -680,9 +707,9 @@ def verify(user_config):
 		# Boolean: Have the HPC system send job status emails?
 
 		print "WARNING: Option config.HPC_EMAIL was not set"
-		print "         Will use True"
+		print "         Will use False"
 		
-		user_config.HPC_EMAIL = True
+		user_config.HPC_EMAIL = False
 
 
 	################################
@@ -752,7 +779,9 @@ def verify(user_config):
 		print "WARNING: Option config.WEIGHTS_FORCE was not set"
 		print "         Will use a value of 1.0"
 		
-		user_config.WEIGHTS_FORCE = 1.0	
+		user_config.WEIGHTS_FORCE = [ ["A"],[[1.0]]]
+	elif isinstance(user_config.WEIGHTS_FORCE,float):
+			user_config.WEIGHTS_FORCE = [ ["A"],[[user_config.WEIGHTS_FORCE]]]
 		
 	if not hasattr(user_config,'WEIGHTS_FGAS'):
 
@@ -764,7 +793,10 @@ def verify(user_config):
 		print "WARNING: Option config.WEIGHTS_FGAS was not set"
 		print "         Will use a value of 5.0"
 		
-		user_config.WEIGHTS_FGAS = 5.0							
+		user_config.WEIGHTS_FGAS = [ ["A"],[[5.0]]]
+	elif isinstance(user_config.WEIGHTS_FGAS,float):
+			user_config.WEIGHTS_FGAS = [ ["A"],[[user_config.WEIGHTS_FGAS]]]
+								
 
 	if not hasattr(user_config,'WEIGHTS_ENER'):
 
@@ -773,7 +805,9 @@ def verify(user_config):
 		print "WARNING: Option config.WEIGHTS_ENER was not set"
 		print "         Will use a value of 0.1"
 		
-		user_config.WEIGHTS_ENER = 0.1	
+		user_config.WEIGHTS_ENER = [ ["A"],[[0.1]]]
+	elif isinstance(user_config.WEIGHTS_ENER,float):
+			user_config.WEIGHTS_ENER = [ ["A"],[[user_config.WEIGHTS_ENER]]]
 		
 	
 	if not hasattr(user_config,'WEIGHTS_EGAS'):
@@ -783,7 +817,9 @@ def verify(user_config):
 		print "WARNING: Option config.WEIGHTS_EGAS was not set"
 		print "         Will use a value of 0.1"
 		
-		user_config.WEIGHTS_EGAS = 0.1
+		user_config.WEIGHTS_EGAS = [ ["A"],[[0.1]]]
+	elif isinstance(user_config.WEIGHTS_EGAS,float):
+			user_config.WEIGHTS_EGAS = [ ["A"],[[user_config.WEIGHTS_EGAS]]]
 		
 	if not hasattr(user_config,'WEIGHTS_STRES'):
 
@@ -792,7 +828,9 @@ def verify(user_config):
 		print "WARNING: Option config.WEIGHTS_STRES was not set"
 		print "         Will use a value of 250.0"
 		
-		user_config.WEIGHTS_STRES = 250.0
+		user_config.WEIGHTS_STRES = [ ["A"],[[250.0]]]
+	elif isinstance(user_config.WEIGHTS_STRES,float):
+			user_config.WEIGHTS_STRES = [ ["A"],[[user_config.WEIGHTS_STRES]]]
 
 	if not hasattr(user_config,'REGRESS_ALG'):
 
@@ -853,7 +891,7 @@ def verify(user_config):
 		# The number of nodes to use when solving the design matrix
 
 		print "WARNING: Option config.CHIMES_SOLVE_NODES was not set"
-		print "         Will use a value of 12"
+		print "         Will use a value of 8"
 		
 		user_config.CHIMES_SOLVE_NODES = 8
 		
@@ -1038,10 +1076,10 @@ def verify(user_config):
 		# ... I don't think "False" is actually implemented yet... 
 
 		print "WARNING: Option config.DO_CLUSTER was not set"
-		print "         Will use a value of True"
-		print "		Note: \"False\" is not current supported"
+		print "         Will use a value of False"
+		#print "		Note: \"False\" is not current supported"
 		
-		user_config.DO_CLUSTER = True
+		user_config.DO_CLUSTER = False
 
 	if not hasattr(user_config,'MAX_CLUATM'):
 
