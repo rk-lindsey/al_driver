@@ -21,14 +21,14 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = u'ALD'
-copyright = u'2022, Rebecca K. Lindsey'
-author = u'Rebecca K. Lindsey'
+project = 'ALD'
+copyright = '2022, Rebecca K. Lindsey'
+author = 'Rebecca K. Lindsey'
 
 # The short X.Y version
-version = u''
+version = ''
 # The full version, including alpha/beta/rc tags
-release = u'0.1.0'
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -133,8 +133,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Active_Learning_Driver.tex', u'Active\\_Learning\\_Driver Documentation',
-     u'Rebecca K. Lindsey', 'manual'),
+    (master_doc, 'Active_Learning_Driver.tex', 'Active\\_Learning\\_Driver Documentation',
+     'Rebecca K. Lindsey', 'manual'),
 ]
 
 
@@ -143,7 +143,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'Active_Learning_Driver', u'Active_Learning_Driver Documentation',
+    (master_doc, 'Active_Learning_Driver', 'Active_Learning_Driver Documentation',
      [author], 1)
 ]
 
@@ -154,7 +154,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Active_Learning_Driver', u'Active_Learning_Driver Documentation',
+    (master_doc, 'Active_Learning_Driver', 'Active_Learning_Driver Documentation',
      author, 'Active_Learning_Driver', 'One line description of project.',
      'Miscellaneous'),
 ]

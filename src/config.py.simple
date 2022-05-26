@@ -1,10 +1,10 @@
 
 """
 
-	A configuration file containing all user-specified parameters.
-	
-	Notes: Relative paths will almost certainly break the code.
-	
+    A configuration file containing all user-specified parameters.
+    
+    Notes: Relative paths will almost certainly break the code.
+    
 """
 
 ################################
@@ -15,9 +15,9 @@ ATOM_TYPES      = ["H"]
 NO_CASES        = 1
 MOLANAL_SPECIES = ["H1", "H2 1(H-H)", "H3 2(H-H)"]
 
-DRIVER_DIR    = "/usr/workspace/wsb/rlindsey/al_driver_stable"	# This driver's src location
-WORKING_DIR   = "/p/lustre2/rlindsey/DNTF_MODEL-7/"		# Directory from which all ALCs will be run
-CHIMES_SRCDIR = "/usr/workspace/wsb/rlindsey/ChIMES4B_SVN/src/"	# Location of ChIMES src files ... expects also post_proc_lsq2.py there
+DRIVER_DIR    = "/usr/workspace/wsb/rlindsey/al_driver_stable"  # This driver's src location
+WORKING_DIR   = "/p/lustre2/rlindsey/DNTF_MODEL-7/"             # Directory from which all ALCs will be run
+CHIMES_SRCDIR = "/usr/workspace/wsb/rlindsey/ChIMES4B_SVN/src/" # Location of ChIMES src files ... expects also post_proc_lsq2.py there
 
 ################################
 ##### ChIMES LSQ

@@ -34,7 +34,7 @@ def split_amat(amat, bvec, nproc, ppn):
 	
 	lines_per_file = int(m.ceil(float(lines)/float(nfiles)))
 
-	print "Will write", nfiles, "files with", lines_per_file, "lines per file"
+	print("Will write", nfiles, "files with", lines_per_file, "lines per file")
 
 	# Read the file line by line, print chunks to new numbered files
 
@@ -58,16 +58,16 @@ def split_amat(amat, bvec, nproc, ppn):
 
 	                        line_srt  = line_idx
 
-	                        print "Counted", cols, "columns"
+	                        print("Counted", cols, "columns")
 
 	        
 	                if line_idx > 0 and line_idx % lines_per_file == 0:
 			
 				if file_idx >= nfiles:
-					print "LOGIC ERROR: Building too many files"
+					print("LOGIC ERROR: Building too many files")
 					exit()
 	        
-	                        print "Working on a new file no.", file_idx
+	                        print("Working on a new file no.", file_idx)
 	                        
 	                        # Close the previous A.*.txt file and write the corresponding dim.*.txt file
 	                        
@@ -132,8 +132,8 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
 	if w_method[0] == "A":
 	
 		if len(w_method[1]) != 1:
-			print "ERROR: Found weight request with wrong number of parameters:"
-			print w_method
+			print("ERROR: Found weight request with wrong number of parameters:")
+			print(w_method)
 			exit()
 	
 		weight =  float(w_method[1][0])
@@ -141,8 +141,8 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
 	elif w_method[0] == "B":
 	
 		if len(w_method[1]) != 2:
-			print "ERROR: Found weight request with wrong number of parameters:"
-			print w_method
+			print("ERROR: Found weight request with wrong number of parameters:")
+			print(w_method)
 			exit()
 	
 		eff_ALC = this_ALC
@@ -155,8 +155,8 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
 	elif w_method[0] == "C":
 	
 		if len(w_method[1]) != 3:
-			print "ERROR: Found weight request with wrong number of parameters:"
-			print w_method
+			print("ERROR: Found weight request with wrong number of parameters:")
+			print(w_method)
 			exit()
 	
 		weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * abs(float(b_labeled_i)) / float(w_method[1][2]) )		
@@ -165,8 +165,8 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
 	elif w_method[0] == "D":
 	
 		if len(w_method[1]) != 4:
-			print "ERROR: Found weight request with wrong number of parameters:"
-			print w_method
+			print("ERROR: Found weight request with wrong number of parameters:")
+			print(w_method)
 			exit()
 	
 		weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * (abs(float(b_labeled_i))-float(w_method[1][2])) / float(w_method[1][3]) )		
@@ -175,14 +175,14 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
 	elif w_method[0] == "E":
 	
 		if len(w_method[1]) != 1:
-			print "ERROR: Found weight request with wrong number of parameters:"
-			print w_method
+			print("ERROR: Found weight request with wrong number of parameters:")
+			print(w_method)
 			exit()
 	
 		weight =  float(natoms_i)**float(w_method[1][1])
 	
 	else:
-		print "ERROR: Unknown weight method!"
+		print("ERROR: Unknown weight method!")
 		exit()
 		
 	return weight
@@ -219,15 +219,15 @@ def gen_weights(w_method, this_ALC, b_labeled_i, natoms_i):
 	
 	if len(methods) != len(wparams):
 	
-		print "ERROR: number of requested weighting methods doesn't match "
-		print "       provided number of weighting parameter sets:"
-		print methods
-		print wparams
+		print("ERROR: number of requested weighting methods doesn't match ")
+		print("       provided number of weighting parameter sets:")
+		print(methods)
+		print(wparams)
 		exit()
 	
 	weight = 1.0
 	
-	for i in xrange(len(methods)):
+	for i in range(len(methods)):
 	
 		weight *= gen_weights_one( [methods[i], wparams[i]], this_ALC, b_labeled_i, natoms_i)
 		
@@ -310,7 +310,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 	
 	# Overall job controls
 	
-	default_keys[4 ] = "job_name"	       ; default_values[4 ] =	"ALC-"+ `my_ALC`+"-lsq-2"	       # Name for ChIMES lsq job
+	default_keys[4 ] = "job_name"	       ; default_values[4 ] =	"ALC-"+ repr(my_ALC)+"-lsq-2"	       # Name for ChIMES lsq job
 	default_keys[5 ] = "job_nodes"         ; default_values[5 ] =	"1"				       # Number of nodes for ChIMES lsq job
 	default_keys[6 ] = "job_ppn"	       ; default_values[6 ] =	"36"				       # Number of processors per node for ChIMES lsq job
 	default_keys[7 ] = "job_walltime"      ; default_values[7 ] =	"1"				       # Walltime in hours for ChIMES lsq job
@@ -323,7 +323,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 	
 	
 
-	args = dict(zip(default_keys, default_values))
+	args = dict(list(zip(default_keys, default_values)))
 	args.update(kwargs)
 
 	################################
@@ -334,7 +334,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 
 	if not "dlasso" in args["regression_alg"]:
 	
-		print "ERROR: restart_solve_amat only available for dlasso and dlars"
+		print("ERROR: restart_solve_amat only available for dlasso and dlars")
 		exit()
 		
 	# Assuming the following files are present from the previous run:
@@ -359,16 +359,16 @@ def restart_solve_amat(my_ALC, **kwargs):
 	
 	prev_restarts = copy.deepcopy(tmp)
 	
-	print "Found the following dlars/dlasso restart files:", prev_restarts
+	print("Found the following dlars/dlasso restart files:", prev_restarts)
 	
 	if len(prev_restarts) == 0:
-		print "Bad logic in restart_solve_amat..."
-		print "prev_restarts list is empty"
+		print("Bad logic in restart_solve_amat...")
+		print("prev_restarts list is empty")
 		exit()
 	
 	if prev_restarts[-1] != "restart.txt":
-		print "Bad logic in restart_solve_amat..."
-		print "last item in prev_restarts should be restart.txt"
+		print("Bad logic in restart_solve_amat...")
+		print("last item in prev_restarts should be restart.txt")
 		exit()
 		
 	# Copy restart.txt to a new (original) name
@@ -379,7 +379,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 		helpers.run_bash_cmnd("cp restart.txt " + this_restart)
 	else:
 		this_restart  = "restart-"
-		this_restart += `int(prev_restarts[-2].split("-")[1].split(".")[0])+1`
+		this_restart += repr(int(prev_restarts[-2].split("-")[1].split(".")[0])+1)
 		this_restart += ".txt"
 	
 		helpers.run_bash_cmnd("cp restart.txt " + this_restart)
@@ -387,8 +387,8 @@ def restart_solve_amat(my_ALC, **kwargs):
 		
 	run_no = int(this_restart.split("-")[1].split(".")[0])
 
-	helpers.run_bash_cmnd("mkdir run-"+`run_no`)
-	helpers.run_bash_cmnd("cp restart.txt dlars.log traj.txt run-"+`run_no`)
+	helpers.run_bash_cmnd("mkdir run-"+repr(run_no))
+	helpers.run_bash_cmnd("cp restart.txt dlars.log traj.txt run-"+repr(run_no))
 
 	# Determine whether this was a job with a split amat, and if so, ensure files are correct
 	
@@ -398,18 +398,18 @@ def restart_solve_amat(my_ALC, **kwargs):
 
 		do_split = True
 
-		print "Expecting a split A-matrix for faster solve"
+		print("Expecting a split A-matrix for faster solve")
 		
 		n_split_amat = len(glob.glob("A.*.txt"))
 		n_split_dims = len(glob.glob("dim.*.txt"))
 		n_expected   = int(args["job_nodes"])*int(args["job_ppn"])
 
 		if n_split_amat != n_expected:
-			print "ERROR: Expected",n_expected, "A.XXXX.txt files, counted", n_split_amat
+			print("ERROR: Expected",n_expected, "A.XXXX.txt files, counted", n_split_amat)
 			exit()
 		
 		if n_split_dims != n_expected:
-			print "ERROR: Expected",n_expected, "dim.XXXX.txt files, counted", n_split_dims
+			print("ERROR: Expected",n_expected, "dim.XXXX.txt files, counted", n_split_dims)
 			exit()		
 		
 		
@@ -492,7 +492,7 @@ def build_amat(my_ALC, **kwargs):
 	
 	# Paths
 	
-	default_keys[0 ] = "prev_gen_path"     ; default_values[0 ] = 	 "../ALC-" + `my_ALC-1` + "/GEN_FF/"    # Path to previous ALCs GEN_FF folder -- absolute is best
+	default_keys[0 ] = "prev_gen_path"     ; default_values[0 ] = 	 "../ALC-" + repr(my_ALC-1) + "/GEN_FF/"    # Path to previous ALCs GEN_FF folder -- absolute is best
 	default_keys[1 ] = "prev_qm_all_path"  ; default_values[1 ] = 	 ""	       	       	       	        	# Path to previous ALCs <QM>-all folder -- absolute is best
 	default_keys[2 ] = "prev_qm_20_path"   ; default_values[2 ] = 	 ""	       	       	       	        	# Path to previous ALCs <QM>-20 folder --absolute is best
 	default_keys[3 ] = "do_cluster"        ; default_values[3 ] =    True									# Should cluser configurations be considered 
@@ -502,7 +502,7 @@ def build_amat(my_ALC, **kwargs):
 	
 	# Job controls
 	
-	default_keys[7 ] = "job_name"	       ; default_values[7 ] =	 "ALC-"+ `my_ALC`+"-lsq-1"	# Name for ChIMES lsq job
+	default_keys[7 ] = "job_name"	       ; default_values[7 ] =	 "ALC-"+ repr(my_ALC)+"-lsq-1"	# Name for ChIMES lsq job
 	default_keys[8 ] = "job_nodes"         ; default_values[8 ] =	 "2"						# Number of nodes for ChIMES lsq job
 	default_keys[9 ] = "job_ppn"	       ; default_values[9 ] =	 "36"						# Number of processors per node for ChIMES lsq job
 	default_keys[10] = "job_walltime"      ; default_values[10] =	 "1"						# Walltime in hours for ChIMES lsq job
@@ -512,7 +512,7 @@ def build_amat(my_ALC, **kwargs):
 	default_keys[14] = "job_system"        ; default_values[14] =	 "slurm"					# slurm or torque	
 	default_keys[15] = "job_email"         ; default_values[15] =	  True  					# Send slurm emails?
 
-	args = dict(zip(default_keys, default_values))
+	args = dict(list(zip(default_keys, default_values)))
 	args.update(kwargs)
 	
 	################################
@@ -566,7 +566,7 @@ def build_amat(my_ALC, **kwargs):
 		found2 = False
 		found3 = False
 	
-		for i in xrange(len(runfile)):
+		for i in range(len(runfile)):
 	
 			if found1:
 				ofstream.write('\t' + "MULTI traj_list.dat" + '\n')
@@ -581,25 +581,25 @@ def build_amat(my_ALC, **kwargs):
 				if args["include_stress"]:
 					if  args["stress_style"] == "DIAG":
 						
-						print "Warning: Fitting first",nframes_20,"diagonal stress tensor components for ALC >",my_ALC
+						print("Warning: Fitting first",nframes_20,"diagonal stress tensor components for ALC >",my_ALC)
 						
-						ofstream.write('\t' + "FIRST "    +`nframes_20` +'\n')
+						ofstream.write('\t' + "FIRST "    +repr(nframes_20) +'\n')
 						
 						
 					elif args["stress_style"] == "ALL":
 					
-						print "Warning: Fitting first",nframes_20,"total stress tensor components for ALC >",my_ALC
+						print("Warning: Fitting first",nframes_20,"total stress tensor components for ALC >",my_ALC)
 					
-						ofstream.write('\t' + "FIRSTALL " +`nframes_20` +'\n')
+						ofstream.write('\t' + "FIRSTALL " +repr(nframes_20) +'\n')
 					else:
-						print "ERROR: Unknown stress style:",args["stress_style"]
-						print "       Options are \"DIAG\" or \"ALL\""
-						print "Exiting."
+						print("ERROR: Unknown stress style:",args["stress_style"])
+						print("       Options are \"DIAG\" or \"ALL\"")
+						print("Exiting.")
 						
 						exit()
 
 				else:
-					print "Warning: Setting FITSTRS false for ALC >",my_ALC
+					print("Warning: Setting FITSTRS false for ALC >",my_ALC)
 					ofstream.write('\t' + "false" + '\n')
 		
 				found3 = False	
@@ -625,13 +625,13 @@ def build_amat(my_ALC, **kwargs):
 		# Update the traj_list file
 	
 		ifstream = open("GEN_FF/traj_list.dat",'w')
-		ifstream.write(`nfiles` + '\n')
+		ifstream.write(repr(nfiles) + '\n')
 
 		if args["prev_qm_20_path"]:
-			ifstream.write(`nframes_20`  + " " + args["prev_qm_20_path"]  + "/OUTCAR.xyzf\n")
+			ifstream.write(repr(nframes_20)  + " " + args["prev_qm_20_path"]  + "/OUTCAR.xyzf\n")
 
 		if args["prev_qm_all_path"] and args["do_cluster"]:
-			ifstream.write(`nframes_all` + " " + args["prev_qm_all_path"] + "/OUTCAR.xyzf G_ G_ G_\n")
+			ifstream.write(repr(nframes_all) + " " + args["prev_qm_all_path"] + "/OUTCAR.xyzf G_ G_ G_\n")
 			
 		ifstream.close()
 
@@ -641,7 +641,7 @@ def build_amat(my_ALC, **kwargs):
 	
 	# Create the task string
 	
-	job_task = "-n " + `int(args["job_nodes"])*int(args["job_ppn"])` + " " + args["job_executable"] + " fm_setup.in | tee fm_setup.log"
+	job_task = "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " fm_setup.in | tee fm_setup.log"
 	
 	if args["job_system"] == "slurm":
 		job_task = "srun "   + job_task
@@ -719,7 +719,7 @@ def solve_amat(my_ALC, **kwargs):
 	
 	# Overall job controls
 	
-	default_keys[10] = "job_name"	       ; default_values[10] =	 "ALC-"+ `my_ALC`+"-lsq-2"		# Name for ChIMES lsq job
+	default_keys[10] = "job_name"	       ; default_values[10] =	 "ALC-"+ repr(my_ALC)+"-lsq-2"		# Name for ChIMES lsq job
 	default_keys[11] = "job_nodes"         ; default_values[11] =	 "1"					# Number of nodes for ChIMES lsq job
 	default_keys[12] = "job_ppn"	       ; default_values[12] =	 "36"					# Number of processors per node for ChIMES lsq job
 	default_keys[13] = "job_walltime"      ; default_values[13] =	 "1"					# Walltime in hours for ChIMES lsq job
@@ -732,7 +732,7 @@ def solve_amat(my_ALC, **kwargs):
 	
 	
 
-	args = dict(zip(default_keys, default_values))
+	args = dict(list(zip(default_keys, default_values)))
 	args.update(kwargs)
 
 	################################
@@ -753,7 +753,7 @@ def solve_amat(my_ALC, **kwargs):
 	natoms   = ifstream.readlines()
 	ifstream .close()	
 	
-	for i in xrange(len(contents)):
+	for i in range(len(contents)):
 	
 		tag = contents[i].split()[0]
 		val = contents[i].split()[1]
@@ -802,15 +802,15 @@ def solve_amat(my_ALC, **kwargs):
 	
 		#prevfile    = "../ALC-" + `my_ALC-1` + "/GEN_FF/A_comb.txt"
 	
-		helpers.cat_specific("GEN_FF/A_comb.txt",        ["../ALC-" + `my_ALC-1` + "/GEN_FF/A_comb.txt",        "GEN_FF/A.txt"]         )
+		helpers.cat_specific("GEN_FF/A_comb.txt",        ["../ALC-" + repr(my_ALC-1) + "/GEN_FF/A_comb.txt",        "GEN_FF/A.txt"]         )
 	
-		helpers.cat_specific("GEN_FF/b_comb.txt",        ["../ALC-" + `my_ALC-1` + "/GEN_FF/b_comb.txt",        "GEN_FF/b.txt"]         )
+		helpers.cat_specific("GEN_FF/b_comb.txt",        ["../ALC-" + repr(my_ALC-1) + "/GEN_FF/b_comb.txt",        "GEN_FF/b.txt"]         )
 
-		helpers.cat_specific("GEN_FF/b-labeled_comb.txt",["../ALC-" + `my_ALC-1` + "/GEN_FF/b-labeled_comb.txt","GEN_FF/b-labeled.txt"] )
+		helpers.cat_specific("GEN_FF/b-labeled_comb.txt",["../ALC-" + repr(my_ALC-1) + "/GEN_FF/b-labeled_comb.txt","GEN_FF/b-labeled.txt"] )
 		
-		helpers.cat_specific("GEN_FF/natoms_comb.txt",   ["../ALC-" + `my_ALC-1` + "/GEN_FF/natoms_comb.txt",   "GEN_FF/natoms.txt"]    )
+		helpers.cat_specific("GEN_FF/natoms_comb.txt",   ["../ALC-" + repr(my_ALC-1) + "/GEN_FF/natoms_comb.txt",   "GEN_FF/natoms.txt"]    )
 
-		helpers.cat_specific("GEN_FF/weights_comb.dat",  ["../ALC-" + `my_ALC-1` + "/GEN_FF/weights_comb.dat",  "GEN_FF/weights.dat"]   )
+		helpers.cat_specific("GEN_FF/weights_comb.dat",  ["../ALC-" + repr(my_ALC-1) + "/GEN_FF/weights_comb.dat",  "GEN_FF/weights.dat"]   )
 
 		os.chdir("GEN_FF")
 
@@ -823,19 +823,19 @@ def solve_amat(my_ALC, **kwargs):
 		nline =     helpers.wc_l("b_comb.txt")
 	
 		ofstream = open("dim.txt",'w')
-		ofstream.write(`nvars` + " " + `nline` + '\n') # no. vars, first line, last line, total possible lines
+		ofstream.write(repr(nvars) + " " + repr(nline) + '\n') # no. vars, first line, last line, total possible lines
 		ofstream.close() 
 	
 	# Sanity checks	... As written, these only make sense when a single A-mat is being read
 	
-	print "A-mat entries:  ",helpers.run_bash_cmnd("wc -l A_comb.txt"      ).split()[0]
-	print "b-mat entries:  ",helpers.run_bash_cmnd("wc -l b_comb.txt"      ).split()[0]
-	print "natoms entries: ",helpers.run_bash_cmnd("wc -l natoms_comb.txt" ).split()[0]
-	print "weight entries: ",helpers.run_bash_cmnd("wc -l weights_comb.dat").split()[0]
+	print("A-mat entries:  ",helpers.run_bash_cmnd("wc -l A_comb.txt"      ).split()[0])
+	print("b-mat entries:  ",helpers.run_bash_cmnd("wc -l b_comb.txt"      ).split()[0])
+	print("natoms entries: ",helpers.run_bash_cmnd("wc -l natoms_comb.txt" ).split()[0])
+	print("weight entries: ",helpers.run_bash_cmnd("wc -l weights_comb.dat").split()[0])
 	
 	if "dlasso" in args["regression_alg"]:
 		
-		print "Dim file contents:", helpers.cat_to_var("dim.txt")[0]
+		print("Dim file contents:", helpers.cat_to_var("dim.txt")[0])
 		
 	
 	################################
@@ -850,13 +850,13 @@ def solve_amat(my_ALC, **kwargs):
 		
 			do_split = True
 		
-			print "Splitting A-matrix for faster solve"
+			print("Splitting A-matrix for faster solve")
 		
 			helpers.run_bash_cmnd("rm -f A.*.txt dim.*.txt")
 
 			split_amat("A_comb.txt", "b_comb.txt", int(args["job_nodes"]), int(args["job_ppn"]))
 		
-			print "	...split complete"
+			print("	...split complete")
 
 
 	################################
@@ -889,7 +889,7 @@ def solve_amat(my_ALC, **kwargs):
 	elif "lasso" in args["regression_alg"]:
 		job_task += " --alpha " + str(args["regression_var"])		
 	else:
-		print "ERROR: unknown regression algorithm: ", args["regression_alg"]
+		print("ERROR: unknown regression algorithm: ", args["regression_alg"])
 		exit()
 	
 
@@ -941,7 +941,7 @@ def split_weights():
 	
 	bfiles = sorted(glob.glob("b.*.txt"))
 
-	for i in xrange(len(bfiles)):
+	for i in range(len(bfiles)):
 		
 		bfiles[i] = helpers.wc_l(bfiles[i])
 
@@ -950,11 +950,11 @@ def split_weights():
 	start = 0
 	pad   = 4 # 1+len(str(len(bfiles)))
 	
-	print "len:", len(bfiles)
+	print("len:", len(bfiles))
 	
-	for i in xrange(len(bfiles)):
+	for i in range(len(bfiles)):
 		
-		outname  = "weights." + `i`.rjust(pad,'0') + ".dat"
+		outname  = "weights." + repr(i).rjust(pad,'0') + ".dat"
 		ofstream = open(outname,'w')
 		
 		ofstream.write( "\n".join(str(j) for j in weights[start:(start+bfiles[i])] ) + '\n')
@@ -963,8 +963,8 @@ def split_weights():
 		
 		start += bfiles[i]
 
-	print "weight entries: ",helpers.run_bash_cmnd("wc -l " + "weights.dat").split()[0]
-	print "weight entries: ",helpers.run_bash_cmnd("wc -l " + ' '.join(glob.glob("weights.*.dat"))).split()[0]
+	print("weight entries: ",helpers.run_bash_cmnd("wc -l " + "weights.dat").split()[0])
+	print("weight entries: ",helpers.run_bash_cmnd("wc -l " + ' '.join(glob.glob("weights.*.dat"))).split()[0])
 	
 	exit()
 
