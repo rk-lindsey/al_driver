@@ -1114,9 +1114,9 @@ def verify(user_config):
         # Cluster extraction code
 
         print("WARNING: Option config.CLU_CODE was not set")
-        print("         Will use config.DRIVER_DIR  + \"/utilities/new_ts_clu.cpp\"")
+        print("         Will use config.DRIVER_DIR  + \"/../utilities/new_ts_clu.cpp\"")
 
-        user_config.CLU_CODE = user_config.DRIVER_DIR  + "/utilities/new_ts_clu.cpp"
+        user_config.CLU_CODE = user_config.DRIVER_DIR  + "/../utilities/new_ts_clu.cpp"
                 
 
     ################################
