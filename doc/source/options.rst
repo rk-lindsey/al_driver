@@ -1,5 +1,5 @@
 ########################################################
-ChIMES Active Learning Driver Configuraiton File Options
+ChIMES Active Learning Driver Configuration File Options
 ########################################################
 
 ***************************************
