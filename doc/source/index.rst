@@ -26,7 +26,7 @@ TO DO:
 
 The Active Learning Driver (ALD) is an extensible multifunction workflow tool for generating ChIMES [1] models. At its simplest, the ALD can be used for model generation via iterative refinement [2], at at its most complex, via active learning [3]. 
 
-Before proceeding, the user is **strongly** encouraged to familiarize themselves with the ChIMES literature (See references below) and ChIMES LSQ user manual. **UPDATE LINK** Note that the ALD itself *only* contains the tools necessary to orchestrate model generation and active learning, and must be used in conjunction with the ChIMES design matrix generator, a supported MD code, and a supported quantum code. Note also that the ALD is *only* intended for use on high performance computing platforms and currently only supports runs via slurm (SBATCH) schedulers. For additional details, see the ***GETTING STARTED*** page.
+Before proceeding, the user is **strongly** encouraged to familiarize themselves with the ChIMES literature (See references below) and ChIMES LSQ user manual. **UPDATE LINK** Note that the ALD itself *only* contains the tools necessary to orchestrate model generation and active learning, and must be used in conjunction with the ChIMES design matrix generator, a supported MD code, and a supported quantum code. Note also that the ALD is *only* intended for use on high performance computing platforms and currently only supports runs via slurm (SBATCH) schedulers. For additional details, see the :ref:`page-quickstart` page.
 
 
 
@@ -46,14 +46,9 @@ For additional information, see:
    overview
    quickstart
    options
-   getting_started
-   quick_start
-   chimes_overview
-   lsq_input_file
-   units
-   citing
+   citing  
+   extending
    contact
-   contributing
    legal
 
 

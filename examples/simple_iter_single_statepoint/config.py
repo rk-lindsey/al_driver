@@ -8,9 +8,9 @@ EMAIL_ADD = "lindsey11@llnl.gov"
 ATOM_TYPES     = ["C"]
 NO_CASES       = 1
 
-DRIVER_DIR     = "/p/lustre2/rlindsey/ald_with_nir/al_driver/src/"
-WORKING_DIR    = "/p/lustre2/rlindsey/ald_with_nir/example_ald_for_nir/my_ald_test/"
-CHIMES_SRCDIR  = "/p/lustre2/rlindsey/ald_with_nir/chimes_lsq-rev-1/src/"
+DRIVER_DIR     = "/p/lustre2/rlindsey/al_driver/src/"
+WORKING_DIR    = "/p/lustre2/rlindsey/al_driver/examples/simple_iter_single_statepoint"
+CHIMES_SRCDIR  = "/p/lustre2/rlindsey/chimes_lsq/src/
 
 ################################
 ##### ChIMES LSQ

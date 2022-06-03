@@ -22,7 +22,7 @@ The 5th step, i.e. "candiate configuration filter" comprises selection of candid
 ---------
 
 
-Additional information on different execution modes can be found below:
+Additional information on different execution modes as well as example scripts can be found below:
 
 .. toctree::
    :maxdepth: 1
