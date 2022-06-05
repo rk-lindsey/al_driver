@@ -697,10 +697,10 @@ def verify(user_config):
         # Path to python executable
 
         print("WARNING: Option config.HPC_PYTHON was not set")
-        print("         Will use /usr/tce/bin/python")
-        print("        Note: This script currently requires python2.x")    
+        print("         Will use python3")
+        print("         Note: This script currently requires python3")    
         
-        user_config.HPC_PYTHON = "/usr/tce/bin/python"    
+        user_config.HPC_PYTHON = "python3"    
         
     if not hasattr(user_config, 'HPC_EMAIL'):
 
@@ -748,9 +748,9 @@ def verify(user_config):
         # Location of post_proc_lsq2.py script
 
         print("WARNING: Option config.CHIMES_POSTPRC was not set")
-        print("         Will use config.CHIMES_SRCDIR + \"post_proc_lsq2.py\"")
+        print("         Will use config.CHIMES_SRCDIR + \"/../build/post_proc_chimes_lsq.py\"")
         
-        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "post_proc_lsq2.py"
+        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "/../build/post_proc_chimes_lsq.py"
 
 
     if not hasattr(user_config,'WEIGHTS_SET_ALC_0'):
