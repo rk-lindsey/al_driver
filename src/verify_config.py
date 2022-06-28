@@ -576,6 +576,60 @@ def verify(user_config):
 
 
     ################################
+    ##### General HPC options
+    ################################
+
+    if not hasattr(user_config,'HPC_PPN'):
+
+        # Number of procs per node
+
+        print("WARNING: Option config.HPC_PPN was not set")
+        print("         Will use a value of 36")    
+        
+        user_config.HPC_PPN = 36
+        
+    if not hasattr(user_config,'HPC_ACCOUNT'):
+
+        # HPC Charge bank/account
+
+        print("WARNING: Option config.HPC_ACCOUNT was not set")
+        print("         Will use pbronze")    
+        
+        user_config.HPC_ACCOUNT = "pbronze"    
+        
+    if not hasattr(user_config,'HPC_SYSTEM'):
+
+        # HPC System (i.e. SLURM, Torque, etc.)
+
+        print("WARNING: Option config.HPC_SYSTEM was not set")
+        print("         Will use slurm")
+        print("        Note: No other options are currently supported.")    
+        
+        user_config.HPC_SYSTEM = "slurm"    
+
+        
+    if not hasattr(user_config,'HPC_PYTHON'):
+
+        # Path to python executable
+
+        print("WARNING: Option config.HPC_PYTHON was not set")
+        print("         Will use python3")
+        print("         Note: This script currently requires python3")    
+        
+        user_config.HPC_PYTHON = "python3"    
+        
+    if not hasattr(user_config, 'HPC_EMAIL'):
+
+        # Boolean: Have the HPC system send job status emails?
+
+        print("WARNING: Option config.HPC_EMAIL was not set")
+        print("         Will use False")
+        
+        user_config.HPC_EMAIL = False
+
+
+
+    ################################
     ##### Correction fitting options
     ################################
 
@@ -656,61 +710,7 @@ def verify(user_config):
             print("Will attempt to use electron temperatures specified in CORRECTED_TYPE_FILES")
         else:
             print("Will use electron temperatures specified in traj_list.dat")
-            
-            
-
-    ################################
-    ##### General HPC options
-    ################################
-
-    if not hasattr(user_config,'HPC_PPN'):
-
-        # Number of procs per node
-
-        print("WARNING: Option config.HPC_PPN was not set")
-        print("         Will use a value of 36")    
-        
-        user_config.HPC_PPN = 36
-        
-    if not hasattr(user_config,'HPC_ACCOUNT'):
-
-        # HPC Charge bank/account
-
-        print("WARNING: Option config.HPC_ACCOUNT was not set")
-        print("         Will use pbronze")    
-        
-        user_config.HPC_ACCOUNT = "pbronze"    
-        
-    if not hasattr(user_config,'HPC_SYSTEM'):
-
-        # HPC System (i.e. SLURM, Torque, etc.)
-
-        print("WARNING: Option config.HPC_SYSTEM was not set")
-        print("         Will use slurm")
-        print("        Note: No other options are currently supported.")    
-        
-        user_config.HPC_SYSTEM = "slurm"    
-
-        
-    if not hasattr(user_config,'HPC_PYTHON'):
-
-        # Path to python executable
-
-        print("WARNING: Option config.HPC_PYTHON was not set")
-        print("         Will use python3")
-        print("         Note: This script currently requires python3")    
-        
-        user_config.HPC_PYTHON = "python3"    
-        
-    if not hasattr(user_config, 'HPC_EMAIL'):
-
-        # Boolean: Have the HPC system send job status emails?
-
-        print("WARNING: Option config.HPC_EMAIL was not set")
-        print("         Will use False")
-        
-        user_config.HPC_EMAIL = False
-
+ 
 
     ################################
     ##### ChIMES LSQ
