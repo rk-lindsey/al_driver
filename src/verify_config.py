@@ -538,41 +538,44 @@ def verify(user_config):
         print("         Will use \"False\"")
         
         user_config.DO_HIERARCH = False
-        
-    if not hasattr(user_config,'HIERARCH_PARAM_FILES'):
-
-        # Determines whether to build on existing parameter files
-        
-        if user_config.DO_HIERARCH:
-        
-            print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
-            print("config.HIERARCH_PARAM_FILES not specified")
-        
-            exit()
-            
-        print("Warning: Option config.HIERARCH_PARAM_FILES was not set")
-        print("         Will use []")            
-            
         user_config.HIERARCH_PARAM_FILES = []
-    else:
-        for i in range(len(user_config.HIERARCH_PARAM_FILES)):
-            user_config.HIERARCH_PARAM_FILES[i] = user_config.WORKING_DIR + "ALL_BASE_FILES/HIERARCH_PARAMS/" + user_config.HIERARCH_PARAM_FILES[i]
-            
-        print("WARNING: config.HIERARCH_PARAM_FILES special cutoffs must") 
-        print("         be specified with \"SPECIFIC\" and not \"ALL\"")
+	
+    if user_config.DO_HIERARCH:
         
-    if not hasattr(user_config,'HIERARCH_EXE'):
+        if not hasattr(user_config,'HIERARCH_PARAM_FILES'):
 
-        # Determines whether to build on existing parameter files
-        
-        if user_config.DO_HIERARCH:
-        
-            print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
-            print("config.HIERARCH_EXE not specified")
-        
-            exit()
+            # Determines whether to build on existing parameter files
+            
+            if user_config.DO_HIERARCH:
+            
+                print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
+                print("config.HIERARCH_PARAM_FILES not specified")
+            
+                exit()
+                
+            print("Warning: Option config.HIERARCH_PARAM_FILES was not set")
+            print("         Will use []")            
+                
+            user_config.HIERARCH_PARAM_FILES = []
         else:
-            user_config.HIERARCH_EXE = None                
+            for i in range(len(user_config.HIERARCH_PARAM_FILES)):
+                user_config.HIERARCH_PARAM_FILES[i] = user_config.WORKING_DIR + "ALL_BASE_FILES/HIERARCH_PARAMS/" + user_config.HIERARCH_PARAM_FILES[i]
+                
+            print("WARNING: config.HIERARCH_PARAM_FILES special cutoffs must") 
+            print("         be specified with \"SPECIFIC\" and not \"ALL\"")
+            
+        if not hasattr(user_config,'HIERARCH_EXE'):
+
+            # Determines whether to build on existing parameter files
+            
+            if user_config.DO_HIERARCH:
+            
+                print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
+                print("config.HIERARCH_EXE not specified")
+            
+                exit()
+            else:
+                user_config.HIERARCH_EXE = None                
 
 
     ################################
@@ -640,76 +643,82 @@ def verify(user_config):
         print("Warning: Option config.FIT_CORRECTION was not set")
         print("         Will use \"False\"")
         
-        user_config.FIT_CORRECTION = False
+        user_config.FIT_CORRECTION          = False
+        user_config.CORRECTED_TYPE          = None 
+        user_config.CORRECTED_TYPE_FILES    = None
+        user_config.CORRECTED_TYPE_EXE      = None 
+        user_config.CORRECTED_TEMPS_BY_FILE = None 
         
-    if not hasattr(user_config,'CORRECTED_TYPE'):
+    if user_config.FIT_CORRECTION:
+        
+        if not hasattr(user_config,'CORRECTED_TYPE'):
 
-        # Determines whether to build on existing parameter files
-        
-        if user_config.FIT_CORRECTION:
-        
-            print("ERROR: Option config.FIT_CORRECTION was set to \"True\", but")
-            print("config.CORRECTED_TYPE not specified")
-        
-            exit()    
-        else:
-        
-            print("Warning: Option config.CORRECTED_TYPE was not set")
-            print("         Will use None")        
-            user_config.CORRECTED_TYPE = None                
-        
-    if not hasattr(user_config,'CORRECTED_TYPE_FILES'):
-
-        # Determines whether to build on existing parameter files
-        
-        if user_config.FIT_CORRECTION:
-        
-            print("ERROR: Option config.FIT_CORRECTION was set to \"True\", but")
-            print("config.CORRECTED_TYPE_FILES not specified")
-        
-            exit()
-        else:
-            print("Warning: Option config.CORRECTED_TYPE_FILES was not set")
-            print("         Will use None")        
-            user_config.CORRECTED_TYPE_FILES = None                
+            # Determines whether to build on existing parameter files
             
-    if not hasattr(user_config,'CORRECTED_TYPE_EXE'):
+            if user_config.FIT_CORRECTION:
+            
+                print("ERROR: Option config.FIT_CORRECTION was set to \"True\", but")
+                print("config.CORRECTED_TYPE not specified")
+            
+                exit()    
+            else:
+            
+                print("Warning: Option config.CORRECTED_TYPE was not set")
+                print("         Will use None")        
+                user_config.CORRECTED_TYPE = None                
+            
+        if not hasattr(user_config,'CORRECTED_TYPE_FILES'):
 
-        # Determines whether to build on existing parameter files
-        
-        if user_config.FIT_CORRECTION:
-        
-            print("ERROR: Option config.FIT_CORRECTION was set to \"True\", but")
-            print("config.CORRECTED_TYPE_EXE not specified")
-        
-            exit()    
-        else:
-            print("Warning: Option config.CORRECTED_TYPE_EXE was not set")
-            print("         Will use None")        
-            user_config.CORRECTED_TYPE_EXE = None            
-        
-    
-    if not hasattr(user_config,'CORRECTED_TEMPS_BY_FILE'):
+            # Determines whether to build on existing parameter files
+            
+            if user_config.FIT_CORRECTION:
+            
+                print("ERROR: Option config.FIT_CORRECTION was set to \"True\", but")
+                print("config.CORRECTED_TYPE_FILES not specified")
+            
+                exit()
+            else:
+                print("Warning: Option config.CORRECTED_TYPE_FILES was not set")
+                print("         Will use None")        
+                user_config.CORRECTED_TYPE_FILES = None                
+                
+        if not hasattr(user_config,'CORRECTED_TYPE_EXE'):
 
-        # Determines whether to build on existing parameter files
+            # Determines whether to build on existing parameter files
+            
+            if user_config.FIT_CORRECTION:
+            
+                print("ERROR: Option config.FIT_CORRECTION was set to \"True\", but")
+                print("config.CORRECTED_TYPE_EXE not specified")
+            
+                exit()    
+            else:
+                print("Warning: Option config.CORRECTED_TYPE_EXE was not set")
+                print("         Will use None")        
+                user_config.CORRECTED_TYPE_EXE = None            
+            
         
-        if user_config.FIT_CORRECTION and (user_config.CORRECTED_TYPE == "DFTB"):
+        if not hasattr(user_config,'CORRECTED_TEMPS_BY_FILE'):
+
+            # Determines whether to build on existing parameter files
+            
+            if user_config.FIT_CORRECTION and (user_config.CORRECTED_TYPE == "DFTB"):
+            
+                print("WARNING: No explicit electron temperature file listed for correction generation.")
+                print("         Will attempt to use values in traj_list.dat")
+            
+                exit()
+            else:
+                print("Warning: Option config.CORRECTED_TEMPS_BY_FILE was not set")
+                print("         Will use None")        
+                user_config.CORRECTED_TEMPS_BY_FILE = None            
+            
+        elif hasattr(user_config,'CORRECTED_TYPE_EXE') and (user_config.CORRECTED_TYPE == "DFTB"):
         
-            print("WARNING: No explicit electron temperature file listed for correction generation.")
-            print("         Will attempt to use values in traj_list.dat")
-        
-            exit()
-        else:
-            print("Warning: Option config.CORRECTED_TEMPS_BY_FILE was not set")
-            print("         Will use None")        
-            user_config.CORRECTED_TEMPS_BY_FILE = None            
-        
-    elif hasattr(user_config,'CORRECTED_TYPE_EXE') and (user_config.CORRECTED_TYPE == "DFTB"):
-    
-        if user_config.CORRECTED_TEMPS_BY_FILE:
-            print("Will attempt to use electron temperatures specified in CORRECTED_TYPE_FILES")
-        else:
-            print("Will use electron temperatures specified in traj_list.dat")
+            if user_config.CORRECTED_TEMPS_BY_FILE:
+                print("Will attempt to use electron temperatures specified in CORRECTED_TYPE_FILES")
+            else:
+                print("Will use electron temperatures specified in traj_list.dat")
  
 
     ################################
@@ -1080,120 +1089,122 @@ def verify(user_config):
         #print "        Note: \"False\" is not current supported"
         
         user_config.DO_CLUSTER = False
-
-    if not hasattr(user_config,'MAX_CLUATM'):
-
-        # Max number of atoms to consider in a cluster
-
-        print("WARNING: Option config.MAX_CLUATM was not set")
-        print("         Will use a value of 100")
-
-        user_config.MAX_CLUATM = 100
-             
-    if not hasattr(user_config,'TIGHT_CRIT'):
-
-        # File with tight clustering criteria
-
-        print("WARNING: Option config.TIGHT_CRIT was not set")
-        print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/tight_bond_crit.dat\"")
-
-        user_config.TIGHT_CRIT = user_config.WORKING_DIR + "ALL_BASE_FILES/tight_bond_crit.dat"
         
-    if not hasattr(user_config,'LOOSE_CRIT'):
+    if user_config.DO_CLUSTER:
 
-        # File with loose clustering criteria... if set equal to the tight criteria file,
-        # then no "loose" (i.e. "ts") clusters are generated.
+        if not hasattr(user_config,'MAX_CLUATM'):
 
-        print("WARNING: Option config.LOOSE_CRIT was not set")
-        print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/loose_bond_crit.dat\"")
+            # Max number of atoms to consider in a cluster
 
-        user_config.LOOSE_CRIT = user_config.WORKING_DIR + "ALL_BASE_FILES/loose_bond_crit.dat"        
-        
-    if not hasattr(user_config,'CLU_CODE'):
+            print("WARNING: Option config.MAX_CLUATM was not set")
+            print("         Will use a value of 100")
 
-        # Cluster extraction code
+            user_config.MAX_CLUATM = 100
+                 
+        if not hasattr(user_config,'TIGHT_CRIT'):
 
-        print("WARNING: Option config.CLU_CODE was not set")
-        print("         Will use config.DRIVER_DIR  + \"/../utilities/new_ts_clu.cpp\"")
+            # File with tight clustering criteria
 
-        user_config.CLU_CODE = user_config.DRIVER_DIR  + "/../utilities/new_ts_clu.cpp"
+            print("WARNING: Option config.TIGHT_CRIT was not set")
+            print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/tight_bond_crit.dat\"")
+
+            user_config.TIGHT_CRIT = user_config.WORKING_DIR + "ALL_BASE_FILES/tight_bond_crit.dat"
+            
+        if not hasattr(user_config,'LOOSE_CRIT'):
+
+            # File with loose clustering criteria... if set equal to the tight criteria file,
+            # then no "loose" (i.e. "ts") clusters are generated.
+
+            print("WARNING: Option config.LOOSE_CRIT was not set")
+            print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/loose_bond_crit.dat\"")
+
+            user_config.LOOSE_CRIT = user_config.WORKING_DIR + "ALL_BASE_FILES/loose_bond_crit.dat"        
+            
+        if not hasattr(user_config,'CLU_CODE'):
+
+            # Cluster extraction code
+
+            print("WARNING: Option config.CLU_CODE was not set")
+            print("         Will use config.DRIVER_DIR  + \"/../utilities/new_ts_clu.cpp\"")
+
+            user_config.CLU_CODE = user_config.DRIVER_DIR  + "/../utilities/new_ts_clu.cpp"
                 
 
-    ################################
-    ##### ALC-specific variables ... Note: Hardwired for partial memory mode
-    ################################
+        ################################
+        ##### ALC-specific variables ... Note: Hardwired for partial memory mode
+        ################################
 
-    if not hasattr(user_config,'MEM_BINS'):
+        if not hasattr(user_config,'MEM_BINS'):
 
-        # number of bins for histograms (cluster selection)
+            # number of bins for histograms (cluster selection)
 
-        print("WARNING: Option config.MEM_BINS was not set")
-        print("         Will use a value of 40")
+            print("WARNING: Option config.MEM_BINS was not set")
+            print("         Will use a value of 40")
 
-        user_config.MEM_BINS = 40    
-    
-    if not hasattr(user_config,'MEM_CYCL'):
-
-        # number of cycles for cluster selection
-
-        print("WARNING: Option config.MEM_CYCL was not set")
-        print("         Will use a value of config.MEM_BINS/10")
-
-        user_config.MEM_CYCL = user_config.MEM_BINS/10        
-    
-    if not hasattr(user_config,'MEM_NSEL'):
-
-        # number of clusters to select each ALC
-
-        print("WARNING: Option config.MEM_NSEL was not set")
-        print("         Will use a value of 400")
-
-        user_config.MEM_NSEL = 400
+            user_config.MEM_BINS = 40    
         
-    if not hasattr(user_config,'MEM_ECUT'):
+        if not hasattr(user_config,'MEM_CYCL'):
 
-        # Energy cutoff (E/atom in kcal/mol) cutoff for cluster selection
+            # number of cycles for cluster selection
 
-        print("WARNING: Option config.MEM_ECUT was not set")
-        print("         Will use a value of 100.0")
+            print("WARNING: Option config.MEM_CYCL was not set")
+            print("         Will use a value of config.MEM_BINS/10")
 
-        user_config.MEM_ECUT = 100.0        
+            user_config.MEM_CYCL = user_config.MEM_BINS/10        
         
-    if not hasattr(user_config,'CALC_REPO_ENER_CENT_QUEUE'):
+        if not hasattr(user_config,'MEM_NSEL'):
 
-        # Queue for central repo energy calculations
+            # number of clusters to select each ALC
 
-        print("WARNING: Option config.CALC_REPO_ENER_CENT_QUEUE was not set")
-        print("         Will use pbatch")
+            print("WARNING: Option config.MEM_NSEL was not set")
+            print("         Will use a value of 400")
 
-        user_config.CALC_REPO_ENER_CENT_QUEUE = "pdebug"
-        
-    if not hasattr(user_config,'CALC_REPO_ENER_CENT_TIME'):
+            user_config.MEM_NSEL = 400
+            
+        if not hasattr(user_config,'MEM_ECUT'):
 
-        # Time for central repo energy calculations
+            # Energy cutoff (E/atom in kcal/mol) cutoff for cluster selection
 
-        print("WARNING: Option config.CALC_REPO_ENER_CENT_TIME was not set")
-        print("         Will use a value of \"00:10:00\"")
+            print("WARNING: Option config.MEM_ECUT was not set")
+            print("         Will use a value of 100.0")
 
-        user_config.CALC_REPO_ENER_CENT_TIME =  "00:10:00"    
-        
-    if not hasattr(user_config,'CALC_REPO_ENER_QUEUE'):
+            user_config.MEM_ECUT = 100.0        
+            
+        if not hasattr(user_config,'CALC_REPO_ENER_CENT_QUEUE'):
 
-        # Queue for central repo energy calculations
+            # Queue for central repo energy calculations
 
-        print("WARNING: Option config.CALC_REPO_ENER_QUEUE was not set")
-        print("         Will use pbatch")
+            print("WARNING: Option config.CALC_REPO_ENER_CENT_QUEUE was not set")
+            print("         Will use pbatch")
 
-        user_config.CALC_REPO_ENER_QUEUE = "pbatch"
-        
-    if not hasattr(user_config,'CALC_REPO_ENER_TIME'):
+            user_config.CALC_REPO_ENER_CENT_QUEUE = "pdebug"
+            
+        if not hasattr(user_config,'CALC_REPO_ENER_CENT_TIME'):
 
-        # Time for central repo energy calculations
+            # Time for central repo energy calculations
 
-        print("WARNING: Option config.CALC_REPO_ENER_TIME was not set")
-        print("         Will use a value of \"04:00:00\"")
+            print("WARNING: Option config.CALC_REPO_ENER_CENT_TIME was not set")
+            print("         Will use a value of \"00:10:00\"")
 
-        user_config.CALC_REPO_ENER_TIME =  "04:00:00"                
+            user_config.CALC_REPO_ENER_CENT_TIME =  "00:10:00"    
+            
+        if not hasattr(user_config,'CALC_REPO_ENER_QUEUE'):
+
+            # Queue for central repo energy calculations
+
+            print("WARNING: Option config.CALC_REPO_ENER_QUEUE was not set")
+            print("         Will use pbatch")
+
+            user_config.CALC_REPO_ENER_QUEUE = "pbatch"
+            
+        if not hasattr(user_config,'CALC_REPO_ENER_TIME'):
+
+            # Time for central repo energy calculations
+
+            print("WARNING: Option config.CALC_REPO_ENER_TIME was not set")
+            print("         Will use a value of \"04:00:00\"")
+
+            user_config.CALC_REPO_ENER_TIME =  "04:00:00"                
             
 
     ################################
@@ -1226,10 +1237,15 @@ def verify(user_config):
 
     # If a given reference (QM) method is not used, set defaults silently
     # In this case they are unused, but ensure function call compatibility
-
-    check_VASP(user_config)
-    check_DFTB(user_config)
-    check_GAUS(user_config)
+    
+    if (user_config.IGAS_QM_METHOD == "VASP") or (user_config.BULK_QM_METHOD == "VASP"):
+        check_VASP(user_config)
+        
+    if (user_config.IGAS_QM_METHOD == "DFTB+") or (user_config.BULK_QM_METHOD == "DFTB+"):    
+        check_DFTB(user_config)
+        
+    if (user_config.IGAS_QM_METHOD == "GAUS") or (user_config.BULK_QM_METHOD == "GAUS"):
+        check_GAUS(user_config)
     
 
 
