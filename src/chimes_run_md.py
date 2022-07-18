@@ -2,6 +2,7 @@
 
 import glob # Warning: glob is unserted... set my_list = sorted(glob.glob(<str>)) if sorting needed
 import os
+import random # Needed to set seed for each MD run
 
 # Local modules
 
@@ -235,7 +236,8 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     for i in range(len(runfile)):
     
         if found1:
-            ofstream.write('\t' + str(1+my_indep) + str(1+my_indep) + str(1+my_indep) + str(1+my_indep) + '\n')
+            #ofstream.write('\t' + str(1+my_indep) + str(1+my_indep) + str(1+my_indep) + str(1+my_indep) + '\n')
+            ofstream.write('\t' + str(random.randint(0,9999)) + '\n')
             found1 = False
         elif found2:
             ofstream.write('\t' + md_xyzfile + '\n')
