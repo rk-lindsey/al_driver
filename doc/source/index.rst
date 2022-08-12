@@ -10,15 +10,15 @@ ChIMES Active Learning Driver Documentation
 *Note: This documentation is under still construction.*
 
 
-TO DO:
-------
+.. TO DO:
+.. ------
 
-* Hierarchical fitting mode overivew
-* Correction fitting mode overivew
-* Cluster fitting mode overivew
-* Committe fitting mode overivew
-* Sample config files
-* Complete sample input decks
+.. * Hierarchical fitting mode overivew
+.. * Correction fitting mode overivew
+.. * Cluster fitting mode overivew
+.. * Committe fitting mode overivew
+.. * Sample config files
+.. * Complete sample input decks
 
 
 

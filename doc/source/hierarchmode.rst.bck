@@ -91,6 +91,8 @@ The ALC-0_BASEFILES Files
     For additional information on how to configure these options, see the ChIMES LSQ manual `(link <UPDATE LINK>)`_.
 
 
+**<PROVIDE EXAMPLE INPUT WITH RELEVANT LINES HIGHLIGHTED>**
+
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The config.py File

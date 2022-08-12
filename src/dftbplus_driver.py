@@ -370,8 +370,8 @@ def generate_gen(inxyz, *argv):
         
             tmp.pop(i)
     
-    atm_types  = list(zip(*tmp)[0])
-    natm_types = list(map(int, list(zip(*tmp)[1])))
+    atm_types  = list(list(zip(*tmp))[0])
+    natm_types = list(map(int,list(list(zip(*tmp))[1])))
 
     # Finish up the header portion
     

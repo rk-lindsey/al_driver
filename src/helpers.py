@@ -435,7 +435,7 @@ def email_user(base, address, status):
 
     if address:
 
-        cmnd = base + "/../utilities/send_email.sh " + address + " " + status + " "
+        cmnd = base + "/utilities/send_email.sh " + address + " " + status + " "
 
         return run_bash_cmnd(cmnd)
         
