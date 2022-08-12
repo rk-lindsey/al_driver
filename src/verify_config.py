@@ -128,15 +128,6 @@ def check_VASP(user_config):
     Usage: check_VASP(user_config)
     
     """
-
-    if not hasattr(user_config,'QM_FILES'):
-
-        # Location of basic QM input files (INCAR, KPOINTS, etc)
-        
-        print("WARNING: Option config.QM_FILES was not set")
-        print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\"")
-
-        user_config.QM_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
         
     if not hasattr(user_config,'VASP_POSTPRC'):
 
@@ -539,7 +530,7 @@ def verify(user_config):
         
         user_config.DO_HIERARCH = False
         user_config.HIERARCH_PARAM_FILES = []
-	
+    
     if user_config.DO_HIERARCH:
         
         if not hasattr(user_config,'HIERARCH_PARAM_FILES'):
@@ -1089,6 +1080,10 @@ def verify(user_config):
         #print "        Note: \"False\" is not current supported"
         
         user_config.DO_CLUSTER = False
+        user_config.MAX_CLUATM = None
+        user_config.TIGHT_CRIT = None
+        user_config.LOOSE_CRIT = None
+        user_config.CLU_CODE   = None
         
     if user_config.DO_CLUSTER:
 
@@ -1233,20 +1228,52 @@ def verify(user_config):
             print("WARNING: Option config.IGAS_QM_METHOD was not set")
             print("         Will use VASP")
 
-        user_config.IGAS_QM_METHOD = "VASP"        
+        user_config.IGAS_QM_METHOD = "VASP"  
+        
+    if not hasattr(user_config,'QM_FILES'):
+
+        # Location of basic QM input files (INCAR, KPOINTS, etc)
+        
+        print("WARNING: Option config.QM_FILES was not set")
+        print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\"")
+
+        user_config.QM_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"              
 
     # If a given reference (QM) method is not used, set defaults silently
     # In this case they are unused, but ensure function call compatibility
     
     if (user_config.IGAS_QM_METHOD == "VASP") or (user_config.BULK_QM_METHOD == "VASP"):
         check_VASP(user_config)
+    else:
+        user_config.VASP_POSTPRC = None
+        user_config.VASP_NODES   = None
+        user_config.VASP_PPN     = None 
+        user_config.VASP_TIME    = None
+        user_config.VASP_QUEUE   = None
+        user_config.VASP_MODULES = None
+        user_config.VASP_EXE     = None
         
     if (user_config.IGAS_QM_METHOD == "DFTB+") or (user_config.BULK_QM_METHOD == "DFTB+"):    
         check_DFTB(user_config)
+    else:
+        user_config.DFTB_FILES   = None
+        user_config.DFTB_POSTPRC = None
+        user_config.DFTB_NODES   = None 
+        user_config.DFTB_PPN     = None 
+        user_config.DFTB_TIME    = None
+        user_config.DFTB_QUEUE   = None
+        user_config.DFTB_MODULES = None 
+        user_config.DFTB_EXE     = None
         
     if (user_config.IGAS_QM_METHOD == "GAUS") or (user_config.BULK_QM_METHOD == "GAUS"):
         check_GAUS(user_config)
-    
-
+    else:
+        user_config.GAUS_NODES   = None
+        user_config.GAUS_PPN     = None
+        user_config.GAUS_TIME    = None 
+        user_config.GAUS_QUEUE   = None
+        user_config.GAUS_EXE     = None
+        user_config.GAUS_SCR     = None
+        user_config.GAUS_REF     = None
 
 
