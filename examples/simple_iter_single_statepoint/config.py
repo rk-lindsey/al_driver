@@ -8,9 +8,9 @@ EMAIL_ADD = "lindsey11@llnl.gov"
 ATOM_TYPES     = ["C"]
 NO_CASES       = 1
 
-DRIVER_DIR     = "/p/lustre2/rlindsey/al_driver/src/"
-WORKING_DIR    = "/p/lustre2/rlindsey/al_driver/examples/simple_iter_single_statepoint"
-CHIMES_SRCDIR  = "/p/lustre2/rlindsey/chimes_lsq/src/
+DRIVER_DIR     = "/usr/WS2/rlindsey/al_driver-fork/"
+WORKING_DIR    = "/usr/WS2/rlindsey/al_driver-fork/examples/simple_iter_single_statepoint/"
+CHIMES_SRCDIR  = "/usr/WS2/rlindsey/al_driver-fork/chimes_lsq-forALD/src/"
 
 ################################
 ##### ChIMES LSQ
