@@ -135,9 +135,9 @@ def check_VASP(user_config):
 
         if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
             print("WARNING: Option config.VASP_POSTPRC was not set")
-            print("         Will use config.CHIMES_SRCDIR + \"vasp2xyzf.py\"")
+            print("         Will use config.CHIMES_SRCDIR + \"../contrib/vasp2xyzf.py\"")
 
-        user_config.VASP_POSTPRC = user_config.DRIVER_DIR + "vasp2xyzf.py"            
+        user_config.VASP_POSTPRC = user_config.CHIMES_SRCDIR + "../contrib/vasp2xyzf.py"            
         
     if not hasattr(user_config,'VASP_NODES'):
 
@@ -228,9 +228,9 @@ def check_DFTB(user_config):
 
         if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
             print("WARNING: Option config.DFTB_POSTPRC was not set")
-            print("         Will use config.CHIMES_SRCDIR + \"dftb+2xyzf.py\"")
+            print("         Will use config.CHIMES_SRCDIR + \"../contrib/dftbgen_to_xyz.py\"")
 
-        user_config.DFTB_POSTPRC = user_config.DRIVER_DIR + "dftbgen_to_xyz.py"            
+        user_config.DFTB_POSTPRC = user_config.CHIMES_SRCDIR + "/../contrib/dftbgen_to_xyz.py"            
     
     if not hasattr(user_config,'DFTB_NODES'):
 
