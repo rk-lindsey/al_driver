@@ -100,7 +100,7 @@ Contents of the ``config.py`` file must be modified to reflect your e-mail addre
     ATOM_TYPES     = ["C"]
     NO_CASES       = 1
 
-    DRIVER_DIR     = "/p/lustre2/rlindsey/al_driver/src/"
+    DRIVER_DIR     = "/p/lustre2/rlindsey/al_driver/"
     WORKING_DIR    = "/p/lustre2/rlindsey/al_driver/examples/simple_iter_single_statepoint"
     CHIMES_SRCDIR  = "/p/lustre2/rlindsey/chimes_lsq/src/"
 
@@ -157,7 +157,7 @@ Depending on standard queuing times for your system, the ALD could take quite so
 
 .. code-block :: bash
 
-    $: cd /path/to/my/software/folder
+    $: cd /path/to/my/example/files
     $: screen 
     $: unbuffer python3 /path/to/your/ald/installation/main.py 0 1 2 3 | tee driver-0.log
     
@@ -180,7 +180,7 @@ Once the ALD has finished running, execute the following commands:
 .. code-block :: bash
 
     $: cd /path/to/examples/simple_iter_single_statepoint/
-    $: for i in {1..3}; do cd ALC-1/GEN_FF; paste b_comb.txt force.txt > compare.txt; cd -; done
+    $: for i in {1..3}; do cd ALC-${i}/GEN_FF; paste b_comb.txt force.txt > compare.txt; cd -; done
     
 Then, plot ``ALC-{3,2,1}/GEN_FF/compare.txt`` with your favorite plotting software. The resulting figure should look like the following:
 
@@ -217,7 +217,7 @@ In-depth Setup and Options Overview
 Setting up Steps 1 & 2
 ------------------------------------------
 
-As with a standard ChIMES fit (see e.g, <LINK TO LSQ DOCS>), model generation must begin selecting an intial training set and specifying fitting hyperparameters. In the ALD, this involves the following files, at a minimum:
+As with a standard ChIMES fit (see e.g, <LINK TO LSQ DOCS>), model generation must begin with selecting an intial training set and specifying fitting hyperparameters. In the ALD, this involves the following files, at a minimum:
 
 .. code-block :: text
 
@@ -259,7 +259,7 @@ Finally, options for this first phase of fitting ``config.py`` must be specified
 
 * The user is running on a SLURM/SBATCH based HPC system (**set by default**)
 * The HPC system has 36 processors per compute node (**set by default**)
-* We want to generate hydrogen parameters by iteratively fitting at 3 statepoints, in simultaneously (**indicated by line 6**).
+* We want to generate hydrogen parameters by iteratively fitting at 3 statepoints, simultaneously (**indicated by line 6**).
 
 
 The minimal config.py lines necessary for steps 1 & 2 are provided in the code block below. Recalling that ALD functions primarily as a workflow tool, it must be linked with external software. Here, we tell the ALD:
@@ -303,7 +303,7 @@ Finally, lines 23-25 specify how forces, energies, and stresses should be weight
 
     # Generic weight settings
 
-    WEIGHTS_FORCE =   1.0s
+    WEIGHTS_FORCE =   1.0
     WEIGHTS_ENER  =   0.1
     WEIGHTS_STRES = 100.0
 
@@ -327,7 +327,7 @@ Step 3 comprises molecular dynamics (MD) simulation with the parameters generate
 * A MD code executable, and 
 * Instructions on how to post-process resultant trajectories
 
-Recalling that the current example concerns concurrent iterative fitting for three cases (training state points), the is specified by the following in ``/path/to/ALL_BASE_FILES/CHIMESMD_BASEFILES/`` and ``config.py``, i.e.:
+Recalling that the current example concerns concurrent iterative fitting for three cases (training state points), this is specified by the following in ``/path/to/ALL_BASE_FILES/CHIMESMD_BASEFILES/`` and ``config.py``, i.e.:
 
 .. code-block :: text
 
@@ -415,5 +415,7 @@ There should be one ``*.INCAR`` file for each case temperature, i.e. ``{1000,200
 
     Support for additional data labeling schemes (i.e., both quantum- and moleuclar mechanics-based) are incoming.
 
+.. Warning ::
 
+    QM codes can fail to converge in unexpected cases, in manners that are challenging to detect. If you notice your force pairity plots indicate generally good model performance but show a few unexpected outliers, verify your QM code is providing the correct answer. This can be done by evaluating the offending configurationw with a different code version or a different code altogether. 
 
