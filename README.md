@@ -53,7 +53,7 @@ Authors
 
 The The ChIMES AL Driver was developed by Rebecca K. Lindsey.
 
-Contributors can be found [here](https://github.com/rk-lindsey/chimes_calculator/graphs/contributors).
+Contributors can be found [here](https://github.com/rk-lindsey/al_driver/graphs/contributors).
 
 <hr>
 
