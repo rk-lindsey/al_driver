@@ -27,7 +27,7 @@ This work was produced under the auspices of the U.S. Department of Energy by La
 Documentation
 ----------------
 
-[**Full documentation**](https://https://al-driver.readthedocs.io/en/latest/) is available, but under construction.
+[**Documentation**](https://https://al-driver.readthedocs.io/en/latest/) is available, but under construction.
 
 <hr>
 
