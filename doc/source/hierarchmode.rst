@@ -21,7 +21,9 @@ This section provides an overview of how to configure the ALD for a hierarchical
 
 For additional information on strategies and benefits of hierarchical fitting, see: 
 
-* R.K. Lindsey, B. Steele, S. Bastea, I.-F. Kuo, L.E. Fried, and N. Goldman **UPDATE JOURNAL** ... this would be for C/N ... try for JCTC   `(link) < UPDATE >`_
+* R.K. Lindsey, B. Steele, S. Bastea, I.-F. Kuo, L.E. Fried, and N. Goldman *In Prep*
+
+.. **UPDATE JOURNAL** ... this would be for C/N ... try for JCTC   `(link) < UPDATE >`_
 
 -------
 
