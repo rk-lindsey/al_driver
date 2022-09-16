@@ -31,7 +31,7 @@ The ALD requires a specific version of the ChIMES LSQ/MD code. To download and c
 
     cd /path/to/my/software/folder
     mkdir chimes_lsq-forALD
-    git clone PATH TO GITHUB REPO WILL GO HERE chimes_lsq-forALD
+    git clone https://github.com/rk-lindsey/chimes_lsq.git chimes_lsq-forALD
     cd chimes_lsq-forALD
     ./install.sh
 
