@@ -27,7 +27,7 @@ Example Fit: Molten Carbon
     
 In this section, an example 3-iteration fit for molten carbon at 6000 K and 2.0 g/cc is overviewed. The model will include up-to-three body interactions with the following hyperparameters. For more information on ChIMES hyperparameters and selection strategies, see: 
 
-* The ChIMES LSQ code manual `(link) < UPDATE >`_
+* The ChIMES LSQ code manual `(link) <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_
 * R.K. Lindsey, L.E. Fried, N. Goldman, *JCTC*, **13**, 6222 (2017) `(link) <https://doi.org/10.1021/acs.jctc.7b00867>`_
 * R.K. Lindsey, L.E. Fried, N. Goldman, *JCTC* **15** 436 (2019) `(link) <https://doi.org/10.1021/acs.jctc.8b00831>`_
 
@@ -77,7 +77,7 @@ Briefly:
 * The ``ALL_BASE_FILES/QM_BASEFILES`` directory contains files specifying how step 6 of figure 1 should be run, i.e.,  quantum calculation instructions (``6000.INCAR``), psuedopotential files (``C.POTCAR``), and a K-point file (``KPOINTS``) file. 
 * the ``config.py`` provides high-level instructions on how *all* steps in fig. 1 should be run.
 
-A detailed description of the files in ``ALL_BASE_FILES/ALC-0_BASEFILES`` and ``ALL_BASE_FILES/CHIMESMD_BASEFILES`` can be found in the ChIMES LSQ manual `(link <UPDATE LINK>)`_. 
+A detailed description of the files in ``ALL_BASE_FILES/ALC-0_BASEFILES`` and ``ALL_BASE_FILES/CHIMESMD_BASEFILES`` can be found in the `(ChIMES LSQ manual) <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_. 
 
 
 .. Tip ::
@@ -217,7 +217,7 @@ In-depth Setup and Options Overview
 Setting up Steps 1 & 2
 ------------------------------------------
 
-As with a standard ChIMES fit (see e.g, <LINK TO LSQ DOCS>), model generation must begin with selecting an intial training set and specifying fitting hyperparameters. In the ALD, this involves the following files, at a minimum:
+As with a standard ChIMES fit (see e.g, the `(ChIMES LSQ manual) <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_), model generation must begin with selecting an intial training set and specifying fitting hyperparameters. In the ALD, this involves the following files, at a minimum:
 
 .. code-block :: text
 
@@ -231,13 +231,13 @@ The ``fm_setup.in`` file is created as usual, except:
 * The ``# TRJFILE #`` option must be set to ``MULTI traj_list.dat`` 
 * The ``# SPLITFI #`` option must be set to ``false``.
 
-See <LINK TO LSQ DOCS> for more information on what these settings control.
+See the `(ChIMES LSQ manual) <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_for more information on what these settings control.
 
 .. Warning ::
 
     Arbitrary specification of fit hyperparameters (i.e., set in ``fm_setup.in``) **will** result in inaccurate and/or unstable models. For more information on ChIMES hyperparameters and selection strategies, see: 
 
-    * The ChIMES LSQ code manual `(link) < UPDATE >`_
+    * The ChIMES LSQ code manual `(link) <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_
     * R.K. Lindsey, L.E. Fried, N. Goldman, *JCTC*, **13**, 6222 (2017) `(link) <https://doi.org/10.1021/acs.jctc.7b00867>`_
     * R.K. Lindsey, L.E. Fried, N. Goldman, *JCTC* **15** 436 (2019) `(link) <https://doi.org/10.1021/acs.jctc.8b00831>`_
 
@@ -356,9 +356,9 @@ and
     MOLANAL_SPECIES = ["H1", "H2 1(H-H)", "H3 2(H-H)"]
 
 
-Each ``case-*.indep-0.input.xyz`` is a ChIMES ``.xyz`` file containing initial coordinates for the system of interest for the corresponding case, while each ``case-*.indep-0.run_md.in`` is the corresponding ChIMES MD input file. Note that ``case-*.indep-0.run_md.in`` options ``# PRMFILE #`` and ``# CRDFILE #`` should be set to ``WILL_AUTO_UPDATE``. For more information on these files, see the ChIMES LSQ manual (<UPDATE LINK>). The bonds.dat file will be described below.
+Each ``case-*.indep-0.input.xyz`` is a ChIMES ``.xyz`` file containing initial coordinates for the system of interest for the corresponding case, while each ``case-*.indep-0.run_md.in`` is the corresponding ChIMES MD input file. Note that ``case-*.indep-0.run_md.in`` options ``# PRMFILE #`` and ``# CRDFILE #`` should be set to ``WILL_AUTO_UPDATE``. For more information on these files, see the `(ChIMES LSQ manual) <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_. The bonds.dat file will be described below.
 
-In the config.py file snipped above, lines 5 and 6 tell the ALD to use ChIMES MD for MD simulation runs, and provides a path to the MPI-enabled and serial compilations. Lines 9 and 10 provide information on how to post-process the trajectory. Specifically, the ALD will use the a molecular analyzer ("molanal") <REFERENCE LARRYS PAPER> to determine speciation for the generated MD trajectories. Once speciation is determined, the ALD will provide a summary of lifetimes and molefractions for species listed in ``MOLANAL_SPECIES``. Note that the species names must match the "Molecule type" fields produced by molanal *exactly*. These strings are usually determined by running molanal on DFT-MD trajectories, prior to any ALD. Finally, the ``bonds.dat`` file specifies bond length and lifetime criteria for molanal. See the molanal ``readme.txt`` file for additional information. Be sure to verify specified bonds.dat lifetime criteria are consistent with the timestep and output frequency specified in ``case-*.indep-0.run_md.in``
+In the config.py file snipped above, lines 5 and 6 tell the ALD to use ChIMES MD for MD simulation runs, and provides a path to the MPI-enabled and serial compilations. Lines 9 and 10 provide information on how to post-process the trajectory. Specifically, the ALD will use the a molecular analyzer _`("molanal") <https://pubs.acs.org/doi/pdf/10.1021/ja808196e>`_ to determine speciation for the generated MD trajectories. Once speciation is determined, the ALD will provide a summary of lifetimes and molefractions for species listed in ``MOLANAL_SPECIES``. Note that the species names must match the "Molecule type" fields produced by molanal *exactly*. These strings are usually determined by running molanal on DFT-MD trajectories, prior to any ALD. Finally, the ``bonds.dat`` file specifies bond length and lifetime criteria for molanal. See the molanal ``readme.txt`` file for additional information. Be sure to verify specified bonds.dat lifetime criteria are consistent with the timestep and output frequency specified in ``case-*.indep-0.run_md.in``
 
 -------
 
@@ -389,7 +389,7 @@ The latter configurations are included to inform the short-ranged region of the 
 Setting up Step 6
 ------------------------------------------
 
-Step 6 comprises single point evaluation of configurations selected in step 5 via the user's requested quantum-based reference method. In this overview, we will assume the user is employing VASP but additional options are described in <UPDATE LINK>. To do so, the following must be provided, at a minimum:
+Step 6 comprises single point evaluation of configurations selected in step 5 via the user's requested quantum-based reference method. In this overview, we will assume the user is employing VASP but additional options are described in `options`_. To do so, the following must be provided, at a minimum:
 
 .. code-block :: text
 
