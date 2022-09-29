@@ -35,6 +35,11 @@ The ALD requires a specific version of the ChIMES LSQ/MD code. To download and c
     cd chimes_lsq-forALD
     ./install.sh
 
+.. Warning :: 
+
+    If you are note running on an LLNL (Quartz) or UM (Great Lakes) system, you will need to manually configure your compilers. We recommend Intel OneAPI, which is freely available. You will need to compile dlars and molanal by hand (see install script for steps).
+    
+ 
 If the above instructions are followed properly, the following executables/scripts should be generated:
 
 .. code-block :: bash
