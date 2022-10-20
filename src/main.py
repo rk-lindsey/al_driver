@@ -284,7 +284,8 @@ def main(args):
                         job_queue          = config.CHIMES_SOLVE_QUEUE,                    
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
-                        job_executable     = config.CHIMES_SOLVER)    
+                        job_executable     = config.CHIMES_SOLVER,
+                        job_mpiexecmnd     = config.HPC_MPI_CMND)    
                         
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "solve_amat")
 
@@ -311,7 +312,8 @@ def main(args):
                         job_queue          = config.CHIMES_SOLVE_QUEUE,    
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
-                        job_executable     = config.CHIMES_SOLVER)    
+                        job_executable     = config.CHIMES_SOLVER,
+                        job_mpiexecmnd     = config.HPC_MPI_CMND)    
                     
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "restart_solve_amat")
                     
@@ -633,6 +635,8 @@ def main(args):
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-all/"
             elif config.IGAS_QM_METHOD == "Gaussian":
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/GAUS-all/"
+            elif config.IGAS_QM_METHOD == "QE":
+                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/QE-all/"
             else:
                 print("Error in main driver while building Amat: unkown IGAS QM method:", config.IGAS_QM_METHOD)
                 exit()
@@ -642,7 +646,9 @@ def main(args):
                 if config.BULK_QM_METHOD == "VASP":
                     qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/VASP-20/"
                 elif config.BULK_QM_METHOD == "DFTB+":
-                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-20/"            
+                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-20/"
+                elif config.BULK_QM_METHOD == "QE":
+                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/QE-20/"
                 else:
                     print("Error in main driver while building Amat: unkown BULK QM method:", config.BULK_QM_METHOD)
                     exit()
@@ -663,18 +669,19 @@ def main(args):
                             do_correction      = config.FIT_CORRECTION,
                             correction_method  = config.CORRECTED_TYPE,
                             correction_files   = config.CORRECTED_TYPE_FILES,
-                            correction_exe     = config.CORRECTED_TYPE_EXE,                            
-                            correction_temps   = config.CORRECTED_TEMPS_BY_FILE,                            
+                            correction_exe     = config.CORRECTED_TYPE_EXE,
+                            correction_temps   = config.CORRECTED_TEMPS_BY_FILE,
                             do_cluster         = config.DO_CLUSTER,
                             prev_gen_path      = config.ALC0_FILES,
                             job_email          = config.HPC_EMAIL,
                             job_ppn            = str(config.HPC_PPN),
                             job_nodes          = config.CHIMES_BUILD_NODES,
-                            job_walltime       = config.CHIMES_BUILD_TIME,    
-                            job_queue          = config.CHIMES_BUILD_QUEUE,        
+                            job_walltime       = config.CHIMES_BUILD_TIME,
+                            job_queue          = config.CHIMES_BUILD_QUEUE,
                             job_account        = config.HPC_ACCOUNT, 
                             job_system         = config.HPC_SYSTEM,
-                            job_executable     = config.CHIMES_LSQ)    
+                            job_executable     = config.CHIMES_LSQ)
+
                 else:
             
                     active_job = gen_ff.build_amat(THIS_ALC, 
@@ -738,6 +745,7 @@ def main(args):
                         job_queue          = config.CHIMES_SOLVE_QUEUE,                            
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
+                        job_mpiexecmnd     = config.HPC_MPI_CMND,
                         job_executable     = config.CHIMES_SOLVER)    
                         
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "solve_amat")
@@ -982,9 +990,12 @@ def main(args):
                 
                 for THIS_CASE in range(config.NO_CASES):
 
-                    qm_driver  .cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE, build_dir=".") # Always clean up, just in case
+                    qm_driver.cleanup_and_setup(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE, build_dir=".") # Always clean up, just in case
                                         
-                    active_job = qm_driver.setup_qm(THIS_ALC,config.BULK_QM_METHOD, config.IGAS_QM_METHOD,
+                    active_job = qm_driver.setup_qm(
+                        THIS_ALC,
+                        config.BULK_QM_METHOD,
+                        config.IGAS_QM_METHOD,
                         tasks, 
                         config.ATOM_TYPES,
                         THIS_CASE, 
@@ -992,7 +1003,7 @@ def main(args):
                         first_run      = True,
                         tight_crit     = config.TIGHT_CRIT,
                         loose_crit     = config.LOOSE_CRIT,
-                        clu_code       = config.CLU_CODE,  
+                        clu_code       = config.CLU_CODE,
                         compilation    = "g++ -std=c++11 -O3",
                         basefile_dir   = config.QM_FILES,
                         VASP_exe       = config.VASP_EXE,
@@ -1005,7 +1016,7 @@ def main(args):
                         DFTB_ppn       = config.DFTB_PPN,
                         DFTB_time      = config.DFTB_TIME,
                         DFTB_modules   = config.DFTB_MODULES,
-                        DFTB_queue     = config.DFTB_QUEUE,                        
+                        DFTB_queue     = config.DFTB_QUEUE,
                         Gaussian_exe   = config.GAUS_EXE,
                         Gaussian_scr   = config.GAUS_SCR,
                         Gaussian_nodes = config.GAUS_NODES,
@@ -1015,7 +1026,8 @@ def main(args):
                         job_ppn        = config.HPC_PPN,
                         job_account    = config.HPC_ACCOUNT,
                         job_system     = config.HPC_SYSTEM,
-                        job_email      = config.HPC_EMAIL)
+                        job_email      = config.HPC_EMAIL
+                    )
                                                     
                     active_jobs += active_job
 

@@ -35,6 +35,7 @@ def print_help():
     PARAM.append("HPC_SYSTEM");                     VARTYP.append("str");           DETAILS.append("Job scheduler on machine code is launched on (only \"slurm\" is supported currently)")
     PARAM.append("HPC_PYTHON");                     VARTYP.append("str");           DETAILS.append("Path to python executable (2.X required for now)")
     PARAM.append("HPC_EMAIL");                      VARTYP.append("bool");          DETAILS.append("Controls whether driver status updates are e-mailed to user")
+    PARAM.append("HPC_MPI_CMND");                   VARTYP.append("str");           DETAILS.append("Whether to use mpirun or srun for submitting SBATCH jobs (HPC system dependent)")
     PARAM.append("ALC0_FILES");                     VARTYP.append("str");           DETAILS.append("Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)")
     PARAM.append("CHIMES_LSQ");                     VARTYP.append("str");           DETAILS.append("ChIMES_lsq executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_lsq\")")
     PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"lsq2.py\")")
@@ -620,6 +621,15 @@ def verify(user_config):
         print("         Will use False")
         
         user_config.HPC_EMAIL = False
+
+    if not hasattr(user_config, 'HPC_MPI_CMND'):
+
+        # string: Do jobs on this HPC use mpirun or srun? (system dependent)
+
+        print("WARNING: Option config.HPC_EMAIL was not set")
+        print("         Will use False")
+        
+        user_config.HPC_MPI_CMND = "srun"
 
 
 

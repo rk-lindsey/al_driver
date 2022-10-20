@@ -137,26 +137,26 @@ def split_amat(amat, bvec, nproc, ppn):
                             print("LOGIC ERROR: Building too many files")
                             exit()
             
-                            print("Working on a new file no.", file_idx)
-                            
-                            # Close the previous A.*.txt file and write the corresponding dim.*.txt file
-                            
-                            Afstream.close()
-                            
-                            #Dname = "dim." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
-                            Dname = "dim." + str(file_idx).rjust(4,'0') + ".txt"
-                            Dfstream = open(Dname,'w')
-                            Dfstream.write(str(cols) + " " + str(line_srt) + " " + str(line_idx-1) + " " + str(lines) + "\n") 
-                            Dfstream.close()              
-            
-                            # Start up the next A.*.txt file
-            
-                            file_idx += 1
-                            line_srt  = line_idx
+                        print("Working on a new file no.", file_idx)
+                        
+                        # Close the previous A.*.txt file and write the corresponding dim.*.txt file
+                        
+                        Afstream.close()
+                        
+                        #Dname = "dim." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
+                        Dname = "dim." + str(file_idx).rjust(4,'0') + ".txt"
+                        Dfstream = open(Dname,'w')
+                        Dfstream.write(str(cols) + " " + str(line_srt) + " " + str(line_idx-1) + " " + str(lines) + "\n") 
+                        Dfstream.close()              
+        
+                        # Start up the next A.*.txt file
+        
+                        file_idx += 1
+                        line_srt  = line_idx
 
-                            Aname = "A." + str(file_idx).rjust(4,'0') + ".txt"
-                            #Aname = "A." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
-                            Afstream = open(Aname,'w')
+                        Aname = "A." + str(file_idx).rjust(4,'0') + ".txt"
+                        #Aname = "A." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
+                        Afstream = open(Aname,'w')
             
             
                     Afstream.write(line)
@@ -399,7 +399,7 @@ def restart_solve_amat(my_ALC, **kwargs):
     args.update(kwargs)
 
     ################################
-    # 1. Run checks before settign up job
+    # 1. Run checks before setting up job
     ################################
     
     os.chdir("GEN_FF")    
@@ -821,8 +821,10 @@ def build_amat(my_ALC, **kwargs):
     
     if args["job_system"] == "slurm":
         job_task = "srun "   + job_task
+    elif args["job_system"] == "slurm-jhu-arch":
+        job_task = "mpirun " + job_task
     else:
-        job_task = "mpirun " + job_task    
+        job_task = "mpirun " + job_task
 
     # Launch the job
     
@@ -864,7 +866,7 @@ def solve_amat(my_ALC, **kwargs):
     
     WARNING: The DLARS/DLASSO code zero pads for ints of *4 MAXIMUM* digits
     
-    WARNING: Currently only writtien with DLASSO support, NOT DLARS!
+    WARNING: Currently only written with DLASSO support, NOT DLARS!
                
     """
 
@@ -872,13 +874,13 @@ def solve_amat(my_ALC, **kwargs):
     # 0. Set up an argument parser
     ################################
     
-    default_keys   = [""]*22
-    default_values = [""]*22
+    default_keys   = [""]*23 # NOTE: key:value pair at index 22 is located under the "Overall job controls" header
+    default_values = [""]*23
     
     # Weights
     
     default_keys[20] = "weights_set_alc_0" ; default_values[20] =     False   # Weights to be added to per-atom forces
-    default_keys[21] = "weights_alc_0"     ; default_values[21] =     None    # Weights to be added to per-atom forces for clusters  
+    default_keys[21] = "weights_alc_0"     ; default_values[21] =     None    # Weights to be added to per-atom forces for clusters
     
     default_keys[0 ] = "weights_force"     ; default_values[0 ] =     "1.0"   # Weights to be added to per-atom forces
     default_keys[1 ] = "weights_force_gas" ; default_values[1 ] =     "5.0"   # Weights to be added to per-atom forces for clusters  
@@ -896,7 +898,7 @@ def solve_amat(my_ALC, **kwargs):
     
     # Overall job controls
     
-    default_keys[10] = "job_name"           ; default_values[10] =     "ALC-"+ repr(my_ALC)+"-lsq-2"        # Name for ChIMES lsq job
+    default_keys[10] = "job_name"          ; default_values[10] =     "ALC-"+ repr(my_ALC)+"-lsq-2"        # Name for ChIMES lsq job
     default_keys[11] = "job_nodes"         ; default_values[11] =     "1"                     # Number of nodes for ChIMES lsq job
     default_keys[12] = "job_ppn"           ; default_values[12] =     "36"                    # Number of processors per node for ChIMES lsq job
     default_keys[13] = "job_walltime"      ; default_values[13] =     "1"                     # Walltime in hours for ChIMES lsq job
@@ -906,7 +908,7 @@ def solve_amat(my_ALC, **kwargs):
     default_keys[17] = "job_system"        ; default_values[17] =     "slurm"                 # slurm or torque    
     default_keys[18] = "job_email"         ; default_values[18] =     True                    # Send slurm emails?
     default_keys[19] = "node_ppn"          ; default_values[19] =     "36"                    # The actual number of procs per node
-    
+    default_keys[22] = "job_mpiexecmnd"    ; default_values[22] =     "srun"                  # Which command to use (mpirun or srun) for dlars jobs
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -1039,7 +1041,7 @@ def solve_amat(my_ALC, **kwargs):
         
             print("Splitting A-matrix for faster solve")
         
-            helpers.run_bash_cmnd("rm -f A.*.txt dim.*.txt")
+            helpers.run_bash_cmnd("rm -f A.*.txtf dim.*.txt")
 
             no_files = split_amat("A_comb.txt", "b_comb.txt", int(args["job_nodes"]), int(args["job_ppn"]))
         
@@ -1082,6 +1084,8 @@ def solve_amat(my_ALC, **kwargs):
         print("ERROR: unknown regression algorithm: ", args["regression_alg"])
         exit()
     
+    job_task += " --mpiexecmnd " + args["job_mpiexecmnd"]
+    
 
     # Launch the job
      
@@ -1097,6 +1101,7 @@ def solve_amat(my_ALC, **kwargs):
         job_account    =     args["job_account" ] ,
         job_executable =     job_task,
         job_system     =     args["job_system"  ] ,
+        # job_mpiexecmnd =     str(args["job_mpiexecmnd"]),
         job_file       =     "run_lsqpy.cmd")
 
     os.chdir("..")
