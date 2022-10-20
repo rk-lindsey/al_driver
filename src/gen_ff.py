@@ -1041,7 +1041,7 @@ def solve_amat(my_ALC, **kwargs):
         
             print("Splitting A-matrix for faster solve")
         
-            helpers.run_bash_cmnd("rm -f A.*.txtf dim.*.txt")
+            helpers.run_bash_cmnd("rm -f A.*.txt dim.*.txt")
 
             no_files = split_amat("A_comb.txt", "b_comb.txt", int(args["job_nodes"]), int(args["job_ppn"]))
         
@@ -1101,7 +1101,6 @@ def solve_amat(my_ALC, **kwargs):
         job_account    =     args["job_account" ] ,
         job_executable =     job_task,
         job_system     =     args["job_system"  ] ,
-        # job_mpiexecmnd =     str(args["job_mpiexecmnd"]),
         job_file       =     "run_lsqpy.cmd")
 
     os.chdir("..")

@@ -635,8 +635,8 @@ def main(args):
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-all/"
             elif config.IGAS_QM_METHOD == "Gaussian":
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/GAUS-all/"
-            elif config.IGAS_QM_METHOD == "QE":
-                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/QE-all/"
+            #elif config.IGAS_QM_METHOD == "QE":
+            #    qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/QE-all/"
             else:
                 print("Error in main driver while building Amat: unkown IGAS QM method:", config.IGAS_QM_METHOD)
                 exit()
@@ -647,8 +647,8 @@ def main(args):
                     qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/VASP-20/"
                 elif config.BULK_QM_METHOD == "DFTB+":
                     qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-20/"
-                elif config.BULK_QM_METHOD == "QE":
-                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/QE-20/"
+                #elif config.BULK_QM_METHOD == "QE":
+                #    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/QE-20/"
                 else:
                     print("Error in main driver while building Amat: unkown BULK QM method:", config.BULK_QM_METHOD)
                     exit()
@@ -1026,8 +1026,7 @@ def main(args):
                         job_ppn        = config.HPC_PPN,
                         job_account    = config.HPC_ACCOUNT,
                         job_system     = config.HPC_SYSTEM,
-                        job_email      = config.HPC_EMAIL
-                    )
+                        job_email      = config.HPC_EMAIL)
                                                     
                     active_jobs += active_job
 
