@@ -463,17 +463,16 @@ def create_and_launch_job(*argv, **kwargs):
 
     # Overall job controls
     
-    default_keys[0 ] = "job_name"           ; default_values[0 ] =     "ALC-x-lsq-1" # Name for ChIMES lsq job
+    default_keys[0 ] = "job_name"          ; default_values[0 ] =     "ALC-x-lsq-1"  # Name for ChIMES lsq job
     default_keys[1 ] = "job_nodes"         ; default_values[1 ] =     "2"            # Number of nodes for ChIMES lsq job
     default_keys[2 ] = "job_ppn"           ; default_values[2 ] =     "36"           # Number of processors per node for ChIMES lsq job
     default_keys[3 ] = "job_walltime"      ; default_values[3 ] =     "1"            # Walltime in hours for ChIMES lsq job
     default_keys[4 ] = "job_queue"         ; default_values[4 ] =     "pdebug"       # Queue for ChIMES lsq job
     default_keys[5 ] = "job_account"       ; default_values[5 ] =     "pbronze"      # Account for ChIMES lsq job
     default_keys[6 ] = "job_executable"    ; default_values[6 ] =     ""             # Full path to executable for ChIMES lsq job
-    default_keys[7 ] = "job_system"        ; default_values[7 ] =     "slurm"        # slurm or torque    
-    default_keys[8 ] = "job_file"          ; default_values[8 ] =     "run.cmd"      # Name of the resulting submit script    
-    default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Name of the resulting submit script    
-    
+    default_keys[7 ] = "job_system"        ; default_values[7 ] =     "slurm"        # slurm or torque
+    default_keys[8 ] = "job_file"          ; default_values[8 ] =     "run.cmd"      # Name of the resulting submit script
+    default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Name of the resulting submit script
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)
@@ -502,7 +501,7 @@ def create_and_launch_job(*argv, **kwargs):
     
     for i in range(len(JOB)):
     
-        if args["job_system"] == "slurm":
+        if (args["job_system"] == "slurm") or (args["job_system"] == "slurm-jhu-arch"):
             JOB[i] = "#SBATCH" + JOB[i]
         elif args["job_system"] == "torque":
             JOB[i] = "#PBS"  + JOB[i]
@@ -530,12 +529,12 @@ def create_and_launch_job(*argv, **kwargs):
 
     jobid = None
     
-    if args["job_system"] == "slurm":
+    if (args["job_system"] == "slurm") or (args["job_system"] == "slurm-jhu-arch"):
         jobid = run_bash_cmnd("sbatch " + args["job_file"]).split()[-1]
-    else:    
+    else:
         jobid = run_bash_cmnd("qsub " + args["job_file"])
 
-    return jobid    
+    return jobid
     
 
 def wait_for_job(active_job, **kwargs):
@@ -577,7 +576,7 @@ def wait_for_job(active_job, **kwargs):
         
         check_job = ""
         
-        if args["job_system"] == "slurm":
+        if (args["job_system"] == "slurm") or (args["job_system"] == "slurm-jhu-arch"):
             check_job = "squeue -j " + active_job
             
         elif args["job_system"] == "torque":
@@ -646,7 +645,7 @@ def wait_for_jobs(*argv, **kwargs):
             if type(active_jobs[i]) == type(1):
                 active_jobs[i] = str(active_jobs[i])
         
-            if args["job_system"] == "slurm":
+            if (args["job_system"] == "slurm") or (args["job_system"] == "slurm-jhu-arch"):
 
                 check_job = "squeue -j " + active_jobs[i]
             
