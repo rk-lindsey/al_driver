@@ -43,6 +43,10 @@ def post_process_molanal(args):
         ifile    = ifstream.readlines()
 
         for j in range(len(ifile)):
+            
+            if "The mole fraction sum of transition states" in ifile[j]:
+                
+                break
         
             if args_species[i] in ifile[j]:
 
