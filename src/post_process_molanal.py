@@ -47,8 +47,11 @@ def post_process_molanal(args):
             if "The mole fraction sum of transition states" in ifile[j]:
                 
                 break
+            
+            tmp = ifile[j].split()
+            tmp = ' '.join(tmp[0:len(tmp)-5])
         
-            if args_species[i] in ifile[j]:
+            if args_species[i] == tmp:
 
                 tmp = ifile[j].split()
                 
