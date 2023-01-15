@@ -88,7 +88,6 @@ def cleanup_and_setup(*argv, **kwargs):
         else:
             helpers.run_bash_cmnd("mkdir -p  " + vasp_dir + "/CASE-" + repr(args_this_case))
 
-
 def continue_job(*argv, **kwargs):
 
     """ 
@@ -182,7 +181,6 @@ def continue_job(*argv, **kwargs):
 
     return job_list    
     
-
 def check_convergence(my_ALC, *argv, **kwargs):
 
     """
@@ -444,7 +442,6 @@ def generate_POSCAR(inxyz, *argv):
         ofstream.write(line)
         
     ofstream.close()
-
 
 def post_process(*argv, **kwargs):
 

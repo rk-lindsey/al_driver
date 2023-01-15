@@ -141,6 +141,8 @@ def main(args):
         config.VASP_POSTPRC   = config.HPC_PYTHON + " " + config.VASP_POSTPRC
     if ((config.BULK_QM_METHOD == "DFTB+") or (config.IGAS_QM_METHOD == "DFTB+")):
         config.DFTB_POSTPRC   = config.HPC_PYTHON + " " + config.DFTB_POSTPRC
+    if ((config.BULK_QM_METHOD == "CP2K") or (config.IGAS_QM_METHOD == "CP2K")):
+        config.CP2K_POSTPRC   = config.HPC_PYTHON + " " + config.CP2K_POSTPRC        
     
     if config.EMAIL_ADD:
         EMAIL_ADD = config.EMAIL_ADD    
@@ -505,6 +507,12 @@ def main(args):
                         DFTB_queue     = config.DFTB_QUEUE,  
                         DFTB_exe       = config.DFTB_EXE,    
                         DFTB_modules   = config.DFTB_MODULES,
+                        CP2K_exe       = config.CP2K_EXE,
+                        CP2K_nodes     = config.CP2K_NODES,
+                        CP2K_time      = config.CP2K_TIME,
+                        CP2K_queue     = config.CP2K_QUEUE,
+                        CP2K_modules   = config.CP2K_MODULES,
+                        CP2K_data_dir  = config.CP2K_DATADIR,
                         Gaussian_exe   = config.GAUS_EXE,
                         Gaussian_scr   = config.GAUS_SCR,
                         Gaussian_nodes = config.GAUS_NODES,
@@ -601,7 +609,8 @@ def main(args):
             
                 qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY",
                     vasp_postproc = config.VASP_POSTPRC,
-                    dftb_postproc = config.DFTB_POSTPRC, # ) #,
+                    dftb_postproc = config.DFTB_POSTPRC, 
+                    cp2k_postproc = config.CP2K_POSTPRC,
                     gaus_reffile  = config.GAUS_REF)
                     # gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 
@@ -631,6 +640,8 @@ def main(args):
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/VASP-all/"
             elif config.IGAS_QM_METHOD == "DFTB+":
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-all/"
+            elif config.IGAS_QM_METHOD == "CP2K":
+                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/CP2K-all/"
             elif config.IGAS_QM_METHOD == "Gaussian":
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/GAUS-all/"
             else:
@@ -642,7 +653,9 @@ def main(args):
                 if config.BULK_QM_METHOD == "VASP":
                     qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/VASP-20/"
                 elif config.BULK_QM_METHOD == "DFTB+":
-                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-20/"            
+                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-20/"  
+                elif config.BULK_QM_METHOD == "CP2K":
+                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/CP2K-20/"          
                 else:
                     print("Error in main driver while building Amat: unkown BULK QM method:", config.BULK_QM_METHOD)
                     exit()
@@ -1005,7 +1018,13 @@ def main(args):
                         DFTB_ppn       = config.DFTB_PPN,
                         DFTB_time      = config.DFTB_TIME,
                         DFTB_modules   = config.DFTB_MODULES,
-                        DFTB_queue     = config.DFTB_QUEUE,                        
+                        DFTB_queue     = config.DFTB_QUEUE,
+                        CP2K_exe       = config.CP2K_EXE,
+                        CP2K_nodes     = config.CP2K_NODES,
+                        CP2K_time      = config.CP2K_TIME,
+                        CP2K_queue     = config.CP2K_QUEUE,
+                        CP2K_modules   = config.CP2K_MODULES,
+                        CP2K_data_dir  = config.CP2K_DATADIR,                                                
                         Gaussian_exe   = config.GAUS_EXE,
                         Gaussian_scr   = config.GAUS_SCR,
                         Gaussian_nodes = config.GAUS_NODES,
@@ -1110,7 +1129,8 @@ def main(args):
                 
                     qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["all"], "ENERGY", config.NO_CASES,
                         vasp_postproc = config.VASP_POSTPRC,
-                        dftb_postproc = config.DFTB_POSTPRC, # )#,
+                        dftb_postproc = config.DFTB_POSTPRC,
+                        cp2k_postproc = config.CP2K_POSTPRC,
                         gaus_reffile  = config.GAUS_REF)
                         #gaus_postproc = config.GAUS_POSTPRC) -- this is unused
                         
@@ -1127,7 +1147,8 @@ def main(args):
                 
                 qm_driver.post_process(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, ["20"], extract, config.NO_CASES,
                     vasp_postproc = config.VASP_POSTPRC,
-                    dftb_postproc = config.DFTB_POSTPRC, # ) #,
+                    dftb_postproc = config.DFTB_POSTPRC,
+                    cp2k_postproc = config.CP2K_POSTPRC,
                     gaus_reffile  = config.GAUS_REF)
                     #gaus_postproc = config.GAUS_POSTPRC) -- this is unused
                         

@@ -92,7 +92,7 @@ def continue_job(*argv, **kwargs):
     
     Usage: continue_job(<arguments>)
     
-    Notes: See function definition in gaus_driver.py for a full list of options. 
+    Notes: See function definition in dftbplus_driver.py for a full list of options. 
            Returns a SLURM jobid list??
                
     """
@@ -393,7 +393,6 @@ def generate_gen(inxyz, *argv):
             
     ofstream.close()
 
-
 def post_process(*argv, **kwargs):
 
     """ 
@@ -520,9 +519,7 @@ def post_process(*argv, **kwargs):
                 helpers.run_bash_cmnd("mv tmp.tmp OUTCAR.temps")
         
         os.chdir("..")
-        
-                  
-          
+         
 def setup_dftb(my_ALC, *argv, **kwargs):
 
     """ 
@@ -578,9 +575,9 @@ def setup_dftb(my_ALC, *argv, **kwargs):
     # DFTB specific controls
     
     default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../QM_BASEFILES/"        # dftb_in.hsd files, optionall .sfk files
-    default_keys[1 ] = "traj_list"        ; default_values[1 ] = "traj_list.dat"        # Traj_list used in fm_setup.in... last column is target temperatura
-    default_keys[2 ] = "modules"        ; default_values[2 ] = "mkl"             # Post_proc_lsq*py file... should also include the python command
-    default_keys[3 ] = "build_dir"        ; default_values[3 ] = "."                 # Post_proc_lsq*py file... should also include the python command
+    default_keys[1 ] = "traj_list"     ; default_values[1 ] = "traj_list.dat"        # Traj_list used in fm_setup.in... last column is target temperatura
+    default_keys[2 ] = "modules"       ; default_values[2 ] = "mkl"             # Post_proc_lsq*py file... should also include the python command
+    default_keys[3 ] = "build_dir"     ; default_values[3 ] = "."                 # Post_proc_lsq*py file... should also include the python command
     default_keys[4 ] = "first_run"     ; default_values[4 ] = False                # Optional... is this the first run? if so, dont search for "CASE" in the name
 
 
@@ -593,7 +590,7 @@ def setup_dftb(my_ALC, *argv, **kwargs):
     default_keys[9 ] = "job_account"   ; default_values[9 ] = "pbronze"              # Account for ChIMES md job
     default_keys[10] = "job_executable"; default_values[10] = ""                  # Full path to executable for ChIMES md job
     default_keys[11] = "job_system"    ; default_values[11] = "slurm"              # slurm or torque       
-    default_keys[12] = "job_file"       ; default_values[12] = "run.cmd"              # Name of the resulting submit script   
+    default_keys[12] = "job_file"      ; default_values[12] = "run.cmd"              # Name of the resulting submit script   
     default_keys[13] = "job_email"     ; default_values[13] = True                  # Send slurm emails?
     
 
@@ -782,3 +779,4 @@ def setup_dftb(my_ALC, *argv, **kwargs):
         os.chdir(curr_dir)
     
     return run_dftb_jobid    
+

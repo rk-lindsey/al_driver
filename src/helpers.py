@@ -11,6 +11,21 @@ import os
 
 """ Small helper functions and utilities general to the ALC process. """
 
+def findinfile(search_str,search_file):
+    
+    matches = []
+    
+    
+    with open(search_file) as ifstream:
+        for line in ifstream:
+            
+            if search_str in line:
+                match.append(line.strip())
+    
+    return matches
+    
+    
+
 def readlines(infile,start_line=0, nlines=-1):
 
     """ 
@@ -87,7 +102,6 @@ def writelines(outfile, contents, nlines=-1):
         
     ofstream.close()
 
-
 def run_bash_cmnd(cmnd_str):
 
     """ 
@@ -146,8 +160,6 @@ def run_bash_cmnd_to_file(outfile, cmnd_str):
     ofstream .write(run_bash_cmnd(cmnd_str))
     ofstream .close()
     
-
-    
 def cat_to_var(*argv):
 
     """ 
@@ -172,8 +184,7 @@ def cat_to_var(*argv):
             
         ifstream.close()
         
-    return contents
-    
+    return contents  
     
 def cat_specific(outfilename, *argv):
 
@@ -418,8 +429,7 @@ def list_natoms(infile):
             if len(line.split()) == 1:
                 natoms.append(int(line.split()[0]))
     return natoms        
-    
-    
+        
 def email_user(base, address, status):
 
     """ 
@@ -438,8 +448,7 @@ def email_user(base, address, status):
         cmnd = base + "/utilities/send_email.sh " + address + " " + status + " "
 
         return run_bash_cmnd(cmnd)
-        
-    
+           
 def create_and_launch_job(*argv, **kwargs):
 
     """ 
@@ -537,7 +546,6 @@ def create_and_launch_job(*argv, **kwargs):
 
     return jobid    
     
-
 def wait_for_job(active_job, **kwargs):
 
     """ 
@@ -598,7 +606,6 @@ def wait_for_job(active_job, **kwargs):
             
     return
     
-
 def wait_for_jobs(*argv, **kwargs):
 
     """ 
@@ -671,8 +678,7 @@ def wait_for_jobs(*argv, **kwargs):
         else:        
             print("Breaking ... ")
             break                    
-    return
-    
+    return  
 
 def str2bool(v):
 
@@ -897,8 +903,7 @@ def xyz_to_dftbgen(xyzfile):
     ifstream.close()
     ofstream.close()
 
-    return genfile
-    
+    return genfile 
     
 def dftbgen_to_xyz(*argv):
 

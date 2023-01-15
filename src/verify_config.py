@@ -96,6 +96,12 @@ def print_help():
     PARAM.append("DFTB_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for DFTB+ calculations, e.g. \"04:00:00\"")
     PARAM.append("DFTB_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit DFTB+ jobs to")
     PARAM.append("DFTB_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ executable")
+    PARAM.append("CP2K_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for CP2K jobs")
+    PARAM.append("CP2K_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for CP2K jobs")
+    PARAM.append("CP2K_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for CP2K calculations, e.g. \"04:00:00\"")
+    PARAM.append("CP2K_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit CP2K jobs to")
+    PARAM.append("CP2K_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to CP2K executable")
+    PARAM.append("CP2K_DATADIR");                   VARTYP.append("str");           DETAILS.append("Absolute path to CP2K scratch (\"data\") directory")
     PARAM.append("GAUS_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for Gaussian jobs")
     PARAM.append("GAUS_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for Gaussian jobs")
     PARAM.append("GAUS_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for Gaussian calculations, e.g. \"04:00:00\"")
@@ -292,6 +298,101 @@ def check_DFTB(user_config):
             exit()
         else:
             user_config.DFTB_EXE = None
+
+
+def check_CP2K(user_config):
+    
+    """
+    
+    Checks whether settings for CP2K compatibility.
+    Produces warnings for un-initialized values if CP2K is requested
+        
+    Usage: check_CP2K(user_config)
+    
+    """    
+    
+    if not hasattr(user_config,'CP2K_FILES'):
+
+        # Location of basic DFTB+ input files (dftb_in.hsd)
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_FILES was not set")
+            print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\"")
+
+        user_config.CP2K_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
+    
+    if not hasattr(user_config,'CP2K_POSTPRC'):
+
+        # Location of a CP2K post-processing file
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_POSTPRC was not set")
+            print("         Will use config.DRIVER_DIR + \"/src/cp2k_to_xyz.py\"")
+
+        user_config.CP2K_POSTPRC = user_config.DRIVER_DIR + "/src/cp2k_to_xyz.py"            
+    
+    if not hasattr(user_config,'CP2K_NODES'):
+
+        # Number of nodes to use for a CP2K calculation
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_NODES was not set")
+            print("         Will use a value of 1")
+
+        user_config.CP2K_NODES = 1
+    
+    if not hasattr(user_config,'CP2K_PPN'):
+
+        # Number of nodes to use for a CP2K calculation
+        
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_PPN was not set")
+            print("         Will use a value of 1")
+
+        user_config.CP2K_PPN = 1                            
+
+    if not hasattr(user_config,'CP2K_TIME'):
+
+        # Time for a CP2K calculation (hrs)
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_TIME was not set")
+            print("         Will use a value of \"04:00:00\"")
+
+        user_config.CP2K_TIME = "04:00:00"
+    
+    if not hasattr(user_config,'CP2K_QUEUE'):
+
+        # Queue for a CP2K calculation
+        
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_QUEUE was not set")
+            print("         Will use pbatch")
+
+        user_config.CP2K_QUEUE = "pbatch"
+    
+    if not hasattr(user_config,'CP2K_MODULES'):
+
+        # Queue for a CP2K calculation
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_MODULES was not set")
+            print("         Will use mkl")
+
+        user_config.CP2K_MODULES = "mkl"        
+    
+    if not hasattr(user_config,'CP2K_EXE'):
+
+        # CP2K executable
+        
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("ERROR: Option config.CP2K_EXE was not set")
+            print("         Acceptable settings are of the form: \"/path/to/cp2k.popt\"")
+            exit()
+        else:
+            user_config.CP2K_EXE = None    
+    
+    
 
 def check_GAUS(user_config):
     
@@ -1264,6 +1365,19 @@ def verify(user_config):
         user_config.DFTB_QUEUE   = None
         user_config.DFTB_MODULES = None 
         user_config.DFTB_EXE     = None
+        
+    if (user_config.IGAS_QM_METHOD == "CP2K") or (user_config.BULK_QM_METHOD == "CP2K"):    
+        check_CP2K(user_config)
+    else:
+        user_config.CP2K_FILES   = None
+        user_config.CP2K_POSTPRC = None
+        user_config.CP2K_NODES   = None 
+        user_config.CP2K_PPN     = None 
+        user_config.CP2K_TIME    = None
+        user_config.CP2K_QUEUE   = None
+        user_config.CP2K_MODULES = None 
+        user_config.CP2K_EXE     = None  
+        user_config.CP2K_DATADIR = None      
         
     if (user_config.IGAS_QM_METHOD == "GAUS") or (user_config.BULK_QM_METHOD == "GAUS"):
         check_GAUS(user_config)
