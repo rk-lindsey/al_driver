@@ -55,3 +55,6 @@ MOLANAL_SPECIES = ["C1"]
 
 QM_FILES = WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
 VASP_EXE = "/usr/gapps/emc-vasp/vasp.5.4.4/build/gam/vasp"
+VASP_TIME    = "01:00:00"
+VASP_NODES   = 2
+VASP_PPN     = 36

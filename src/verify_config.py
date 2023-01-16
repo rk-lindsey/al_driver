@@ -878,10 +878,12 @@ def verify(user_config):
     if not hasattr(user_config,'CHIMES_LSQ_MODULES'):
     
         print("WARNING: Option config.CHIMES_LSQ_MODULES was not set")
+        user_config.CHIMES_LSQ_MODULES = ""
 
     if not hasattr(user_config,'CHIMES_MD_MODULES'):
     
         print("WARNING: Option config.CHIMES_MD_MODULES was not set")
+        user_config.CHIMES_MD_MODULES = ""
   
 
     if not hasattr(user_config,'CHIMES_SOLVER'):
