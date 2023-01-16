@@ -1030,6 +1030,7 @@ def main(args):
                         VASP_mem       = config.VASP_MEM,
                         VASP_time      = config.VASP_TIME,
                         VASP_queue     = config.VASP_QUEUE,
+                        VASP_modules   = config.VASP_MODULES,
                         DFTB_exe       = config.DFTB_EXE,
                         DFTB_nodes     = config.DFTB_NODES,
                         DFTB_ppn       = config.DFTB_PPN,

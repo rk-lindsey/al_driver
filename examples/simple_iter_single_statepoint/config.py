@@ -1,3 +1,4 @@
+# Configured for seamless run on LLNL-LC (Quartz)
 
 ################################
 ##### General options
@@ -58,3 +59,5 @@ VASP_EXE = "/usr/gapps/emc-vasp/vasp.5.4.4/build/gam/vasp"
 VASP_TIME    = "01:00:00"
 VASP_NODES   = 2
 VASP_PPN     = 36
+VASP_MODULES = "mkl intel/18.0.1 impi/2018.0"
+

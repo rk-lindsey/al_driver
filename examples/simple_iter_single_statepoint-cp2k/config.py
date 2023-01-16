@@ -1,3 +1,4 @@
+# Configred for seamless run on UM-ARC (Great Lakes)
 
 ################################
 ##### General options
@@ -72,6 +73,7 @@ CP2K_EXE     = "/nfs/turbo/coe-rklinds/software/cp2k/exe/Linux-intel-x86_64-RKL/
 CP2K_TIME    = "01:00:00"
 CP2K_NODES   = 2
 CP2K_PPN     = 36
+CP2K_MEM     = 128 
 CP2K_QUEUE   = "standard"
 CP2K_MODULES = "intel/2022.1.2 impi/2021.5.1 mkl/2022.0.2"
 CP2K_DATADIR = "/nfs/turbo/coe-rklinds/software/cp2k/data/"
