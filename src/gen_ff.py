@@ -43,11 +43,11 @@ def subtract(**kwargs):
     default_values = [""]*5
 
 
-    default_keys[0 ] = "md_driver"        ; default_values[0 ] = None      # MD code executable to use when evaluating interactions
-    default_keys[1 ] = "method"            ; default_values[1 ] = "CHIMES" # Type of MD code used by executable
+    default_keys[0 ] = "md_driver"       ; default_values[0 ] = None      # MD code executable to use when evaluating interactions
+    default_keys[1 ] = "method"          ; default_values[1 ] = "CHIMES" # Type of MD code used by executable
     default_keys[2 ] = "trajectories"    ; default_values[2 ] = []         # List of trajectory files to modify
     default_keys[3 ] = "temperatures"    ; default_values[3 ] = []         # List of temperatures files for each trajectory file
-    default_keys[4 ] = "parameters"        ; default_values[4 ] = []       # List of parameter files to use
+    default_keys[4 ] = "parameters"      ; default_values[4 ] = []       # List of parameter files to use
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
@@ -95,7 +95,7 @@ def split_amat(amat, bvec, nproc, ppn):
     Usage: split_amat("A_comb.txt", "b_comb.txt", 8, 36)
                
     """
-    
+
     infile = amat
     lines  = helpers.wc_l(bvec)
     nfiles = nproc*ppn
@@ -132,31 +132,31 @@ def split_amat(amat, bvec, nproc, ppn):
 
             
                     if line_idx > 0 and line_idx % lines_per_file == 0:
-            
+                    
                         if file_idx >= nfiles:
                             print("LOGIC ERROR: Building too many files")
                             exit()
             
-                            print("Working on a new file no.", file_idx)
-                            
-                            # Close the previous A.*.txt file and write the corresponding dim.*.txt file
-                            
-                            Afstream.close()
-                            
-                            #Dname = "dim." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
-                            Dname = "dim." + str(file_idx).rjust(4,'0') + ".txt"
-                            Dfstream = open(Dname,'w')
-                            Dfstream.write(str(cols) + " " + str(line_srt) + " " + str(line_idx-1) + " " + str(lines) + "\n") 
-                            Dfstream.close()              
+                        print("Working on a new file no.", file_idx)
+                        
+                        # Close the previous A.*.txt file and write the corresponding dim.*.txt file
+                        
+                        Afstream.close()
+                        
+                        #Dname = "dim." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
+                        Dname = "dim." + str(file_idx).rjust(4,'0') + ".txt"
+                        Dfstream = open(Dname,'w')
+                        Dfstream.write(str(cols) + " " + str(line_srt) + " " + str(line_idx-1) + " " + str(lines) + "\n") 
+                        Dfstream.close()              
             
-                            # Start up the next A.*.txt file
+                        # Start up the next A.*.txt file
             
-                            file_idx += 1
-                            line_srt  = line_idx
+                        file_idx += 1
+                        line_srt  = line_idx
 
-                            Aname = "A." + str(file_idx).rjust(4,'0') + ".txt"
-                            #Aname = "A." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
-                            Afstream = open(Aname,'w')
+                        Aname = "A." + str(file_idx).rjust(4,'0') + ".txt"
+                        #Aname = "A." + str(file_idx).rjust(len(str(nfiles))+1,'0') + ".txt"
+                        Afstream = open(Aname,'w')
             
             
                     Afstream.write(line)
@@ -573,8 +573,8 @@ def build_amat(my_ALC, **kwargs):
     # 0. Set up an argument parser
     ################################
     
-    default_keys   = [""]*24
-    default_values = [""]*24
+    default_keys   = [""]*25
+    default_values = [""]*25
     
     # Paths
     
@@ -598,15 +598,16 @@ def build_amat(my_ALC, **kwargs):
         
     # Job controls
     
-    default_keys[15] = "job_name"           ; default_values[15] =     "ALC-"+ repr(my_ALC)+"-lsq-1"   # Name for ChIMES lsq job
-    default_keys[16] = "job_nodes"         ; default_values[16] =     "2"                              # Number of nodes for ChIMES lsq job
-    default_keys[17] = "job_ppn"           ; default_values[17] =     "36"                             # Number of processors per node for ChIMES lsq job
-    default_keys[18] = "job_walltime"      ; default_values[18] =     "1"                              # Walltime in hours for ChIMES lsq job
-    default_keys[19] = "job_queue"         ; default_values[19] =     "pdebug"                         # Queue for ChIMES lsq job
-    default_keys[20] = "job_account"       ; default_values[20] =     "pbronze"                        # Account for ChIMES lsq job
-    default_keys[21] = "job_executable"    ; default_values[21] =     ""                               # Full path to executable for ChIMES lsq job
-    default_keys[22] = "job_system"        ; default_values[22] =     "slurm"                          # slurm or torque    
-    default_keys[23] = "job_email"         ; default_values[23] =      True                            # Send slurm emails?
+    default_keys[15] = "job_name"          ; default_values[15] =     "ALC-"+ repr(my_ALC)+"-lsq-1"   # Name for ChIMES lsq job
+    default_keys[16] = "job_nodes"         ; default_values[16] =     "2"                             # Number of nodes for ChIMES lsq job
+    default_keys[17] = "job_ppn"           ; default_values[17] =     "36"                            # Number of processors per node for ChIMES lsq job
+    default_keys[18] = "job_walltime"      ; default_values[18] =     "1"                             # Walltime in hours for ChIMES lsq job
+    default_keys[19] = "job_queue"         ; default_values[19] =     "pdebug"                        # Queue for ChIMES lsq job
+    default_keys[20] = "job_account"       ; default_values[20] =     "pbronze"                       # Account for ChIMES lsq job
+    default_keys[21] = "job_executable"    ; default_values[21] =     ""                              # Full path to executable for ChIMES lsq job
+    default_keys[22] = "job_system"        ; default_values[22] =     "slurm"                         # slurm or torque    
+    default_keys[23] = "job_email"         ; default_values[23] =      True                           # Send slurm emails?
+    default_keys[24] = "job_modules"       ; default_values[24] =     ""                              # Modules for the job
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)
@@ -835,6 +836,7 @@ def build_amat(my_ALC, **kwargs):
         job_queue      =      args["job_queue"   ] ,
         job_account    =      args["job_account" ] ,
         job_executable =      job_task,
+        job_modules    =      args["job_modules"],
         job_system     =      args["job_system"  ] ,
         job_file       = "run_chimeslsq.cmd")
 
@@ -872,20 +874,20 @@ def solve_amat(my_ALC, **kwargs):
     # 0. Set up an argument parser
     ################################
     
-    default_keys   = [""]*22
-    default_values = [""]*22
+    default_keys   = [""]*23
+    default_values = [""]*23
     
     # Weights
     
-    default_keys[20] = "weights_set_alc_0" ; default_values[20] =     False   # Weights to be added to per-atom forces
-    default_keys[21] = "weights_alc_0"     ; default_values[21] =     None    # Weights to be added to per-atom forces for clusters  
+    default_keys[21] = "weights_set_alc_0" ; default_values[21] =     False   # Weights to be added to per-atom forces
+    default_keys[22] = "weights_alc_0"     ; default_values[22] =     None    # Weights to be added to per-atom forces for clusters  
     
     default_keys[0 ] = "weights_force"     ; default_values[0 ] =     "1.0"   # Weights to be added to per-atom forces
     default_keys[1 ] = "weights_force_gas" ; default_values[1 ] =     "5.0"   # Weights to be added to per-atom forces for clusters  
     default_keys[2 ] = "weights_energy"    ; default_values[2 ] =     "0.1"   # Weights to be added to per-frame energies
     default_keys[3 ] = "weights_energy_gas"; default_values[3 ] =     "0.01"  # Weights to be added to per cluster energies
     default_keys[4 ] = "weights_stress"    ; default_values[4 ] =     "250.0" # Weights to be added to stress tensor components
-    default_keys[5 ] = "do_cluster"        ; default_values[5 ] =    True     # Should cluser configurations be considered 
+    default_keys[5 ] = "do_cluster"        ; default_values[5 ] =     True    # Should cluser configurations be considered 
     
     # LSQ controls
     
@@ -896,7 +898,7 @@ def solve_amat(my_ALC, **kwargs):
     
     # Overall job controls
     
-    default_keys[10] = "job_name"           ; default_values[10] =     "ALC-"+ repr(my_ALC)+"-lsq-2"        # Name for ChIMES lsq job
+    default_keys[10] = "job_name"          ; default_values[10] =     "ALC-"+ repr(my_ALC)+"-lsq-2"        # Name for ChIMES lsq job
     default_keys[11] = "job_nodes"         ; default_values[11] =     "1"                     # Number of nodes for ChIMES lsq job
     default_keys[12] = "job_ppn"           ; default_values[12] =     "36"                    # Number of processors per node for ChIMES lsq job
     default_keys[13] = "job_walltime"      ; default_values[13] =     "1"                     # Walltime in hours for ChIMES lsq job
@@ -906,7 +908,7 @@ def solve_amat(my_ALC, **kwargs):
     default_keys[17] = "job_system"        ; default_values[17] =     "slurm"                 # slurm or torque    
     default_keys[18] = "job_email"         ; default_values[18] =     True                    # Send slurm emails?
     default_keys[19] = "node_ppn"          ; default_values[19] =     "36"                    # The actual number of procs per node
-    
+    default_keys[20] = "job_modules"       ; default_values[20] =     ""                      # Modules for job
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -1090,13 +1092,14 @@ def solve_amat(my_ALC, **kwargs):
     run_py_jobid = helpers.create_and_launch_job(
         job_name       =     args["job_name"    ] ,
         job_email      =     args["job_email"   ] ,    
-        job_nodes      = str(args["job_nodes"    ]),
+        job_nodes      = str(args["job_nodes"   ]),
         job_ppn        = str(args["node_ppn"    ]),
         job_walltime   = str(args["job_walltime"]),
-        job_queue      =     args["job_queue"    ] ,
+        job_queue      =     args["job_queue"   ] ,
         job_account    =     args["job_account" ] ,
         job_executable =     job_task,
         job_system     =     args["job_system"  ] ,
+        job_modules    =      args["job_modules"],
         job_file       =     "run_lsqpy.cmd")
 
     os.chdir("..")

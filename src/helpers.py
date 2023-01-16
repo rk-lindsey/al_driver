@@ -20,7 +20,7 @@ def findinfile(search_str,search_file):
         for line in ifstream:
             
             if search_str in line:
-                match.append(line.strip())
+                matches.append(line.strip())
     
     return matches
     
@@ -467,12 +467,12 @@ def create_and_launch_job(*argv, **kwargs):
     # 0. Set up an argument parser
     ################################
     
-    default_keys   = [""]*10
-    default_values = [""]*10
+    default_keys   = [""]*12
+    default_values = [""]*12
 
     # Overall job controls
     
-    default_keys[0 ] = "job_name"           ; default_values[0 ] =     "ALC-x-lsq-1" # Name for ChIMES lsq job
+    default_keys[0 ] = "job_name"          ; default_values[0 ] =     "ALC-x-lsq-1" # Name for ChIMES lsq job
     default_keys[1 ] = "job_nodes"         ; default_values[1 ] =     "2"            # Number of nodes for ChIMES lsq job
     default_keys[2 ] = "job_ppn"           ; default_values[2 ] =     "36"           # Number of processors per node for ChIMES lsq job
     default_keys[3 ] = "job_walltime"      ; default_values[3 ] =     "1"            # Walltime in hours for ChIMES lsq job
@@ -481,7 +481,9 @@ def create_and_launch_job(*argv, **kwargs):
     default_keys[6 ] = "job_executable"    ; default_values[6 ] =     ""             # Full path to executable for ChIMES lsq job
     default_keys[7 ] = "job_system"        ; default_values[7 ] =     "slurm"        # slurm or torque    
     default_keys[8 ] = "job_file"          ; default_values[8 ] =     "run.cmd"      # Name of the resulting submit script    
-    default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Name of the resulting submit script    
+    default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Should emails be sent?
+    default_keys[10] = "job_modules"       ; default_values[10] =     ""             # Name of the resulting submit script    
+    default_keys[11] = "job_mem"           ; default_values[11] =     ""             # GB
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -497,7 +499,9 @@ def create_and_launch_job(*argv, **kwargs):
     JOB = []
     JOB.append(" -J " + args["job_name"])
     JOB.append(" -N " + args["job_nodes"])
-    JOB.append(" -n " + args["job_ppn"])
+    JOB.append(" --ntasks-per-node " + args["job_ppn"])
+    if args["job_mem"]:
+        JOB.append("--mem-per-cpu="+str(int(int(args["job_mem"])/int(args["job_ppn"])))+"G")
     JOB.append(" -t " + args["job_walltime"])             
     JOB.append(" -p " + args["job_queue"])
     if args["job_email"]:
@@ -520,6 +524,9 @@ def create_and_launch_job(*argv, **kwargs):
             exit()
             
         ofstream.write(JOB[i] + '\n')
+        
+    if args["job_modules"]:
+        ofstream.write("module load " + args["job_modules"] + '\n')
     
     if args["job_executable"]:
     

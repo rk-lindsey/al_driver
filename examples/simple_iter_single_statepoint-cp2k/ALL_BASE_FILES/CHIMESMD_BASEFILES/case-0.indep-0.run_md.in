@@ -1,0 +1,50 @@
+###################################
+#### RESTARTERAL CONTROL VARIABLES ####
+###################################
+
+
+# RNDSEED # 
+	1111
+# TEMPERA # ! In K
+	300
+# CMPRFRC # 
+	false
+# TIMESTP # 
+	0.5
+# N_MDSTP # 
+	01000
+# NLAYERS # 
+	1 REPLICATE 0
+# USENEIG # 
+	true
+# PRMFILE # ! Parameter file (i.e. params.txt)
+	WILL_AUTO_UPDATE
+# CRDFILE # ! Coordinate file (.xyz) or force file (.xyzf)
+	WILL_AUTO_UPDATE
+	
+	
+###################################
+####    SIMULATION  OPTIONS    ####
+###################################
+
+# VELINIT # 
+	GEN
+# CONSRNT # 
+	NVT-MTK HOOVER 10
+# PRSCALC # 
+	ANALYTICAL
+	
+###################################
+####      OUTPUT  CONTROL      ####
+###################################	
+			
+# FRQDFTB # ! Frequency to output the DFTB RESTART file
+	5
+# FRQENER # ! Frequency to output energies
+	1	
+# PRNTFRC # ! Print computed forces? Forces are printed to force_out.txt 
+	false
+# PRNTBAD #
+	true
+	
+# ENDFILE #

@@ -143,7 +143,8 @@ def continue_job(*argv, **kwargs):
 
             # Count the number of possible jobs
             
-            count_xyz = len(glob.glob("case*.xyz.xyz")) 
+            count_xyz    = len(glob.glob("case*.xyz.xyz")) 
+            count_forces = len(glob.glob("case*.forces")) 
             
             # Check for convergence issues
             
@@ -274,7 +275,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
         
         if len(base_list) > 0:
         
-            print("Found",len(base_list),"job(s) with erro SCF \"run NOT converged\":")
+            print("Found",len(base_list),"job(s) with error SCF \"run NOT converged\":")
             
             for j in range(len(base_list)):
                 print("-",base_list[j])
@@ -377,12 +378,12 @@ def generate_cell_and_crds(inxyz, *argv):
     # Finish up the header portion
     
     xyzstream.write(str(len(contents)) + "\n")
-    xyzstream.write(' '.join(map(str,a)) + " " + ' '.join(map(str,b)) + " " + ' '.join(map(str,c)) + " smearing: " + smearing + " K" "\n")
+    xyzstream.write(' '.join(map(str,a)) + " " + ' '.join(map(str,b)) + " " + ' '.join(map(str,c)) + " smearing: " + str(smearing) + " K" "\n")
 
     for i in range(len(contents)):
         
         line = contents[i].split()                
-        line = str(atm_types.index(line[0])+1) + " " +  ' '.join(line[1:]) + '\n'
+        line = str(' '.join(line[:])) + '\n'
         xyzstream.write(line)
             
     xyzstream.close()            
@@ -447,18 +448,18 @@ def post_process(*argv, **kwargs):
         helpers.run_bash_cmnd("rm -f OUTCAR.xyzf")
         
         out_list = [] # *.cp2k.out files
-        crd_list = [] # *\#*.xyz files
+        crd_list = [] # *.xyz.xyz files
         frc_list = [] # *cp2k_traj.forces files
         
         for j in range(args_cases):
         
             out_list += sorted(glob.glob("CASE-" + repr(j) + "/*.cp2k.out"))
-            crd_list += sorted(glob.glob("CASE-" + repr(j) + "/*\#*.xyz files"))
+            crd_list += sorted(glob.glob("CASE-" + repr(j) + "/*.xyz.xyz"))
             frc_list += sorted(glob.glob("CASE-" + repr(j) + "/*.cp2k_traj.forces"))
             
             if len(out_list) != len(crd_list):
                 print("ERROR: In cp2k_driver.post_process on case",j)
-                print("       Number of .cp2k.out files and *\#*.xyz files do not match")
+                print("       Number of .cp2k.out files and *\#*.xyz.xyz files do not match")
                 print("       Something went wrong with CP2K calculations...")
                 exit()
             if len(out_list) != len(frc_list):
@@ -469,14 +470,14 @@ def post_process(*argv, **kwargs):
                 
         for j in range(len(out_list)):
 
-            cp2k_to_xyz.cp2k_to_xyzf(out_list[j], crd_list[j], frc_list[j], args_properties)
+            cp2k_to_xyz.cp2k_to_xyzf(crd_list[j], out_list[j], frc_list[j], args_properties)
             
             outfile = crd_list[j].split(".xyz")
             outfile = ''.join(outfile) + ".xyz.xyzf"
 
             # Figure out the temperature
             
-            tmp_temp = helpers.findinfile("MD_PAR| Temperature [K]",out_list[j]).split()[-1]
+            tmp_temp = helpers.findinfile("MD_PAR| Temperature [K]",out_list[j])[0].split()[-1]
 
             tmpfile = crd_list[j].split(".xyz")
             tmpfile = ''.join(outfile) + ".xyz.temps"
@@ -489,7 +490,7 @@ def post_process(*argv, **kwargs):
             if "ENERGY" in args_properties: # Make sure the configuration energy is less than or equal to zero
 
             
-                tmp_ener = float(findinfile("ENERGY| Total FORCE_EVAL ( QS ) energy [a.u.]: ",out_list[j]).split()[-1])
+                tmp_ener = float(helpers.findinfile("ENERGY| Total FORCE_EVAL ( QS ) energy [a.u.]: ",out_list[j])[0].split()[-1])
                 
                 if tmp_ener >= 0.0:
                     
@@ -511,7 +512,7 @@ def post_process(*argv, **kwargs):
         
         os.chdir("..")
     
-def setup_CP2K(my_ALC, *argv, **kwargs):    
+def setup_cp2k(my_ALC, *argv, **kwargs):    
 
     """ 
     
@@ -570,8 +571,8 @@ def setup_CP2K(my_ALC, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*14
-    default_values = [""]*14
+    default_keys   = [""]*15
+    default_values = [""]*15
 
 
     # CP2K specific controls
@@ -592,8 +593,10 @@ def setup_CP2K(my_ALC, *argv, **kwargs):
     default_keys[9 ] = "job_account"   ; default_values[9 ] = "pbronze"             # Account for ChIMES md job
     default_keys[10] = "job_executable"; default_values[10] = ""                    # Full path to executable for ChIMES md job
     default_keys[11] = "job_system"    ; default_values[11] = "slurm"               # slurm or torque       
-    default_keys[12] = "job_file"       ; default_values[12] = "run.cmd"            # Name of the resulting submit script   
+    default_keys[12] = "job_file"      ; default_values[12] = "run.cmd"             # Name of the resulting submit script   
     default_keys[13] = "job_email"     ; default_values[13] = True                  # Send slurm emails?
+    default_keys[14] = "job_mem  "     ; default_values[14] = 128                   # GB
+
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
@@ -732,8 +735,8 @@ def setup_CP2K(my_ALC, *argv, **kwargs):
         #   - crds_file ald.xyz                  # XYZ file with system coordinates (xyz format)
         #   - intg_file cp2k.md_int-block.inp    # MD integrator specification, and energy I/O print frequency
         #   - mdio_file cp2k.md_io-block.inp     # I/O file names/frequencies for MD (except energy!)
-
-        intg_stream = open("cp2k.md_int-block.inp",'r')    
+        
+        intg_stream = open("cp2k.md_int-block.inp",'w')    
         intg_stream.write("ENSEMBLE            NVT    \n")
         intg_stream.write("&THERMOSTAT                \n")
         intg_stream.write("    TYPE            NOSE   \n")
@@ -752,7 +755,7 @@ def setup_CP2K(my_ALC, *argv, **kwargs):
         intg_stream.write("&END PRINT                 \n")
         intg_stream.close()
         
-        mdio_stream = open("cp2k.md_io-block.inp" ,'r')
+        mdio_stream = open("cp2k.md_io-block.inp" ,'w')
         mdio_stream.write("&TRAJECTORY                    \n")
         mdio_stream.write("    FILENAME = cp2k_traj.xyz   \n")
         mdio_stream.write("&END TRAJECTORY                \n")
@@ -786,7 +789,8 @@ def setup_CP2K(my_ALC, *argv, **kwargs):
         tag = glob.glob("*#*xyz") # This block determines how many .xyz files there are for padding purposes
         tag = len(str(len(tag)))
         tag = "".zfill(tag+1)
-        temp   = helpers.head(glob.glob("*" + tag + "*xyz" )[0],1)[0].split()[-2] 
+
+        temp = str(int(float(helpers.head(glob.glob("*" + tag + "*xyz.xyz" )[0],2)[-1].split()[-2])))
         
         # Remove this case's temperature incar from the list of incars to delete
         
@@ -805,7 +809,7 @@ def setup_CP2K(my_ALC, *argv, **kwargs):
     
             job_task.append("ATOMS[" + repr(k) + "]=" + atm_types[k] + '\n')
     
-        job_task.append("for j in $(ls *\#*xyz)         ")
+        job_task.append("for j in $(ls *\#*xyz.xyz)         ")
         job_task.append("do                             ")
         job_task.append("    TAG=${j%*.xyz}             ")      
         job_task.append("    cp ${TAG}.xyz incfg.xyz    ")
@@ -814,17 +818,21 @@ def setup_CP2K(my_ALC, *argv, **kwargs):
         job_task.append("    if [ -e ${CHECK} ] ; then  ")  
         job_task.append("        continue               ")
         job_task.append("    fi                         ")
-        job_task.append("    prev_tries=`wc -l ${TAG}.tries`")
-        job_task.append("    if [ $prev_tries -ge 2 ]; then ")
-        job_task.append("        continue                   ")
-        job_task.append("    fi                             ")         
+        job_task.append("    prev_tries=\"\"              ")
+        job_task.append("    if [ -f ${TAG}.tries ] ; then     ")
+        job_task.append("       prev_tries=`wc -l ${TAG}.tries | awk '{print $1}'`")
+        job_task.append("       if [ $prev_tries -ge 2 ]; then ")
+        job_task.append("            continue                   ")
+        job_task.append("        fi                             ")
+        job_task.append("    fi                                 ")
         job_task.append("    echo \"Attempt\" >> ${TAG}.tries")
-        job_task.append("    TEMP=`awk '{if(NR==2){print $(NF-1)}; exit}' incfg.xyz`")
-        job_task.append("    cp ${TEMP}.cp2k.in cp2k.in         ")
+        job_task.append("    TEMP=`awk '{if(NR==2){print $(NF-1);exit}}' incfg.xyz`")
+        job_task.append("    TEMP=${TEMP%.*}")
+        job_task.append("    cp ${TEMP}.cp2k.inp cp2k.inp       ")
         job_task.append("    rm -f cp2k.qm_basis-block.inp      ") 
         job_task.append("    for k in ${ATOMS[@]}               ")
         job_task.append("    do                                 ")
-        job_task.append("        NA=`awk -v atm=\"$k\" \'{if(NR==6){for(i=1;i<=NF;i++){ if($i==atm){getline;print $i;exit}} print \"0\"}}\' incfg.xyz` ")
+        job_task.append("        NA=`awk -v atm=\"$k\" \'{if((NR>2)&&($1==atm)){print 1;exit}}ENDFILE{print 0}\' incfg.xyz`")
         job_task.append("        if [ $NA -gt 0 ] ; then        ")
         job_task.append("            cat ${k}.cp2k.qm_basis-block.inp >> cp2k.qm_basis-block.inp ")
         job_task.append("        fi                             ")
@@ -836,12 +844,13 @@ def setup_CP2K(my_ALC, *argv, **kwargs):
         this_jobid = helpers.create_and_launch_job(job_task,
             job_name       =          "cp2k_spcalcs"  ,
             job_email      =     args["job_email"   ] ,            
-            job_nodes      = str(args["job_nodes"    ]),
-            job_ppn        = str(args["job_ppn"    ]),
+            job_nodes      = str(args["job_nodes"   ]),
+            job_ppn        = str(args["job_ppn"     ]),
             job_walltime   = str(args["job_walltime"]),
-            job_queue      =     args["job_queue"    ] ,
+            job_queue      =     args["job_queue"   ] ,
             job_account    =     args["job_account" ] ,
             job_system     =     args["job_system"  ] ,
+            job_mem        =     args["job_mem"     ] ,
             job_file       =     "run_cp2k.cmd")
             
         run_cp2k_jobid.append(this_jobid.split()[0])    

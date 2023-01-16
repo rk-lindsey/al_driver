@@ -498,17 +498,22 @@ def main(args):
                         basefile_dir   = config.QM_FILES,
                         VASP_exe       = config.VASP_EXE,
                         VASP_nodes     = config.VASP_NODES,
+                        VASP_ppn       = config.VASP_PPN,
+                        VASP_mem       = config.VASP_MEM,
                         VASP_time      = config.VASP_TIME,
                         VASP_queue     = config.VASP_QUEUE,
                         VASP_modules   = config.VASP_MODULES,
                         DFTB_nodes     = config.DFTB_NODES,  
-                        DFTB_ppn       = config.DFTB_PPN,    
+                        DFTB_ppn       = config.DFTB_PPN,  
+                        DFTB_mem       = config.DFTB_MEM,  
                         DFTB_time      = config.DFTB_TIME,   
                         DFTB_queue     = config.DFTB_QUEUE,  
                         DFTB_exe       = config.DFTB_EXE,    
                         DFTB_modules   = config.DFTB_MODULES,
                         CP2K_exe       = config.CP2K_EXE,
                         CP2K_nodes     = config.CP2K_NODES,
+                        CP2K_ppn       = config.CP2K_PPN,
+                        CP2K_mem       = config.CP2K_MEM,
                         CP2K_time      = config.CP2K_TIME,
                         CP2K_queue     = config.CP2K_QUEUE,
                         CP2K_modules   = config.CP2K_MODULES,
@@ -516,6 +521,8 @@ def main(args):
                         Gaussian_exe   = config.GAUS_EXE,
                         Gaussian_scr   = config.GAUS_SCR,
                         Gaussian_nodes = config.GAUS_NODES,
+                        Gaussian_mem       = config.GAUS_MEM,
+                        Gaussian_ppn   = config.GAUS_PPN,
                         Gaussian_time  = config.GAUS_TIME,
                         Gaussian_queue = config.GAUS_QUEUE,
                         job_ppn        = config.HPC_PPN,
@@ -687,7 +694,8 @@ def main(args):
                             job_queue          = config.CHIMES_BUILD_QUEUE,        
                             job_account        = config.HPC_ACCOUNT, 
                             job_system         = config.HPC_SYSTEM,
-                            job_executable     = config.CHIMES_LSQ)    
+                            job_executable     = config.CHIMES_LSQ,
+                            job_modules        = config.CHIMES_LSQ_MODULES)    
                 else:
             
                     active_job = gen_ff.build_amat(THIS_ALC, 
@@ -711,7 +719,9 @@ def main(args):
                         job_queue        = config.CHIMES_BUILD_QUEUE,                        
                         job_account      = config.HPC_ACCOUNT, 
                         job_system       = config.HPC_SYSTEM,
-                        job_executable   = config.CHIMES_LSQ)
+                        job_executable   = config.CHIMES_LSQ,
+                        job_modules      = config.CHIMES_LSQ_MODULES
+                        )
             
                 helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")
             
@@ -751,7 +761,9 @@ def main(args):
                         job_queue          = config.CHIMES_SOLVE_QUEUE,                            
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
-                        job_executable     = config.CHIMES_SOLVER)    
+                        job_executable     = config.CHIMES_SOLVER,
+                        job_modules        = config.CHIMES_LSQ_MODULES
+                        )    
                         
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "solve_amat")
                 
@@ -777,7 +789,9 @@ def main(args):
                         job_queue          = config.CHIMES_SOLVE_QUEUE,    
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
-                        job_executable     = config.CHIMES_SOLVER)    
+                        job_executable     = config.CHIMES_SOLVER,
+                        job_modules        = config.CHIMES_MODULES
+                        )    
                     
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "restart_solve_amat")
                     
@@ -841,7 +855,9 @@ def main(args):
                         job_account    = config.HPC_ACCOUNT, 
                         job_executable = config.CHIMES_MD_MPI,     
                         job_system     = "slurm",       
-                        job_file       = "run.cmd")
+                        job_file       = "run.cmd",
+                        job_modules    = config.CHIMES_MD_MODULES
+                        )
                         
         
                     active_jobs.append(active_job.split()[0])    
@@ -1011,16 +1027,20 @@ def main(args):
                         VASP_exe       = config.VASP_EXE,
                         VASP_nodes     = config.VASP_NODES,
                         VASP_ppn       = config.VASP_PPN,
+                        VASP_mem       = config.VASP_MEM,
                         VASP_time      = config.VASP_TIME,
                         VASP_queue     = config.VASP_QUEUE,
                         DFTB_exe       = config.DFTB_EXE,
                         DFTB_nodes     = config.DFTB_NODES,
                         DFTB_ppn       = config.DFTB_PPN,
+                        DFTB_mem       = config.DFTB_MEM,
                         DFTB_time      = config.DFTB_TIME,
                         DFTB_modules   = config.DFTB_MODULES,
                         DFTB_queue     = config.DFTB_QUEUE,
                         CP2K_exe       = config.CP2K_EXE,
                         CP2K_nodes     = config.CP2K_NODES,
+                        CP2K_ppn       = config.CP2K_PPN,
+                        CP2K_mem       = config.CP2K_MEM,
                         CP2K_time      = config.CP2K_TIME,
                         CP2K_queue     = config.CP2K_QUEUE,
                         CP2K_modules   = config.CP2K_MODULES,
@@ -1029,6 +1049,7 @@ def main(args):
                         Gaussian_scr   = config.GAUS_SCR,
                         Gaussian_nodes = config.GAUS_NODES,
                         Gaussian_ppn   = config.GAUS_PPN,
+                        Gaussian_mem   = config.GAUS_MEM,
                         Gaussian_time  = config.GAUS_TIME,
                         Gaussian_queue = config.GAUS_QUEUE,
                         job_ppn        = config.HPC_PPN,

@@ -163,7 +163,17 @@ def check_VASP(user_config):
             print("WARNING: Option config.VASP_PPN was not set")
             print("         Will use a value of config.HPC_PPN")
 
-        user_config.VASP_PPN = user_config.HPC_PPN                            
+        user_config.VASP_PPN = user_config.HPC_PPN    
+        
+    if not hasattr(user_config,'VASP_MEM'):
+
+        # Memory per node to use for a VASP calculation
+
+        if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+            print("WARNING: Option config.VASP_MEM was not set")
+            print("         Will use a value of 128 (GB)")
+
+        user_config.VASP_MEM = 128                                   
 
     if not hasattr(user_config,'VASP_TIME'):
 
@@ -256,7 +266,17 @@ def check_DFTB(user_config):
             print("WARNING: Option config.DFTB_PPN was not set")
             print("         Will use a value of 1")
 
-        user_config.DFTB_PPN = 1                            
+        user_config.DFTB_PPN = 1 
+        
+    if not hasattr(user_config,'DFTB_MEM'):
+
+        # Memory per node to to use for a DFTB calculation
+
+        if ((user_config.BULK_QM_METHOD == "DFTB") or (user_config.IGAS_QM_METHOD == "DFTB")):
+            print("WARNING: Option config.DFTB_MEM was not set")
+            print("         Will use a value of 128 (GB)")
+
+        user_config.DFTB_MEM = 128                                       
 
     if not hasattr(user_config,'DFTB_TIME'):
 
@@ -349,7 +369,17 @@ def check_CP2K(user_config):
             print("WARNING: Option config.CP2K_PPN was not set")
             print("         Will use a value of 1")
 
-        user_config.CP2K_PPN = 1                            
+        user_config.CP2K_PPN = 1      
+        
+    if not hasattr(user_config,'CP2K_MEM'):
+
+        # Memory per node to use for a CP2K calculation
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_MEM was not set")
+            print("         Will use a value of 128 (GB)")
+
+        user_config.CP2K_MEM = 128                                  
 
     if not hasattr(user_config,'CP2K_TIME'):
 
@@ -423,7 +453,17 @@ def check_GAUS(user_config):
             print("WARNING: Option config.GAUS_PPN was not set")
             print("         Will use a value of config.HPC_PPN")
 
-        user_config.GAUS_PPN = user_config.HPC_PPN                        
+        user_config.GAUS_PPN = user_config.HPC_PPN  
+        
+    if not hasattr(user_config,'GAUS_MEM'):
+
+        ## Memory per node to use for a GAUS calculation
+
+        if ((user_config.BULK_QM_METHOD == "GAUS") or (user_config.IGAS_QM_METHOD == "GAUS")):
+            print("WARNING: Option config.GAUS_MEM was not set")
+            print("         Will use a value of 128 (GB)")
+
+        user_config.GAUS_MEM = 128                                
 
     if not hasattr(user_config,'GAUS_TIME'):
 
@@ -698,7 +738,7 @@ def verify(user_config):
 
         print("WARNING: Option config.HPC_SYSTEM was not set")
         print("         Will use slurm")
-        print("        Note: No other options are currently supported.")    
+        print("         Note: No other options are currently supported.")    
         
         user_config.HPC_SYSTEM = "slurm"    
 
@@ -834,6 +874,15 @@ def verify(user_config):
         print("         Will use config.CHIMES_SRCDIR + \"chimes_lsq\"")
         
         user_config.CHIMES_LSQ    = user_config.CHIMES_SRCDIR + "chimes_lsq"
+        
+    if not hasattr(user_config,'CHIMES_LSQ_MODULES'):
+    
+        print("WARNING: Option config.CHIMES_LSQ_MODULES was not set")
+
+    if not hasattr(user_config,'CHIMES_MD_MODULES'):
+    
+        print("WARNING: Option config.CHIMES_MD_MODULES was not set")
+  
 
     if not hasattr(user_config,'CHIMES_SOLVER'):
 
@@ -1349,6 +1398,7 @@ def verify(user_config):
         user_config.VASP_POSTPRC = None
         user_config.VASP_NODES   = None
         user_config.VASP_PPN     = None 
+        user_config.VASP_MEM     = None 
         user_config.VASP_TIME    = None
         user_config.VASP_QUEUE   = None
         user_config.VASP_MODULES = None
@@ -1361,6 +1411,7 @@ def verify(user_config):
         user_config.DFTB_POSTPRC = None
         user_config.DFTB_NODES   = None 
         user_config.DFTB_PPN     = None 
+        user_config.DFTB_MEM     = None 
         user_config.DFTB_TIME    = None
         user_config.DFTB_QUEUE   = None
         user_config.DFTB_MODULES = None 
@@ -1373,6 +1424,7 @@ def verify(user_config):
         user_config.CP2K_POSTPRC = None
         user_config.CP2K_NODES   = None 
         user_config.CP2K_PPN     = None 
+        user_config.CP2K_MEM     = None 
         user_config.CP2K_TIME    = None
         user_config.CP2K_QUEUE   = None
         user_config.CP2K_MODULES = None 
@@ -1384,6 +1436,7 @@ def verify(user_config):
     else:
         user_config.GAUS_NODES   = None
         user_config.GAUS_PPN     = None
+        user_config.GAUS_MEM     = None
         user_config.GAUS_TIME    = None 
         user_config.GAUS_QUEUE   = None
         user_config.GAUS_EXE     = None

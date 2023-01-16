@@ -7,6 +7,7 @@ import copy
 import helpers
 import vasp_driver
 import gauss_driver
+import cp2k_driver
 import dftbplus_driver
 
 
@@ -52,7 +53,7 @@ def cleanup_and_setup(bulk_qm_method, igas_qm_method, *argv, **kwargs):
         elif bulk_qm_method == "DFTB+":
             print("WARNING: DFTB+ as a gas phase method is untested!")
             dftbplus_driver.cleanup_and_setup(*argv, **kwargs)
-        elif bulk_qm_method == "CP2K:"
+        elif bulk_qm_method == "CP2K":
             print("WARNING: CP2K as a gas phase method is untested!")
             cp2k_driver.cleanup_and_setup(*argv, **kwargs)        
         else:
@@ -113,8 +114,8 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*34
-    default_values = [""]*34
+    default_keys   = [""]*38
+    default_values = [""]*38
 
     default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../QM_BASEFILES/"  # VASP and DFTB+ input files
 
@@ -123,52 +124,56 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
     default_keys[1 ] = "VASP_exe"      ; default_values[1 ] = ""              # Path to VASP executable
     default_keys[2 ] = "VASP_nodes"    ; default_values[2 ] = "4"             # Requested VASP  job nodes
     default_keys[3 ] = "VASP_ppn"      ; default_values[3 ] = "36"            # Requested VASP  job proc per node    
-    default_keys[4 ] = "VASP_time"     ; default_values[4 ] = "00:30:00"      # Requested max walltime for VASP job
-    default_keys[5 ] = "VASP_queue"    ; default_values[5 ] = "pdebug"        # Requested VASP job queue
-    default_keys[6 ] = "VASP_modules"  ; default_values[6 ] = ""              # Module files for VASP run
+    default_keys[4 ] = "VASP_mem"      ; default_values[4 ] = "128"           # Requested VASP  job mem in GB  
+    default_keys[5 ] = "VASP_time"     ; default_values[5 ] = "00:30:00"      # Requested max walltime for VASP job
+    default_keys[6 ] = "VASP_queue"    ; default_values[6 ] = "pdebug"        # Requested VASP job queue
+    default_keys[7 ] = "VASP_modules"  ; default_values[7 ] = ""              # Module files for VASP run
     
     
     # Gaussian specific controls
     
-    default_keys[7 ] = "Gaussian_exe"    ; default_values[7 ] = ""                 # Path to Gaussian executable
-    default_keys[8 ] = "Gaussian_nodes"  ; default_values[8 ] = "1"                # Requested Gaussian  job nodes
-    default_keys[9 ] = "Gaussian_ppn"    ; default_values[9 ] = "36"               # Requested Gaussian  job proc per node
-    default_keys[10] = "Gaussian_time"   ; default_values[10] = "00:30:00"         # Requested max walltime for Gaussian job
-    default_keys[11] = "Gaussian_queue"  ; default_values[11] = "pdebug"           # Requested Gaussian job queue
-    default_keys[12] = "Gaussian_scr  "  ; default_values[12] = ""                 # Requested Gaussian scratch directory   
+    default_keys[8 ] = "Gaussian_exe"    ; default_values[8 ] = ""                 # Path to Gaussian executable
+    default_keys[9 ] = "Gaussian_nodes"  ; default_values[9 ] = "1"                # Requested Gaussian  job nodes
+    default_keys[10] = "Gaussian_ppn"    ; default_values[10] = "36"               # Requested Gaussian  job proc per node
+    default_keys[11] = "Gaussian_mem"    ; default_values[11] = "128"              # Requested Gaussian  job mem in GB  
+    default_keys[12] = "Gaussian_time"   ; default_values[12] = "00:30:00"         # Requested max walltime for Gaussian job
+    default_keys[13] = "Gaussian_queue"  ; default_values[13] = "pdebug"           # Requested Gaussian job queue
+    default_keys[14] = "Gaussian_scr  "  ; default_values[14] = ""                 # Requested Gaussian scratch directory   
     
     # DFTB specific controls
     
-    default_keys[13] = "DFTB_exe"    ; default_values[13] = ""                     # Path to DFTB+ executable
-    default_keys[14] = "DFTB_nodes"  ; default_values[14] = "1"                    # Requested DFTB+  job nodes
-    default_keys[15] = "DFTB_ppn"    ; default_values[15] = "1"                    # Requested DFTB+  job proc per node
-    default_keys[16] = "DFTB_time"   ; default_values[16] = "00:30:00"             # Requested max walltime for DFTB+ job
-    default_keys[17] = "DFTB_queue"  ; default_values[17] = "pdebug"               # Requested DFTB+ job queue
-    default_keys[18] = "DFTB_modules"; default_values[18] = ""                      # Module files for DFTB+ run
+    default_keys[15] = "DFTB_exe"    ; default_values[15] = ""                     # Path to DFTB+ executable
+    default_keys[16] = "DFTB_nodes"  ; default_values[16] = "1"                    # Requested DFTB+  job nodes
+    default_keys[17] = "DFTB_ppn"    ; default_values[17] = "1"                    # Requested DFTB+  job proc per node
+    default_keys[18] = "DFTB_mem"    ; default_values[18] = "128"                  # Requested DFTB  job mem in GB  
+    default_keys[19] = "DFTB_time"   ; default_values[19] = "00:30:00"             # Requested max walltime for DFTB+ job
+    default_keys[20] = "DFTB_queue"  ; default_values[20] = "pdebug"               # Requested DFTB+ job queue
+    default_keys[21] = "DFTB_modules"; default_values[21] = ""                     # Module files for DFTB+ run
     
     # CP2K specific controls
     
-    default_keys[19] = "CP2K_exe"     ; default_values[19] = ""                     # Path to CP2K executable
-    default_keys[20] = "CP2K_nodes"   ; default_values[20] = "1"                    # Requested CP2K job nodes
-    default_keys[21] = "CP2K_ppn"     ; default_values[21] = "1"                    # Requested CP2K job proc per node
-    default_keys[22] = "CP2K_time"    ; default_values[22] = "00:30:00"             # Requested max walltime for CP2K job
-    default_keys[23] = "CP2K_queue"   ; default_values[23] = "pdebug"               # Requested CP2K job queue
-    default_keys[24] = "CP2K_data_dir"; default_values[24] = ""                     # Path to CP2K scratch ("data") directory 
-    default_keys[25] = "CP2K_modules" ; default_values[25] = ""                     # Module files for CP2K run
+    default_keys[22] = "CP2K_exe"     ; default_values[22] = ""                     # Path to CP2K executable
+    default_keys[23] = "CP2K_nodes"   ; default_values[23] = "1"                    # Requested CP2K job nodes
+    default_keys[24] = "CP2K_ppn"     ; default_values[24] = "1"                    # Requested CP2K job proc per node
+    default_keys[25] = "CP2K_mem"     ; default_values[25] = "128"                  # Requested CP2K  job mem in GB  
+    default_keys[26] = "CP2K_time"    ; default_values[26] = "00:30:00"             # Requested max walltime for CP2K job
+    default_keys[27] = "CP2K_queue"   ; default_values[27] = "pdebug"               # Requested CP2K job queue
+    default_keys[28] = "CP2K_data_dir"; default_values[28] = ""                     # Path to CP2K scratch ("data") directory 
+    default_keys[29] = "CP2K_modules" ; default_values[29] = ""                     # Module files for CP2K run
    
     # Active learning controls
     
-    default_keys[26] = "tight_crit"  ; default_values[26] = "../../../../tight_bond_crit.dat"   # File with tight bonding criteria for clustering
-    default_keys[27] = "loose_crit"  ; default_values[27] = "../../../../loose_bond_crit.dat"   # File with loose bonding criteria for clustering
-    default_keys[28] = "clu_code"    ; default_values[28] = "/p/lscratchrza/rlindsey/RC4B_RAG/11-12-18/new_ts_clu.cpp"   # Clustering code    
-    default_keys[29] = "compilation" ; default_values[29] = "g++ -std=c++11 -O3"
+    default_keys[30] = "tight_crit"  ; default_values[30] = "../../../../tight_bond_crit.dat"   # File with tight bonding criteria for clustering
+    default_keys[31] = "loose_crit"  ; default_values[31] = "../../../../loose_bond_crit.dat"   # File with loose bonding criteria for clustering
+    default_keys[32] = "clu_code"    ; default_values[32] = "/p/lscratchrza/rlindsey/RC4B_RAG/11-12-18/new_ts_clu.cpp"   # Clustering code    
+    default_keys[33] = "compilation" ; default_values[33] = "g++ -std=c++11 -O3"
 
     # Overall job controls    
     
-    default_keys[30] = "job_ppn"      ; default_values[30] = "36"              # Number of processors per node for ChIMES md job
-    default_keys[31] = "job_account"  ; default_values[31] = "pbronze"         # Account for ChIMES md job
-    default_keys[32] = "job_system"   ; default_values[32] = "slurm"           # slurm or torque       
-    default_keys[33] = "job_email"    ; default_values[33] = True              # Send slurm emails?
+    default_keys[34] = "job_ppn"      ; default_values[34] = "36"              # Number of processors per node for ChIMES md job
+    default_keys[35] = "job_account"  ; default_values[35] = "pbronze"         # Account for ChIMES md job
+    default_keys[36] = "job_system"   ; default_values[36] = "slurm"           # slurm or torque       
+    default_keys[37] = "job_email"    ; default_values[37] = True              # Send slurm emails?
     
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
@@ -195,6 +200,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                 job_email      = args  ["job_email"],
                 job_nodes      = args  ["VASP_nodes"],
                 job_ppn        = args  ["VASP_ppn"],
+                job_mem        = args  ["VASP_mem"],
                 job_walltime   = args  ["VASP_time"],
                 job_queue      = args  ["VASP_queue"],
                 job_account    = args  ["job_account"], 
@@ -213,6 +219,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                 job_email      = args  ["job_email"],
                 job_nodes      = args  ["DFTB_nodes"],
                 job_ppn        = args  ["DFTB_ppn"],
+                job_mem        = args  ["DFTB_mem"],
                 job_walltime   = args  ["DFTB_time"],
                 job_queue      = args  ["DFTB_queue"],
                 job_account    = args  ["job_account"], 
@@ -223,7 +230,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
             if not is_just_bulk:
                 print("WARNING: CP2K as a gas phase method is untested!")
                 
-            run_qm_jobids += cp2k_driver.setup_dftb(my_ALC, *argv,
+            run_qm_jobids += cp2k_driver.setup_cp2k(my_ALC, *argv,
                 first_run      = True,             
                 basefile_dir   = args  ["basefile_dir"],
                 modules        = args  ["CP2K_modules"],
@@ -232,6 +239,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                 job_email      = args  ["job_email"],
                 job_nodes      = args  ["CP2K_nodes"],
                 job_ppn        = args  ["CP2K_ppn"],
+                job_mem        = args  ["CP2K_mem"],
                 job_walltime   = args  ["CP2K_time"],
                 job_queue      = args  ["CP2K_queue"],
                 job_account    = args  ["job_account"], 
@@ -258,6 +266,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                         job_email      = args  ["job_email"],
                         job_nodes      = args  ["VASP_nodes"],
                         job_ppn        = args  ["VASP_ppn"],
+                        job_mem        = args  ["VASP_mem"],
                         job_walltime   = args  ["VASP_time"],
                         job_queue      = args  ["VASP_queue"],
                         job_account    = args  ["job_account"],
@@ -272,6 +281,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                         job_email      = args  ["job_email"],
                         job_nodes      = args  ["DFTB_nodes"],
                         job_ppn        = args  ["DFTB_ppn"],
+                        job_mem        = args  ["DFTB_mem"],
                         job_walltime   = args  ["DFTB_time"],
                         job_queue      = args  ["DFTB_queue"],
                         job_account    = args  ["job_account"],
@@ -287,6 +297,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                         job_email      = args  ["job_email"],
                         job_nodes      = args  ["CP2K_nodes"],
                         job_ppn        = args  ["CP2K_ppn"],
+                        job_mem        = args  ["CP2K_mem"],
                         job_walltime   = args  ["CP2K_time"],
                         job_queue      = args  ["CP2K_queue"],
                         job_account    = args  ["job_account"], 
@@ -307,6 +318,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                         job_email      = args  ["job_email"],
                         job_nodes      = args  ["VASP_nodes"],
                         job_ppn        = args  ["VASP_ppn"],
+                        job_mem        = args  ["VASP_mem"],
                         job_walltime   = args  ["VASP_time"],
                         job_queue      = args  ["VASP_queue"],
                         job_account    = args  ["job_account"],
@@ -324,13 +336,14 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                         job_email      = args  ["job_email"],
                         job_nodes      = args  ["DFTB_nodes"],
                         job_ppn        = args  ["DFTB_ppn"],
+                        job_mem        = args  ["DFTB_mem"],
                         job_walltime   = args  ["DFTB_time"],
                         job_queue      = args  ["DFTB_queue"],
                         job_account    = args  ["job_account"],
                         job_system     = args  ["job_system"])
                         
                 elif igas_qm_method == "CP2K":
-                        print("WARNING: CP2K as a gas phase method is untested!")
+                    print("WARNING: CP2K as a gas phase method is untested!")
                 
                     run_qm_jobids += cp2k_driver.setup_dftb(my_ALC, *argv,
                         first_run      = True,             
@@ -341,6 +354,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                         job_email      = args  ["job_email"],
                         job_nodes      = args  ["CP2K_nodes"],
                         job_ppn        = args  ["CP2K_ppn"],
+                        job_mem        = args  ["CP2K_mem"],
                         job_walltime   = args  ["CP2K_time"],
                         job_queue      = args  ["CP2K_queue"],
                         job_account    = args  ["job_account"], 
@@ -356,6 +370,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                         job_email      = args  ["job_email"],
                         job_nodes      = args  ["Gaussian_nodes"],
                         job_ppn        = args  ["Gaussian_ppn"],
+                        job_mem        = args  ["Gaussian_mem"],
                         job_walltime   = args  ["Gaussian_time"],
                         job_queue      = args  ["Gaussian_queue"],
                         job_account    = args  ["job_account"],

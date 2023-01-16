@@ -1,4 +1,4 @@
-
+import helpers
 
 def cp2k_to_xyzf(xyzfile, outfile, forcefile, argv):
 
@@ -12,8 +12,9 @@ def cp2k_to_xyzf(xyzfile, outfile, forcefile, argv):
     
     # Extract the stress tensors
 
+    tensor  = []
     tensors = []
-    store  = -1 
+    store   = -1 
     
     with open(outfile) as ifstream:
         for line in ifstream:
@@ -21,21 +22,21 @@ def cp2k_to_xyzf(xyzfile, outfile, forcefile, argv):
                 store += 1
             elif store == 0:
                 store += 1
-            elif store < 3:
-                tensor.append(line.strip()[2:])
+            elif (store >0) and (store < 4):
+                tensor.append(line.split()[2:])
                 store += 1
             if store > 3:
                 store = -1
-                tensors.append(tensor[0] + tensor[1] + tensor[3]) # Already in GPa
+                tensors.append(tensor[0] + tensor[1] + tensor[2]) # Already in GPa
                 tensor = []
     
     # Store the cell vectors
     
     cell = []
-    
-    cell += helpers.findinfile("CELL| Vector a [angstrom]",search_file).split([4:7]) 
-    cell += helpers.findinfile("CELL| Vector b [angstrom]",search_file).split([4:7]) 
-    cell += helpers.findinfile("CELL| Vector c [angstrom]",search_file).split([4:7]) 
+
+    cell += helpers.findinfile("CELL| Vector a [angstrom]",outfile)[0].split()[4:7]
+    cell += helpers.findinfile("CELL| Vector b [angstrom]",outfile)[0].split()[4:7]
+    cell += helpers.findinfile("CELL| Vector c [angstrom]",outfile)[0].split()[4:7]
     
                 
     # Extract the energies 
@@ -53,11 +54,12 @@ def cp2k_to_xyzf(xyzfile, outfile, forcefile, argv):
 
     natoms = int(helpers.head(xyzfile,1)[0])
     nlines = helpers.wc_l(xyzfile)
-    frames = nlines/(natoms+2)
+    frames = int(nlines/(natoms+2))
+
     
     for f in range(frames):
         
-        xyzfstream.write(natoms+'\n')
+        xyzfstream.write(str(natoms)+'\n')
         
         boxline = ' '.join(cell)
            
@@ -68,7 +70,7 @@ def cp2k_to_xyzf(xyzfile, outfile, forcefile, argv):
         if "ENERGY" in argv:
             boxline  = boxline + str(energies[f])
         
-        xyzfstream.write(boxline + '\n')
+        xyzfstream.write("NON_ORTHO " + boxline + '\n')
         
         crdstream.readline(); crdstream.readline()
         frcstream.readline(); frcstream.readline()
@@ -78,7 +80,7 @@ def cp2k_to_xyzf(xyzfile, outfile, forcefile, argv):
             cline = crdstream.readline()
             fline = frcstream.readline()
             
-            xyzfstream.write(cline + fline.split()[-3:] + '\n') # Already in H/B
+            xyzfstream.write(cline.rstrip() + " " + ' '.join(fline.split()[-3:]) + '\n') # Already in H/B
             
     crdstream .close() 
     frcstream .close()

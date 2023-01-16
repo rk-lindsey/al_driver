@@ -174,8 +174,8 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*15
-    default_values = [""]*15
+    default_keys   = [""]*16
+    default_values = [""]*16
 
     # MD specific controls
 
@@ -186,7 +186,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     default_keys[4 ] = "chimes_exe"    ; default_values[4 ] = None                       # Path to the ChIMES executable to be used - serial version preferred
     # Overall job controls
 
-    default_keys[5 ] = "job_name"       ; default_values[5 ] = "ALC-"+ repr(my_ALC)+"-md"    # Name for ChIMES md job
+    default_keys[5 ] = "job_name"      ; default_values[5 ] = "ALC-"+ repr(my_ALC)+"-md"    # Name for ChIMES md job
     default_keys[6 ] = "job_nodes"     ; default_values[6 ] = "1"                            # Number of nodes for ChIMES md job
     default_keys[7 ] = "job_ppn"       ; default_values[7 ] = "1"                            # Number of processors per node for ChIMES md job
     default_keys[8 ] = "job_walltime"  ; default_values[8 ] = "1"                            # Walltime in hours for ChIMES md job
@@ -194,8 +194,9 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     default_keys[10] = "job_account"   ; default_values[10] = "pbronze"                      # Account for ChIMES md job
     default_keys[11] = "job_executable"; default_values[11] = ""                             # Full path to executable for ChIMES md job
     default_keys[12] = "job_system"    ; default_values[12] = "slurm"                        # slurm or torque    
-    default_keys[13] = "job_file"       ; default_values[13] = "run.cmd"                     # Name of the resulting submit script
+    default_keys[13] = "job_file"      ; default_values[13] = "run.cmd"                     # Name of the resulting submit script
     default_keys[14] = "job_email"     ; default_values[14] = True                           # Send slurm emails?
+    default_keys[15] = "job_modules"   ; default_values[15] = ""                             # Send slurm emails?
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
@@ -302,10 +303,11 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
         job_nodes      = "1",
         job_ppn        = "1",
         job_walltime   = str(args["job_walltime"]),
-        job_queue      =     args["job_queue"    ] ,
+        job_queue      =     args["job_queue"   ] ,
         job_account    =     args["job_account" ] ,
         job_executable =     job_task,
         job_system     =     args["job_system"  ] ,
+        job_modules    =     args["job_modules" ] ,
         job_file       =     "run_dftb.cmd")
         
     
