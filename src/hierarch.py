@@ -992,9 +992,11 @@ class param_file():
         if self.bool_block.keys[1][1] != other.bool_block.keys[1][1]:
             print("ERROR: FITCOUL mismatch")
         if self.bool_block.keys[2][1] != other.bool_block.keys[2][1]:
-            print("ERROR: USEPOVR mismatch")
+            print("     WARNING: USEPOVER mismatch - setting false!") 
+            self.bool_block.keys[2][1] = helpers.bool2str(False)   
         if self.bool_block.keys[3][1] != other.bool_block.keys[3][1]:
-            print("ERROR: FITPOVR mismatch")    
+            print("     WARNING: FITPOVER mismatch - setting false!")  
+            self.bool_block.keys[3][1] = helpers.bool2str(False) 	       
         if self.bool_block.keys[4][1] != other.bool_block.keys[4][1]:
             print("     WARNING: USE3BCH mismatch - setting true!")
             self.bool_block.keys[4][1] = helpers.bool2str(True)

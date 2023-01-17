@@ -11,7 +11,7 @@ def parse_refdatafile(infile):
         <chemical symbol> <Gaussian energy> <planewave code energy>
         
     Energies are expected in kcal/mol, and there should be an entry for each
-    atom type of itnerest    
+    atom type of interest    
     
     """
 

@@ -1,0 +1,49 @@
+
+   ICHARG = 2
+   AMIX   = 0.1
+   BMIX   = 0.01
+
+   NWRITE = 1
+   LPETIM = F write-flag & timer
+   ISTART = 0 job   : 0-new  1-cont  2-samecut
+
+   LWAVE = F
+   LCHARG = F
+
+   ICHARG  = 0 job   : 0-new  1-cont  2-samecut
+   #KPAR   = 4
+   #NCORE  = 36
+   NPAR    = 6 # Brad uses 36
+
+   ENCUT = 1000
+   GGA   = PE
+   LVDW  = .TRUE. 
+
+   EDIFF  = 1E-06 stopping-criterion for ELM
+   EDIFFG = -1E-02 stopping-criterion for IOM
+   ISPIN  = 1 
+
+   ISIF   = 2 stress and relaxation
+
+   NSW    = 0 number of steps for IOM
+   IBRION = 0  ionic relax: 0-MD 1-quasi-New 2-CG
+   ADDGRID= .FALSE.
+   LCORR  = T  Harris-correction to forces
+
+   ISMEAR = -1
+   SIGMA =  0.517
+
+   NELMIN = 4
+   NELM   = 200 # 1000
+   IALGO = 48 #  Normal # IALGO  = 38 algorithm
+   LREAL  = A real space projections
+
+   TEBEG  = 6000.0 !Starting temperature
+   TEEND  = 6000.0 
+   SMASS  = 0.13
+   POTIM  = 0.5
+
+   ISYM=0
+
+
+

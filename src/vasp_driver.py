@@ -88,7 +88,6 @@ def cleanup_and_setup(*argv, **kwargs):
         else:
             helpers.run_bash_cmnd("mkdir -p  " + vasp_dir + "/CASE-" + repr(args_this_case))
 
-
 def continue_job(*argv, **kwargs):
 
     """ 
@@ -182,7 +181,6 @@ def continue_job(*argv, **kwargs):
 
     return job_list    
     
-
 def check_convergence(my_ALC, *argv, **kwargs):
 
     """
@@ -445,7 +443,6 @@ def generate_POSCAR(inxyz, *argv):
         
     ofstream.close()
 
-
 def post_process(*argv, **kwargs):
 
     """ 
@@ -559,7 +556,7 @@ def post_process(*argv, **kwargs):
             # Make sure the configuration energy is less than or equal to zero
             
             if "ENERGY" in args_properties:
-            
+                
                 tmp_ener = helpers.head(outcar_list[j] + ".xyzf",2)
                 tmp_ener = float(tmp_ener[1].split()[-1])
                 
@@ -632,16 +629,16 @@ def setup_vasp(my_ALC, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*14
-    default_values = [""]*14
+    default_keys   = [""]*15
+    default_values = [""]*15
 
 
     # VASP specific controls
     
     default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../VASP_BASEFILES/"  # POTCAR, KPOINTS, and INCAR
-    default_keys[1 ] = "traj_list"        ; default_values[1 ] = "traj_list.dat"    # Traj_list used in fm_setup.in... last column is target temperatura
-    default_keys[2 ] = "modules"        ; default_values[2 ] = "mkl"                # Post_proc_lsq*py file... should also include the python command
-    default_keys[3 ] = "build_dir"        ; default_values[3 ] = "."                # Post_proc_lsq*py file... should also include the python command
+    default_keys[1 ] = "traj_list"     ; default_values[1 ] = "traj_list.dat"       # Traj_list used in fm_setup.in... last column is target temperatura
+    default_keys[2 ] = "modules"       ; default_values[2 ] = "mkl"                 # Post_proc_lsq*py file... should also include the python command
+    default_keys[3 ] = "build_dir"     ; default_values[3 ] = "."                   # Post_proc_lsq*py file... should also include the python command
     default_keys[4 ] = "first_run"     ; default_values[4 ] = False                 # Optional... is this the first run? if so, dont search for "CASE" in the name
 
 
@@ -654,9 +651,9 @@ def setup_vasp(my_ALC, *argv, **kwargs):
     default_keys[9 ] = "job_account"   ; default_values[9 ] = "pbronze"             # Account for ChIMES md job
     default_keys[10] = "job_executable"; default_values[10] = ""                    # Full path to executable for ChIMES md job
     default_keys[11] = "job_system"    ; default_values[11] = "slurm"               # slurm or torque       
-    default_keys[12] = "job_file"       ; default_values[12] = "run.cmd"            # Name of the resulting submit script   
+    default_keys[12] = "job_file"      ; default_values[12] = "run.cmd"             # Name of the resulting submit script   
     default_keys[13] = "job_email"     ; default_values[13] = True                  # Send slurm emails?
-    
+    default_keys[14] = "job_mem  "     ; default_values[14] = 128                   # GB
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
@@ -823,10 +820,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         job_task.append("    if [ -e ${CHECK} ] ; then ")    
         job_task.append("        continue    ")    
         job_task.append("    fi            ")
-        job_task.append("    prev_tries=`wc -l ${TAG}.tries`")
-        job_task.append("    if [ $prev_tries -ge 2 ]; then ")
-        job_task.append("        continue        ")
-        job_task.append("    fi                      ")                
+        job_task.append("    prev_tries=\"\"              ")
+        job_task.append("    if [ -f ${TAG}.tries ] ; then     ")
+        job_task.append("       prev_tries=`wc -l ${TAG}.tries | awk '{print $1}'`")
+        job_task.append("       if [ $prev_tries -ge 2 ]; then ")
+        job_task.append("            continue                   ")
+        job_task.append("        fi                             ")
+        job_task.append("    fi                                 ")        
         job_task.append("    echo \"Attempt\" >> ${TAG}.tries")
         job_task.append("    TEMP=`awk '{print $(NF-1); exit}' POSCAR`")
         job_task.append("    cp ${TEMP}.INCAR INCAR    ")    
@@ -853,6 +853,7 @@ def setup_vasp(my_ALC, *argv, **kwargs):
             job_queue      =     args["job_queue"    ] ,
             job_account    =     args["job_account" ] ,
             job_system     =     args["job_system"  ] ,
+            job_mem        =     args["job_mem"     ],
             job_file       =     "run_vasp.cmd")
             
         run_vasp_jobid.append(this_jobid.split()[0])    
