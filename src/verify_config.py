@@ -141,9 +141,9 @@ def check_VASP(user_config):
 
         if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
             print("WARNING: Option config.VASP_POSTPRC was not set")
-            print("         Will use config.CHIMES_SRCDIR + \"../contrib/vasp2xyzf.py\"")
+            print("         Will use config.DRIVER_DIR + \"/src/vasp2xyzf.py\"")
 
-        user_config.VASP_POSTPRC = user_config.CHIMES_SRCDIR + "../contrib/vasp2xyzf.py"            
+        user_config.VASP_POSTPRC = user_config.DRIVER_DIR + "/src/vasp2xyzf.py"            
         
     if not hasattr(user_config,'VASP_NODES'):
 
@@ -171,9 +171,9 @@ def check_VASP(user_config):
 
         if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
             print("WARNING: Option config.VASP_MEM was not set")
-            print("         Will use a value of 128 (GB)")
+            #print("         Will use a value of 128 (GB)")
 
-        user_config.VASP_MEM = 128                                   
+        user_config.VASP_MEM = ""                                   
 
     if not hasattr(user_config,'VASP_TIME'):
 
@@ -274,9 +274,9 @@ def check_DFTB(user_config):
 
         if ((user_config.BULK_QM_METHOD == "DFTB") or (user_config.IGAS_QM_METHOD == "DFTB")):
             print("WARNING: Option config.DFTB_MEM was not set")
-            print("         Will use a value of 128 (GB)")
+            #print("         Will use a value of 128 (GB)")
 
-        user_config.DFTB_MEM = 128                                       
+        user_config.DFTB_MEM = ""                                       
 
     if not hasattr(user_config,'DFTB_TIME'):
 
@@ -377,9 +377,9 @@ def check_CP2K(user_config):
 
         if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
             print("WARNING: Option config.CP2K_MEM was not set")
-            print("         Will use a value of 128 (GB)")
+            #print("         Will use a value of 128 (GB)")
 
-        user_config.CP2K_MEM = 128                                  
+        user_config.CP2K_MEM = ""                                  
 
     if not hasattr(user_config,'CP2K_TIME'):
 
@@ -461,9 +461,9 @@ def check_GAUS(user_config):
 
         if ((user_config.BULK_QM_METHOD == "GAUS") or (user_config.IGAS_QM_METHOD == "GAUS")):
             print("WARNING: Option config.GAUS_MEM was not set")
-            print("         Will use a value of 128 (GB)")
+            #print("         Will use a value of 128 (GB)")
 
-        user_config.GAUS_MEM = 128                                
+        user_config.GAUS_MEM = ""                                
 
     if not hasattr(user_config,'GAUS_TIME'):
 

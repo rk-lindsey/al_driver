@@ -9,9 +9,9 @@ EMAIL_ADD = "lindsey11@llnl.gov"
 ATOM_TYPES     = ["C"]
 NO_CASES       = 1
 
-DRIVER_DIR     = "/usr/WS2/rlindsey/al_driver-fork/"
-WORKING_DIR    = "/usr/WS2/rlindsey/al_driver-fork/examples/simple_iter_single_statepoint/"
-CHIMES_SRCDIR  = "/usr/WS2/rlindsey/al_driver-fork/chimes_lsq-forALD/src/"
+DRIVER_DIR     = "/usr/WS2/rlindsey/test_cp2k/al_driver/"
+WORKING_DIR    = "/usr/WS2/rlindsey/test_cp2k/al_driver/examples/simple_iter_single_statepoint/"
+CHIMES_SRCDIR  = "/usr/WS2/rlindsey/test_cp2k/chimes_lsq/src/"
 
 ################################
 ##### ChIMES LSQ
@@ -60,4 +60,3 @@ VASP_TIME    = "01:00:00"
 VASP_NODES   = 2
 VASP_PPN     = 36
 VASP_MODULES = "mkl intel/18.0.1 impi/2018.0"
-
