@@ -556,7 +556,7 @@ def post_process(*argv, **kwargs):
             # Make sure the configuration energy is less than or equal to zero
             
             if "ENERGY" in args_properties:
-            
+                
                 tmp_ener = helpers.head(outcar_list[j] + ".xyzf",2)
                 tmp_ener = float(tmp_ener[1].split()[-1])
                 
@@ -820,10 +820,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         job_task.append("    if [ -e ${CHECK} ] ; then ")    
         job_task.append("        continue    ")    
         job_task.append("    fi            ")
-        job_task.append("    prev_tries=`wc -l ${TAG}.tries`")
-        job_task.append("    if [ $prev_tries -ge 2 ]; then ")
-        job_task.append("        continue        ")
-        job_task.append("    fi                      ")                
+        job_task.append("    prev_tries=\"\"              ")
+        job_task.append("    if [ -f ${TAG}.tries ] ; then     ")
+        job_task.append("       prev_tries=`wc -l ${TAG}.tries | awk '{print $1}'`")
+        job_task.append("       if [ $prev_tries -ge 2 ]; then ")
+        job_task.append("            continue                   ")
+        job_task.append("        fi                             ")
+        job_task.append("    fi                                 ")        
         job_task.append("    echo \"Attempt\" >> ${TAG}.tries")
         job_task.append("    TEMP=`awk '{print $(NF-1); exit}' POSCAR`")
         job_task.append("    cp ${TEMP}.INCAR INCAR    ")    

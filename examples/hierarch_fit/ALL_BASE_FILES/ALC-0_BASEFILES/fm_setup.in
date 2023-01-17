@@ -1,0 +1,73 @@
+####### CONTROL VARIABLES #######
+
+# TRJFILE # 
+        MULTI traj_list.dat
+# WRAPTRJ # 
+        true
+# NFRAMES # 
+	20
+# NLAYERS # 
+        1
+# FITCOUL # 
+        false
+# CNSCOUL # 
+        false   
+# FITSTRS #
+	ALL 20
+# FITENER # 
+        true   
+# FITPOVR # 
+        false
+# PAIRTYP # 
+        CHEBYSHEV 25 10 4 -1 1
+# CHBTYPE #
+        MORSE
+# SPLITFI #
+        false
+# HIERARC #	
+	true
+
+####### TOPOLOGY VARIABLES #######
+	
+EXCLUDE 1B INTERACTION: 2
+C
+N
+
+EXCLUDE 2B INTERACTION: 2
+C C
+N N
+
+EXCLUDE 3B INTERACTION: 2
+C C C
+N N N
+
+EXCLUDE 4B INTERACTION: 2
+C C C C
+N N N N
+
+# NATMTYP # 
+        2
+	
+# TYPEIDX #     # ATM_TYP #     # ATMCHRG #     # ATMMASS # 
+1		C		0.0		12.0107
+2               N               0.0		14.0067
+
+# PAIRIDX #     # ATM_TY1 #     # ATM_TY1 #     # S_MINIM #     # S_MAXIM #     # S_DELTA #     # MORSE_LAMBDA #        
+1               C               C               0.98            5.0		0.01            1.4			
+2               N		N               0.86		8.0		0.01		1.09			
+3               C		N               0.90		5.0		0.01		1.34			
+
+SPECIAL 3B S_MAXIM: SPECIFIC 2
+CCCNCN   CC CN CN 5.0 5.0 5.0
+CNCNNN   CN CN NN 5.0 5.0 5.0
+
+SPECIAL 4B S_MAXIM: SPECIFIC 3
+CCCCCNCCCNCN    CC CC CN CC CN CN 4.5 4.5 4.5 4.5 4.5 4.5
+CCCNCNCNCNNN    CC CN CN CN CN NN 4.5 4.5 4.5 4.5 4.5 4.5
+CNCNCNNNNNNN    CN CN CN NN NN NN 4.5 4.5 4.5 4.5 4.5 4.5
+
+# FCUTTYP #
+        TERSOFF 0.75
+
+# ENDFILE #
+
