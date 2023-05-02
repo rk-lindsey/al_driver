@@ -301,7 +301,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
     
     return  total_failed
 
-def generate_gen(inxyz, *argv):
+def generate_gen(inxyz, *argv, **kwargs):
 
     """ 
     
@@ -309,17 +309,25 @@ def generate_gen(inxyz, *argv):
     
     Usage: (my_file./usr/workspace/wsb/rlindsey/AL_Driver_SVN/rlindsey_branch/xyz, ["C","O"], 6500) # , [1,2])
     
-    Notes: The second argument is list of atom types
+    Notes: The second required argument is list of atom types
            The final argument is the smearing temperature, in Kelvin
-              
+           The optional argument is to sort or not sort the atoms
     """
 
-    atm_types = argv[0] # pointer!
-    smearing  = float(argv[1])
-    ifstream  = open(inxyz,'r')
-    ofstream  = open(inxyz + ".gen", 'w')
+    ### **kwargs
+    default_keys = [""]*1 
+    default_values = [""]*1 
+    # DFTB specific controls 
+    default_keys[0 ] = "do_sort" ; default_values[0 ] = True # Whether atom types should be sorted and excess element types removed 
+    args = dict(list(zip(default_keys, default_values))) 
+    args.update(kwargs)
     
-    # Set up the header portion
+    atm_types = argv[0] # pointer!
+    smearing = float(argv[1])
+    ifstream = open(inxyz,'r')
+    ofstream = open(inxyz + ".gen", 'w')
+    
+   # Set up the header portion
         
     box = ifstream.readline()        # No. atoms
     box = ifstream.readline().split()    # Box lengths
@@ -345,7 +353,8 @@ def generate_gen(inxyz, *argv):
     # Count up the number of atoms of each type
     
     contents = ifstream.readlines()
-    contents.sort() # To remain constistent with all other QM methods that expects sorted coordinates
+    if args["do_sort"]:
+        contents.sort() # To remain constistent with all other QM methods that expects sorted coordinates
     
     natm_types = [0]*len(atm_types)
     
@@ -357,22 +366,23 @@ def generate_gen(inxyz, *argv):
                 
                 natm_types[j] += 1
                 
-    
+    if args["do_sort"]:
     # Remove any elements that don't appear in the coordinate file
     # But first, make sure everything is sorted 
+   
+        tmp = list(zip(atm_types,natm_types))
+        tmp.sort() # Sorts by the first entry (atom types) ... alphabetical
     
-    tmp = list(zip(atm_types,natm_types))
-    tmp.sort() # Sorts by the first entry (atom types) ... alphabetical
-    
-    for i in range(len(tmp)-1,-1,-1): # Goes through list backwards
+        for i in range(len(tmp)-1,-1,-1): # Goes through list backwards
         
-        if tmp[i][1] == 0: 
+            if tmp[i][1] == 0: 
         
-            tmp.pop(i)
+                tmp.pop(i)
     
-    atm_types  = list(list(zip(*tmp))[0])
-    natm_types = list(map(int,list(list(zip(*tmp))[1])))
-
+        atm_types  = list(list(zip(*tmp))[0])
+        natm_types = list(map(int,list(list(zip(*tmp))[1])))
+    else:
+        print('WARNING!!!: atom sorting and exess type removing is turned off')
     # Finish up the header portion
     
     ofstream.write(str(sum(natm_types)) + " S\n")
@@ -382,7 +392,7 @@ def generate_gen(inxyz, *argv):
     for i in range(len(contents)):
         
         line = contents[i].split()                
-        line = str(i+1) + " " + str(atm_types.index(line[0])+1) + " " +  ' '.join(line[1:]) + '\n'
+        line = str(i+1) + " " + str(atm_types.index(line[0])+1) + " " +  ' '.join(line[1:4]) + '\n'
         ofstream.write(line)
     
     ofstream.write("0.0 0.0 0.0\n")    
