@@ -790,7 +790,7 @@ def main(args):
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
                         job_executable     = config.CHIMES_SOLVER,
-                        job_modules        = config.CHIMES_MODULES
+                        job_modules        = config.CHIMES_LSQ_MODULES
                         )    
                     
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "restart_solve_amat")
