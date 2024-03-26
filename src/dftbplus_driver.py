@@ -781,4 +781,3 @@ def setup_dftb(my_ALC, *argv, **kwargs):
         os.chdir(curr_dir)
     
     return run_dftb_jobid    
-
