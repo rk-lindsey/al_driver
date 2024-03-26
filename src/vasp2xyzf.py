@@ -269,7 +269,7 @@ for LINE in IFSTREAM:
             if INCL_STRESS:
                 OFSTREAM.write(" " +repr(TENSOR_XX)+ " " + repr(TENSOR_YY) + " " + repr(TENSOR_ZZ))
             elif INCL_ALLSTR:
-                OFSTREAM.write(" " +repr(TENSOR_XX)+ " " + repr(TENSOR_YY) + " " + repr(TENSOR_ZZ) + " " + repr(TENSOR_XY) + " " + repr(TENSOR_YZ) + " " + repr(TENSOR_ZX)) 
+                OFSTREAM.write(" " +repr(TENSOR_XX)+ " " + repr(TENSOR_YY) + " " + repr(TENSOR_ZZ) + " " + repr(TENSOR_XY) + " " + repr(TENSOR_ZX) + " " + repr(TENSOR_YZ)) 
             if INCL_ENERGY:
                 OFSTREAM.write(" " + repr(POT_ENER))
             OFSTREAM.write('\n')
