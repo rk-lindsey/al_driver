@@ -483,7 +483,7 @@ def create_and_launch_job(*argv, **kwargs):
     default_keys[8 ] = "job_file"          ; default_values[8 ] =     "run.cmd"      # Name of the resulting submit script    
     default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Should emails be sent?
     default_keys[10] = "job_modules"       ; default_values[10] =     ""             # Name of the resulting submit script    
-    default_keys[11] = "job_mem"           ; default_values[11] =     ""             # GB
+    default_keys[11] = "job_mem"           ; default_values[11] =     "128"             # GB
     
 
     args = dict(list(zip(default_keys, default_values)))
