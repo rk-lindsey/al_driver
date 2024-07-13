@@ -164,7 +164,7 @@ def continue_job(*argv, **kwargs):
             
                 print("            Resubmitting.")
 
-                if args["job_system"] == "slurm":
+                if args["job_system"] == "slurm" or "TACC":
                     job_list.append(helpers.run_bash_cmnd("sbatch run_dftb.cmd").split()[-1])
                 else:    
                     job_list.append(helpers.run_bash_cmnd("qsub run_dftb.cmd").replace('\n', ''))
@@ -757,7 +757,10 @@ def setup_dftb(my_ALC, *argv, **kwargs):
         job_task.append("    fi            ")
         job_task.append("    TEMP=`awk '{if(NR==2){print int($(NF-1)); exit}}' dftbjob.gen`")
         job_task.append("    cp " + args["basefile_dir" ] + "/${TEMP}.dftb_in.hsd dftb_in.hsd        ")    
-        job_task.append("    srun -N " + str(args["job_nodes" ]) + " -n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
+        if args["job_system"] == "TACC":
+            job_task.append("    ibrun " + "-n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
+        else:
+            job_task.append("    srun -N " + str(args["job_nodes" ]) + " -n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
         job_task.append("    mv results.tag ${TAG}.results.tag")
         job_task.append("    mv md.out      ${TAG}.md.out     ")
         job_task.append("done    ")
@@ -773,8 +776,8 @@ def setup_dftb(my_ALC, *argv, **kwargs):
             job_queue      =     args["job_queue"    ] ,
             job_account    =     args["job_account" ] ,
             job_system     =     args["job_system"  ] ,
-            job_mem        =     args["job_mem"     ],
-            job_file       =     "run_dftb.cmd")
+            job_file       =     "run_dftb.cmd",
+            job_mem        =     args["job_mem"] if args["job_system"] == "UM-ARC" else None)
             
         run_dftb_jobid.append(this_jobid.split()[0])    
     

@@ -7,6 +7,7 @@ import os
 
 import chimes_run_md
 import dftbplus_run_md
+import lmp_run_md
 
 
 def post_proc(my_ALC, my_case, my_indep, style, *argv, **kwargs):
@@ -36,6 +37,8 @@ def post_proc(my_ALC, my_case, my_indep, style, *argv, **kwargs):
         chimes_run_md.post_proc(my_ALC, my_case, my_indep, *argv, **kwargs)
     elif style == "DFTB":
         dftbplus_run_md.post_proc(my_ALC, my_case, my_indep, *argv, **kwargs)
+    elif style == "LMP":
+        lmp_run_md.post_proc(my_ALC, my_case, my_indep, *argv, **kwargs)        
     else:
         print("ERROR: Unknown post_proc style in run_md.py: ", style)
     
@@ -69,6 +72,8 @@ def run_md(my_ALC, my_case, my_indep, style, *argv, **kwargs):
         md_jobid = chimes_run_md.run_md(my_ALC, my_case, my_indep, *argv, **kwargs)
     elif style == "DFTB":
         md_jobid = dftbplus_run_md.run_md(my_ALC, my_case, my_indep, *argv, **kwargs)
+    elif style == "LMP":
+        md_jobid = lmp_run_md.run_md(my_ALC, my_case, my_indep, *argv, **kwargs)        
     else:
         print("ERROR: Unknown post_proc style in run_md.py: ", style)
     
