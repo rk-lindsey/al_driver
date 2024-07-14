@@ -9,8 +9,8 @@
 ATOM_TYPES     = ["C"]
 NO_CASES       = 1
 USE_AL_STRS    = -1
-DRIVER_DIR     = "/work2/09982/aoladipupo/stampede3/codes/al_driver-MyLLfork_4/"
-WORKING_DIR    = "/scratch/09982/aoladipupo/simple_iter_single_statepoint-lmp-test/"
+DRIVER_DIR     = "/work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/"
+WORKING_DIR    = "/work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/examples/simple_iter_single_statepoint-lmp-test/"
 CHIMES_SRCDIR  = "/work2/09982/aoladipupo/stampede3/codes/chimes_lsq-LLfork/src/"
 
 ################################

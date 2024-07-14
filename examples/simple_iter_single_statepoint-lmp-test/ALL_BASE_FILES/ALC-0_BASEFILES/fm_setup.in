@@ -5,7 +5,7 @@
 # WRAPTRJ # 
         true
 # NFRAMES # 
-	200
+	321
 # NLAYERS # 
         1
 # FITCOUL # 
@@ -35,8 +35,6 @@
 
 # PAIRIDX #     # ATM_TY1 #     # ATM_TY1 #     # S_MINIM #     # S_MAXIM #     # S_DELTA #     # MORSE_LAMBDA #        # USEOVRP #     # NIJBINS #     # NIKBINS #     # NJKBINS #
 1               C               C               1.46		7		0.01		1.54			false		0		0		0
-
-SPECIAL 3B S_MAXIM: ALL 3.15
 
 # FCUTTYP #
         TERSOFF 0.75
