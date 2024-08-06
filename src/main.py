@@ -796,7 +796,7 @@ def main(args):
                         regression_alg     = config.REGRESS_ALG,
                         regression_nrm     = config.REGRESS_NRM,
                         regression_var     = config.REGRESS_VAR,  
-			n_hyper_sets       = config.N_HYPER_SETS,  
+			            n_hyper_sets       = config.N_HYPER_SETS,  
                         job_email          = config.HPC_EMAIL,                    
                         job_ppn            = config.CHIMES_SOLVE_PPN,
                         node_ppn           = config.HPC_PPN,
@@ -923,7 +923,7 @@ def main(args):
                         job_queue      = config.MD_QUEUE[THIS_CASE],      
                         job_account    = config.HPC_ACCOUNT, 
                         job_executable = config.MD_MPI,     
-                        job_system     = "slurm",       
+                        job_system     = config.HPC_SYSTEM,       
                         job_file       = "run.cmd",
                         job_modules    = config.MD_MODULES
                         )
