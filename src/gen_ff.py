@@ -1054,21 +1054,24 @@ def solve_amat(my_ALC, **kwargs):
         os.mkdir("GEN_FF")  # Create the GEN_FF directory
 
     # Copy common files from GEN_FF-0 and GEN_FF-1 to GEN_FF
-    #Need to modify for systems for more than 2 fm_setup.in
+    #Need to test for systems for more than 2 fm_setup.in
         shutil.copy("GEN_FF-0/A.txt", "GEN_FF")
         shutil.copy("GEN_FF-0/b.txt", "GEN_FF")
         shutil.copy("GEN_FF-0/b-labeled.txt", "GEN_FF")
         shutil.copy("GEN_FF-0/natoms.txt", "GEN_FF")
         shutil.copy("GEN_FF-0/traj_list.dat", "GEN_FF")
         shutil.copy("GEN_FF-0/fm_setup.in", "GEN_FF")
-        shutil.move("GEN_FF/fm_setup.in", "GEN_FF/0.fm_setup.in")
-        shutil.copy("GEN_FF-1/fm_setup.in", "GEN_FF")
-        shutil.move("GEN_FF/fm_setup.in", "GEN_FF/1.fm_setup.in")
+        # shutil.move("GEN_FF/fm_setup.in", "GEN_FF/0.fm_setup.in")
+        # shutil.copy("GEN_FF-1/fm_setup.in", "GEN_FF")
+        # shutil.move("GEN_FF/fm_setup.in", "GEN_FF/1.fm_setup.in")
 
 
 
         for i in range(1, int(args["n_hyper_sets"])):
             print("Pasting from:", i)
+            shutil.move("GEN_FF/fm_setup.in", "GEN_FF/0.fm_setup.in")
+            shutil.copy(f"GEN_FF-{i}/fm_setup.in", "GEN_FF")
+            shutil.move("GEN_FF/fm_setup.in", f"GEN_FF/{i}.fm_setup.in")
             paste_cmd = f"paste GEN_FF/A.txt GEN_FF-{i}/A.txt > tmp"
             print(paste_cmd)
             os.system(paste_cmd)
