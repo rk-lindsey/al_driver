@@ -288,7 +288,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                         job_system     = args  ["job_system"])
                           
                 elif bulk_qm_method == "CP2K":
-                    run_qm_jobids += cp2k_driver.setup_dftb(my_ALC, *argv,
+                    run_qm_jobids += cp2k_driver.setup_cp2k(my_ALC, *argv,
                         first_run      = True,             
                         basefile_dir   = args  ["basefile_dir"],
                         modules        = args  ["CP2K_modules"],
@@ -345,7 +345,7 @@ def setup_qm(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
                 elif igas_qm_method == "CP2K":
                     print("WARNING: CP2K as a gas phase method is untested!")
                 
-                    run_qm_jobids += cp2k_driver.setup_dftb(my_ALC, *argv,
+                    run_qm_jobids += cp2k_driver.setup_cp2k(my_ALC, *argv,
                         first_run      = True,             
                         basefile_dir   = args  ["basefile_dir"],
                         modules        = args  ["CP2K_modules"],

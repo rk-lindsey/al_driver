@@ -820,8 +820,10 @@ def build_amat(my_ALC, **kwargs):
     
     job_task = "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " fm_setup.in | tee fm_setup.log"
     
-    if args["job_system"] == "slurm":
+    if args["job_system"]  == "slurm":
         job_task = "srun "   + job_task
+    elif args["job_system"] == "TACC":
+        job_task = "ibrun "  + job_task
     else:
         job_task = "mpirun " + job_task    
 
@@ -1072,6 +1074,11 @@ def solve_amat(my_ALC, **kwargs):
         job_task += "--normalize " + str(args["regression_nrm"]) + " "
         job_task += "--nodes "  + str(args["job_nodes"]) + " " 
         job_task += "--cores "  + str(no_files) + " " 
+
+        if args["job_system"] == "TACC":
+            job_task += "--mpistyle ibrun "
+        else:
+            job_task += "--mpistyle srun "
         
         if do_split:
             job_task += "--split_files True    "

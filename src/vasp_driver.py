@@ -164,7 +164,7 @@ def continue_job(*argv, **kwargs):
             
                 print("            Resubmitting.")
 
-                if args["job_system"] == "slurm":
+                if args["job_system"] == "slurm" or "TACC":
                     job_list.append(helpers.run_bash_cmnd("sbatch run_vasp.cmd").split()[-1])
                 else:    
                     job_list.append(helpers.run_bash_cmnd("qsub run_vasp.cmd").replace('\n', ''))
@@ -837,8 +837,11 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         job_task.append("        if [ $NA -gt 0 ] ; then ")
         job_task.append("            cat ${k}.POTCAR >> POTCAR ")
         job_task.append("        fi ")    
-        job_task.append("    done    ")    
-        job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
+        job_task.append("    done    ") 
+        if args["job_system"] == "TACC":
+            job_task.append("    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
+        else:   
+            job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
         job_task.append("    cp OUTCAR  ${TAG}.OUTCAR    ")
         job_task.append("    cp OSZICAR ${TAG}.OSZICAR    ")
         job_task.append("    rm -f OUTCAR CHG DOSCAR XDATCAR POSCAR CHGCAR EIGENVAL PCDAT XDATCAR CONTCAR IBZKPT OSZICAR WAVECAR  ")    
@@ -853,8 +856,8 @@ def setup_vasp(my_ALC, *argv, **kwargs):
             job_queue      =     args["job_queue"    ] ,
             job_account    =     args["job_account" ] ,
             job_system     =     args["job_system"  ] ,
-            job_mem        =     args["job_mem"     ],
-            job_file       =     "run_vasp.cmd")
+            job_file       =     "run_vasp.cmd",
+            job_mem        =     args["job_mem"] if args["job_system"] == "UM-ARC" else None)
             
         run_vasp_jobid.append(this_jobid.split()[0])    
     

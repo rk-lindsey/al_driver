@@ -32,7 +32,7 @@ def print_help():
     PARAM.append("CORRECTED_TEMPS_BY_FILE");        VARTYP.append("bool");          DETAILS.append("Should electron temperatures be set to values in traj_list.dat (false) or in specified file location, for correction calculation? Only needed if correction method is QM-based. ")
     PARAM.append("HPC_PPN");                        VARTYP.append("int");           DETAILS.append("The number of processors per node on the machine code is launched on")    
     PARAM.append("HPC_ACCOUNT");                    VARTYP.append("str");           DETAILS.append("Charge bank name on machine code is launched on (e.g. \"pbronze\")")
-    PARAM.append("HPC_SYSTEM");                     VARTYP.append("str");           DETAILS.append("Job scheduler on machine code is launched on (only \"slurm\" is supported currently)")
+    PARAM.append("HPC_SYSTEM");                     VARTYP.append("str");           DETAILS.append("Job scheduler on machine code is launched on (only \"slurm\" , \"TACC\" and \"UM-ARC\" are supported currently)")
     PARAM.append("HPC_PYTHON");                     VARTYP.append("str");           DETAILS.append("Path to python executable (2.X required for now)")
     PARAM.append("HPC_EMAIL");                      VARTYP.append("bool");          DETAILS.append("Controls whether driver status updates are e-mailed to user")
     PARAM.append("ALC0_FILES");                     VARTYP.append("str");           DETAILS.append("Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)")
@@ -738,7 +738,7 @@ def verify(user_config):
 
         print("WARNING: Option config.HPC_SYSTEM was not set")
         print("         Will use slurm")
-        print("         Note: No other options are currently supported.")    
+        #print("         Note: No other options are currently supported.")    
         
         user_config.HPC_SYSTEM = "slurm"    
 
