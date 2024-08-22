@@ -292,8 +292,10 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     job_task  = "-n 1 " + args["job_executable"] + " > dftb.out"    
 
-    if args["job_system"] == "slurm":
+    if args["job_system"]  == "slurm":
         job_task = "srun "   + job_task
+    elif args["job_system"] == "TACC":
+        job_task = "ibrun "  + job_task
     else:
         job_task = "mpirun " + job_task    
     

@@ -36,6 +36,8 @@ def main(args):
 
            - Run location is specified in the config file (WORKING_DIR), NOT the directory 
              it was launched from
+             
+           - If "unbuffer" command is unavailable on your system, try replacing "unuffer python" with "python -u"
     
            - This tool works most effectively when run with screen during remote runs
              (screen allows the session to be detached/reattached)    
@@ -854,7 +856,7 @@ def main(args):
                         job_queue      = config.MD_QUEUE[THIS_CASE],      
                         job_account    = config.HPC_ACCOUNT, 
                         job_executable = config.CHIMES_MD_MPI,     
-                        job_system     = "slurm",       
+                        job_system     = config.HPC_SYSTEM,       
                         job_file       = "run.cmd",
                         job_modules    = config.CHIMES_MD_MODULES
                         )

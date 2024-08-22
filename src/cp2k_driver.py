@@ -166,7 +166,7 @@ def continue_job(*argv, **kwargs):
             
                 print("            Resubmitting.")
 
-                if args["job_system"] == "slurm":
+                if args["job_system"] == "slurm" or "TACC":
                     job_list.append(helpers.run_bash_cmnd("sbatch run_cp2k.cmd").split()[-1])
                 else:    
                     job_list.append(helpers.run_bash_cmnd("qsub run_cp2k.cmd").replace('\n', ''))
@@ -842,7 +842,11 @@ def setup_cp2k(my_ALC, *argv, **kwargs):
         job_task.append("            cat ${k}.cp2k.qm_basis-block.inp >> cp2k.qm_basis-block.inp ")
         job_task.append("        fi                             ")
         job_task.append("    done                               ")
-        job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
+        if args["job_system"] == "TACC":
+            job_task.append("    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
+        else:
+            job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
+        
         job_task.append("    mv cp2k_traj.forces  ${TAG}.cp2k_traj.forces ")   
         job_task.append("done")
         
@@ -855,8 +859,8 @@ def setup_cp2k(my_ALC, *argv, **kwargs):
             job_queue      =     args["job_queue"   ] ,
             job_account    =     args["job_account" ] ,
             job_system     =     args["job_system"  ] ,
-            job_mem        =     args["job_mem"     ] ,
-            job_file       =     "run_cp2k.cmd")
+            job_file       =     "run_cp2k.cmd",
+            job_mem=args["job_mem"] if args["job_system"] == "UM-ARC" else None)
             
         run_cp2k_jobid.append(this_jobid.split()[0])    
     
