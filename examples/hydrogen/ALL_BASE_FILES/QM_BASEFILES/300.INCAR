@@ -1,0 +1,57 @@
+   NWRITE = 1
+   LPETIM = F write-flag & timer
+   ISTART = 0 job   : 0-new  1-cont  2-samecut
+   
+   LWAVE = F
+   LCHARG = True # Needed for restarts with ispin=2   
+   ICHARG = 0 job   : 0-new  1-cont  2-samecut
+   
+   #KPAR   = 4
+   #NCORE  = 36
+   NPAR = 10 # sqrt of TOTAL cores, i.e. 8N*36PPN = 288 cores; sqrt(288) = 18 
+
+#   LSCALAPACK = .FALSE.
+
+#   ENCUT = 1300
+#   NBANDS = 1000
+   ENCUT = 1000 
+   PREC = Accurate
+   GGA   = PE
+   IVDW = 10 # Same as LVDW=.TRUE. 
+     
+   EDIFF  = 1E-07 stopping-criterion for ELM
+   EDIFFG = -1E-02 stopping-criterion for IOM
+
+   ISPIN  = 2
+   NUPDOWN = 0
+   MAGMOM = 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 \
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 \
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 \
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 \
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 \
+            0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 \
+            0.0 0.0 0.0 0.0
+
+   ISIF   = 2 stress and relaxation
+   
+   NSW    = 0 number of steps for IOM
+   IBRION = 0  ionic relax: 0-MD 1-quasi-New 2-CG
+   ADDGRID = .FALSE.
+   LCORR  = T  Harris-correction to forces
+   
+   ISMEAR = -1  
+   SIGMA =  0.025851842830016576
+
+   NELM =  500
+#   NELMDL = 10
+   NELMIN = 8
+   ALGO = NORMAL  # IALGO 48 algorithm
+#   LREAL  = .FALSE. # Auto
+
+   TEBEG  = 300.0 !Starting temperature
+   TEEND  = 300.0 
+   SMASS  = 0.13 # 0.4
+   POTIM  = 0.2
+   MDALGO = 2
+
+   ISYM = 0
