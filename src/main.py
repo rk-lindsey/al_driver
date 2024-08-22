@@ -20,8 +20,8 @@ import pretty_stuff
 
 local_path = os.path.normpath(helpers.run_bash_cmnd("pwd").rstrip())
 sys.path.append(local_path)
-import config  # User-specified "global" vars
 
+import config  # User-specified "global" vars
 
 def main(args):
 
@@ -523,7 +523,7 @@ def main(args):
                         compilation    = "g++ -std=c++11 -O3",
                         basefile_dir   = config.QM_FILES,
                         VASP_exe       = config.VASP_EXE,
-                        VASP_nodes     = config.VASP_NODES,
+                        VASP_nodes     = config.VASP_NODES[THIS_CASE],
                         VASP_ppn       = config.VASP_PPN,
                         VASP_mem       = config.VASP_MEM,
                         VASP_time      = config.VASP_TIME,
@@ -1094,7 +1094,7 @@ def main(args):
                         compilation    = "g++ -std=c++11 -O3",
                         basefile_dir   = config.QM_FILES,
                         VASP_exe       = config.VASP_EXE,
-                        VASP_nodes     = config.VASP_NODES,
+                        VASP_nodes     = config.VASP_NODES[THIS_CASE],
                         VASP_ppn       = config.VASP_PPN,
                         VASP_mem       = config.VASP_MEM,
                         VASP_time      = config.VASP_TIME,
@@ -1192,7 +1192,8 @@ def main(args):
                 
                         for THIS_CASE in range(config.NO_CASES):
 
-                            active_jobs = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE,
+                            # FIXED
+                            active_job = qm_driver.continue_job(config.BULK_QM_METHOD, config.IGAS_QM_METHOD, tasks, THIS_CASE,
                                 job_system = config.HPC_SYSTEM)
                                     
                             active_jobs += active_job
