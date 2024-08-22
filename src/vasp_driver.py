@@ -909,8 +909,8 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         job_task.append("            cat ${k}.POTCAR >> POTCAR ")
         job_task.append("        fi ")    
         job_task.append("    done    ")    
-
         job_task.append("    rm -f OUTCAR CHG DOSCAR XDATCAR CHGCAR EIGENVAL PCDAT XDATCAR CONTCAR IBZKPT OSZICAR WAVECAR  ")    
+
         if args["job_system"] == "TACC":
             job_task.append("    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
         else:   

@@ -39,6 +39,8 @@ def main(args):
 
            - Run location is specified in the config file (WORKING_DIR), NOT the directory 
              it was launched from
+             
+           - If "unbuffer" command is unavailable on your system, try replacing "unuffer python" with "python -u"
     
            - This tool works most effectively when run with something like screen, tmux, or nohup 
              during remote runs (these utils allow the session to be detached/reattached)    
