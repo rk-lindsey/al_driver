@@ -144,6 +144,22 @@ def continue_job(*argv, **kwargs):
         if os.path.isdir("VASP-" + args_targets[i] + "/" + CASE_PATH):
         
             os.chdir("VASP-" + args_targets[i] + "/" + CASE_PATH)
+            
+            
+            # Check for jobs that will never run (this will happen if the job is unable to complete in the entire walltime requested
+            
+            print("    ...Checking for jobs that will never complete...")
+                
+            all_poscars = sorted(glob.glob("*.POSCAR"))
+                
+            for j in range(len(all_poscars)):
+                
+                tag   = ''.join(all_poscars[j].split('.POSCAR'))
+
+                if not os.path.isfile(tag + ".OUTCAR"):
+                    if os.path.isfile(tag + ".tries") and (int(helpers.wc_l(tag + ".tries"))) == 2:
+                        print("         ", all_poscars[j], "will never complete in allotted time... ignoring")
+                        helpers.run_bash_cmnd("mv " + all_poscars[j] + " " + all_poscars[j] + ".ignored")
 
             # Count the number of possible jobs
             
@@ -161,7 +177,7 @@ def continue_job(*argv, **kwargs):
             # If all jobs haven't completed, resubmit
             
             if count_POSCAR > count_OUTCAR:
-            
+
                 print("            Resubmitting.")
 
                 if args["job_system"] == "slurm" or "TACC":
@@ -237,23 +253,23 @@ def check_convergence(my_ALC, *argv, **kwargs):
     # Generate a list of all VASP jobs with n-SC >= NELM
     ################################
 
+    print("Checking convergence ofVASP jobs")
+
     for i in range(len(args_targets)): # 20 all
 
         if not os.path.isdir("VASP-" + args_targets[i]):
     
-            print("Skipping VASP-" + args_targets[i])
+            print("    Skipping VASP-" + args_targets[i]+"\n")
         
             continue
 
         
-        print("Working on:","VASP-" + args_targets[i])
+        print("    Working on:","VASP-" + args_targets[i]+"\n")
     
         os.chdir("VASP-" + args_targets[i])
         
         # Clear out the "tries" file so we try to achieve convergence one more time
 
-        helpers.run_bash_cmnd("rm -f *.tries")
-        
         # Build the list of failed jobs for the current VASP job type (i.e. "all" or "20")
     
         base_list = []
@@ -268,6 +284,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
                     # Get max NELM
                 
                     NELM = None
+                    sick = False
                 
                     with open(tmp_list[k]) as ifstream:
                     
@@ -276,18 +293,37 @@ def check_convergence(my_ALC, *argv, **kwargs):
                             if "   NELM   =    " in line:
                             
                                 NELM = int(line.split()[2].strip(';'))
+                                
+                            if "I REFUSE TO CONTINUE WITH THIS SICK JOB" in line:
+                                sick = True
                                 break
+
+                    if sick:
+                        print("        WARNING: Received \"Error EDDDAV: Call to ZHEGV\".")
+                        print("        Declaring the problem impossible and ignoring: ",tmp_list[k],"\n")
+                        helpers.run_bash_cmnd("mv " + tmp_list[k] + " " + tmp_list[k] + ".ignored")  
+                        poscar = '.'.join(tmp_list[k].split('.')[:-1]) + ".POSCAR"
+                        helpers.run_bash_cmnd("mv " + poscar + " " + poscar + ".ignored")
+                        continue
+
                                 
                     # Determine if job failed because NELM reached
                 
                     oszicar = '.'.join(tmp_list[k].split('.')[:-1]) + ".OSZICAR"
-                    last_rmm = int(helpers.tail(oszicar,2)[0].split()[1])
-                
-                    #print last_rmm, NELM
-                    
-                    if last_rmm >= NELM:
-                        base_list.append('.'.join(tmp_list[k].split('.')[:-1])) # Won't include the final extension (e.g. POSCAR, OSZICAR, OUTCAR, etc)
-                        base_case.append(int(tmp_list[k].split('.')[0].split('_')[-1]))
+
+                    try:
+                        h = helpers.tail(oszicar,2)
+                        #print('****** tail', h)
+                        if len(h) > 1:
+                            last_rmm = int(helpers.tail(oszicar,2)[0].split()[1])
+                        
+                            #print last_rmm, NELM
+                            
+                            if last_rmm >= NELM:
+                                base_list.append('.'.join(tmp_list[k].split('.')[:-1])) # Won't include the final extension (e.g. POSCAR, OSZICAR, OUTCAR, etc)
+                                base_case.append(int(tmp_list[k].split('.')[0].split('_')[-1]))
+                    except Exception as e:
+                        print('*** index error, skipping ', str(e))
                     
         
         print("Found",len(base_list),"incomplete jobs")
@@ -297,20 +333,16 @@ def check_convergence(my_ALC, *argv, **kwargs):
             continue
         
         total_failed += len(base_list)
-        
-        # Delete corresponding .OUTCAR files
-        
-        for j in range(len(base_list)):
-            helpers.run_bash_cmnd("rm -f " + base_list[j] + ".OUTCAR")
-            
-        # Update the *.INCAR files for the cases
-        
-        #print helpers.run_bash_cmnd("pwd")
-        
+
         incars = []
+        kpoints = []
+
 
         for j in base_case: # Only update INCARs for failed cases
             incars += glob.glob("CASE-" + repr(j) + "/*.INCAR")
+            kpoints += glob.glob("CASE-" + repr(j) + "/*.KPOINTS")
+
+        #assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match"
     
         for j in range(len(incars)):
         
@@ -323,37 +355,53 @@ def check_convergence(my_ALC, *argv, **kwargs):
         
             contents = helpers.readlines(incars[j])
             
-            # Get index of line containing "IALGO"
+            # Get index of line containing "IALGO" or "ALGO"
             
-            targ = next(i for i, w in enumerate(contents) if "ALGO" in w)
-            line = contents[targ].split()
+            targ = None
+            for i, w in enumerate(contents):
+                try:
+                    val = w.split('=')[0].strip()
+                except:
+                    continue                    
+                if (val == "ALGO") or (val == "IALGO"):
+                    targ = i
+
+            line = contents[targ].split('=')
             
             # Make sure it contains the expected value, then replace with 38/Normal
             
             if "IALGO" in line[0]:
 
-                if int(line[2]) != 48:
-                    print("ERROR: Expected IALGO = 48, got",line[2])
-                    print("Would have replaced with 38")                
-                    exit()        
-                line[2] = "38"                        
+                if int(line[1]) != 48:
+                    print("        WARNING: Expected IALGO = 48, got",line[1])
+                    print("        Would have replaced with 38") 
+                    print("        Declaring the problem impossible and ignoring: ",base_list[j] +".OUTCAR","\n")
+                    helpers.run_bash_cmnd("mv " + base_list[j] + ".OUTCAR " + base_list[j] + "OUTCAR.ignored")
+                    helpers.run_bash_cmnd("mv " + base_list[j] + ".POSCAR " + base_list[j] + "POSCAR.ignored")               
+                else:        
+                    line[1] = "38"
+                    helpers.run_bash_cmnd("rm -f " + base_list[j] + ".OUTCAR")
+                    helpers.run_bash_cmnd("rm -f " + base_list[j] + ".tries")
+                            
             
             elif "ALGO" in line[0]:
             
-                if "Fast" not in line[2]:
-                    print("ERROR: Expected ALGO = Fast or ALGO = VeryFast, got",line[2])
-                    print("Would have replaced with Normal")
-                    exit()    
-                line[2] = "Normal"                                
-            
+                if "Fast" not in line[1]:
+                    print("        WARNING: Expected ALGO = Fast or ALGO = VeryFast, got",line[1])
+                    print("        Would have replaced with Normal")
+                    print("        Declaring the problem impossible and ignoring",base_list[j] +".OUTCAR","\n")   
+                    helpers.run_bash_cmnd("mv " + base_list[j] + ".OUTCAR " + base_list[j] + "OUTCAR.ignored")
+                    helpers.run_bash_cmnd("mv " + base_list[j] + ".POSCAR " + base_list[j] + "POSCAR.ignored")
+                else:
+                    line[1] = "Normal"                                
+                    helpers.run_bash_cmnd("rm -f " + base_list[j] + ".OUTCAR")
+                    helpers.run_bash_cmnd("rm -f " + base_list[j] + ".tries")
+          
             contents[targ] = ' '.join(line)+'\n'
     
             helpers.writelines(incars[j],contents)
-            
-            #print "\tFile",incars[j],"updated"
 
         os.chdir("..")
-    #os.chdir("..")
     
     return  total_failed
 
@@ -527,12 +575,14 @@ def post_process(*argv, **kwargs):
             # Determine if job failed because NELM reached
             
             oszicar = '.'.join(outcar_list[j].split('.')[:-1]) + ".OSZICAR"
-            last_rmm = int(helpers.tail(oszicar,2)[0].split()[1])
-            
-            if last_rmm >= NELM:
+            l = helpers.tail(oszicar,2)
+            if len(l) > 0:
+                last_rmm = int(helpers.tail(oszicar,2)[0].split()[1])
                 
-                print("Warning: VASP job never converged within requested NELM", outcar_list[j], ":", NELM)
-                continue            
+                if last_rmm >= NELM:
+                    
+                    print("Warning: VASP job never converged within requested NELM", outcar_list[j], ":", NELM)
+                    continue            
             
 
             print(helpers.run_bash_cmnd(args["vasp_postproc"] + " " + outcar_list[j] + " 1 " + args_properties + " | grep ERROR "))
@@ -554,13 +604,18 @@ def post_process(*argv, **kwargs):
             tmpstream.close()        
             
             # Make sure the configuration energy is less than or equal to zero
-            
+            # Allow for cases where .xyzf file didn't get written
+
             if "ENERGY" in args_properties:
                 
-                tmp_ener = helpers.head(outcar_list[j] + ".xyzf",2)
-                tmp_ener = float(tmp_ener[1].split()[-1])
-                
-                if tmp_ener >= 0.0:
+                tmp_ener = None 
+                try:
+                    tmp_ener = helpers.head(outcar_list[j] + ".xyzf",2)
+                    tmp_ener = float(tmp_ener[1].split()[-1])
+                except:
+                    tmp_ener = -1.0
+
+                if tmp_ener > 0.0:
                     
                     print("Warning: VASP energy is positive energy for job name", outcar_list[j], ":", tmp_ener, "...skipping.")
                     continue
@@ -792,6 +847,9 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         # Delete any not for this case (temperature)
 
         incars = sorted(glob.glob("*.INCAR"))
+        kpoints = sorted(glob.glob("*.KPOINTS"))
+
+        #assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match in setup_vasp 1"
         
         tag = glob.glob("*#*POSCAR")
         tag = len(str(len(tag)))
@@ -800,8 +858,15 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         temp   = helpers.head(glob.glob("*" + tag + "*POSCAR")[0],1)[0].split()[-2]
 
         incars.remove(temp +".INCAR")
+
+        if len(kpoints) > 0:
+            kpoints.remove(temp +".KPOINTS")
+
+        #assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match in setup_vasp 2"
+
         helpers.run_bash_cmnd("rm -f " + ' '.join(incars))
-    
+        helpers.run_bash_cmnd("rm -f " + ' '.join(kpoints))
+
         # Create the task string
                 
         job_task = []
@@ -829,7 +894,13 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         job_task.append("    fi                                 ")        
         job_task.append("    echo \"Attempt\" >> ${TAG}.tries")
         job_task.append("    TEMP=`awk '{print $(NF-1); exit}' POSCAR`")
-        job_task.append("    cp ${TEMP}.INCAR INCAR    ")    
+        job_task.append("    cp ${TEMP}.INCAR INCAR    ")
+
+        job_task.append("   if [ -e ${TEMP}.KPOINTS ] ; then         ")
+        job_task.append("       cp ${TEMP}.KPOINTS KPOINTS    ")
+        job_task.append("   fi                                ")
+
+
         job_task.append("    rm -f POTCAR        ")
         job_task.append("    for k in ${ATOMS[@]}    ")
         job_task.append("    do            ")
@@ -837,14 +908,15 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         job_task.append("        if [ $NA -gt 0 ] ; then ")
         job_task.append("            cat ${k}.POTCAR >> POTCAR ")
         job_task.append("        fi ")    
-        job_task.append("    done    ") 
+        job_task.append("    done    ")    
+        job_task.append("    rm -f OUTCAR CHG DOSCAR XDATCAR CHGCAR EIGENVAL PCDAT XDATCAR CONTCAR IBZKPT OSZICAR WAVECAR  ")    
+
         if args["job_system"] == "TACC":
             job_task.append("    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
         else:   
             job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
         job_task.append("    cp OUTCAR  ${TAG}.OUTCAR    ")
         job_task.append("    cp OSZICAR ${TAG}.OSZICAR    ")
-        job_task.append("    rm -f OUTCAR CHG DOSCAR XDATCAR POSCAR CHGCAR EIGENVAL PCDAT XDATCAR CONTCAR IBZKPT OSZICAR WAVECAR  ")    
         job_task.append("done    ")
         
         this_jobid = helpers.create_and_launch_job(job_task,

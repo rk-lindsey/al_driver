@@ -24,7 +24,17 @@ def findinfile(search_str,search_file):
     
     return matches
     
-    
+def getlineno(search_str,search_file):
+    matches = []
+    index   = 0
+    with open(search_file) as ifstream:
+        for line in ifstream:
+            if search_str in line:
+                matches.append(index)
+            index += 1
+                                                                    
+    return matches  
+
 
 def readlines(infile,start_line=0, nlines=-1):
 

@@ -4,25 +4,27 @@
 ##### General options
 ################################
 
-EMAIL_ADD     = "lindsey11@llnl.gov" 
+#EMAIL_ADD     = "lindsey11@llnl.gov" 
 
 ATOM_TYPES = ['C', 'N']
 NO_CASES = 1
 
-DRIVER_DIR     = "/usr/WS2/rlindsey/test_cp2k/al_driver/"
-WORKING_DIR    = "/usr/WS2/rlindsey/test_cp2k/al_driver/examples/hierarch_fit/"
-CHIMES_SRCDIR  = "/usr/WS2/rlindsey/test_cp2k/chimes_lsq/src/"
+DRIVER_DIR     = "/work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/"
+WORKING_DIR    = "/work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/examples/hierarch_fit/"
+CHIMES_SRCDIR  = "/work2/09982/aoladipupo/stampede3/codes/chimes_lsq-LLfork/src/"
 
 ################################
 ##### General HPC options
 ################################
 
-HPC_PPN = 36
-HPC_ACCOUNT   = "pbronze"
-HPC_SYSTEM    = "slurm"
-HPC_PYTHON    = "python3"
+HPC_ACCOUNT = "TG-CHM240010"
+HPC_PYTHON  = "/scratch/projects/compilers/intel24.0/oneapi/intelpython/python3.9/bin/python"
+HPC_SYSTEM  = "TACC"
+HPC_PPN     = 48 #for spr it has 112, for skx its 48
+
 HPC_EMAIL     = False 
 
+N_HYPER_SET = 1
 ################################
 ##### ChIMES LSQ
 ################################
@@ -50,11 +52,11 @@ REGRESS_NRM = True
 STRS_STYLE    = "ALL" # Options: "DIAG" or "ALL"
 
 CHIMES_BUILD_NODES = 1
-CHIMES_BUILD_QUEUE = "pdebug"
+CHIMES_BUILD_QUEUE = "skx"
 CHIMES_BUILD_TIME  = "01:00:00"
 
 CHIMES_SOLVE_NODES = 4
-CHIMES_SOLVE_QUEUE = "pdebug" 
+CHIMES_SOLVE_QUEUE = "skx" 
 CHIMES_SOLVE_TIME  = "01:00:00"
 
 ################################
@@ -69,7 +71,7 @@ MOLANAL  = CHIMES_SRCDIR + "../contrib/molanal/src/"
 MOLANAL_SPECIES = ["C1","N"]
 
 MD_NODES = [1] * NO_CASES
-MD_QUEUE = ['pdebug'] * NO_CASES
+MD_QUEUE = ['skx'] * NO_CASES
 MD_TIME  = ['1:00:00'] * NO_CASES
 
 ################################
@@ -86,10 +88,10 @@ HIERARCH_EXE = CHIMES_MD_SER
 
 QM_FILES = WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
 
-VASP_NODES   = 1
-VASP_PPN     = 36
+VASP_EXE = "/work2/09982/aoladipupo/stampede3/software/stampede_installation_scripts/vasp/vasp.5.4.4.pl2/build/gam/vasp"
 VASP_TIME    = "01:00:00"
-VASP_QUEUE   = "pdebug"
-VASP_EXE     = "/usr/gapps/emc-vasp/vasp.5.4.1/build/gam/vasp"
-VASP_MODULES = "mkl intel/18.0.1 impi/2018.0" 
+VASP_NODES = 1
+VASP_PPN = 48
+VASP_QUEUE = "skx"
+VASP_MODULES = "mkl intel/24.0  impi/21.11" 
 
