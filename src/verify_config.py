@@ -10,6 +10,9 @@ def print_help():
     Prints a list of expected config options and thier purpose"
     
     """
+    PARAM=[]
+    VARTYP=[]
+    DETAILS=[]
 
     PARAM.append("EMAIL_ADD");                      VARTYP.append("str");           DETAILS.append("E-mail address for driver to sent status updates to")
     PARAM.append("SEED");                           VARTYP.append("int");           DETAILS.append("Seed for random number generator (used for MC cluster selection)")
@@ -84,7 +87,7 @@ def print_help():
     PARAM.append("IGAS_QM_METHOD");                 VARTYP.append("str");           DETAILS.append("Specifies which nominal QM code to use for gas configurations; options are \"VASP\", \"DFTB+\", and \"Gaussian\"")
     PARAM.append("QM_FILES");                       VARTYP.append("str");           DETAILS.append("Absolute path to QM input files")
     PARAM.append("VASP_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to vasp2yzf.py ")
-    PARAM.append("VASP_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for VASP jobs")
+    PARAM.append("VASP_NODES");                     VARTYP.append("int list");      DETAILS.append("Number of nodes to use for VASP jobs")
     PARAM.append("VASP_PPN");                       VARTYP.append("int");           DETAILS.append("Number of processors to use per node for VASP jobs")
     PARAM.append("VASP_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for VASP calculations, e.g. \"04:00:00\"")
     PARAM.append("VASP_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit VASP jobs to")
@@ -143,9 +146,9 @@ def check_VASP(user_config):
             print("WARNING: Option config.VASP_POSTPRC was not set")
             print("         Will use config.DRIVER_DIR + \"/src/vasp2xyzf.py\"")
 
-        user_config.VASP_POSTPRC = user_config.DRIVER_DIR + "/src/vasp2xyzf.py"            
-        
-    if not hasattr(user_config,'VASP_NODES'):
+        user_config.VASP_POSTPRC = user_config.DRIVER_DIR + "/src/vasp2xyzf.py"
+
+    if not hasattr(user_config, 'VASP_NODES'):
 
         # Number of nodes to use for a VASP calculation
 
@@ -154,6 +157,9 @@ def check_VASP(user_config):
             print("         Will use a value of 6")
 
         user_config.VASP_NODES = 6
+
+        if isinstance(user_config.VASP_NODES, int):
+            user_config.VASP_NODES = [user_config.VASP_NODES] * user_config.NO_CASES
         
     if not hasattr(user_config,'VASP_PPN'):
 
@@ -594,9 +600,9 @@ def verify(user_config):
 
         print("WARNING: Option config.MOLANAL_SPECIES was not set")
         print("         Will use:")
-        print("\t",MOLANAL_SPECIES)
+        print("\t",user_config.MOLANAL_SPECIES)
         
-        user_config.MOLANAL_SPECIES = MOLANAL_SPECIES
+        user_config.MOLANAL_SPECIES = user_config.MOLANAL_SPECIES
 
     if not hasattr(user_config,'USE_AL_STRS'):
 
