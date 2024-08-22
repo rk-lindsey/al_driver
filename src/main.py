@@ -2,6 +2,7 @@
 
 import os
 import sys
+import glob
 
 # Local modules
 
@@ -34,11 +35,13 @@ def main(args):
 
     Notes: 
 
+           - If "unbuffer" command is unavailable on your system, try replacing "unuffer python" with "python -u"
+
            - Run location is specified in the config file (WORKING_DIR), NOT the directory 
              it was launched from
     
-           - This tool works most effectively when run with screen during remote runs
-             (screen allows the session to be detached/reattached)    
+           - This tool works most effectively when run with something like screen, tmux, or nohup 
+             during remote runs (these utils allow the session to be detached/reattached)    
     
            - Build documentation with: ./build_docs.sh 
              ...This will create .html files in the doc directory that can be opened
@@ -84,6 +87,14 @@ def main(args):
            - Add ability to use AL-driver for DFTB model fitting (DFTB+)
            
            - Add ability to subtract off contributions from an external simulation (LAMMPS)
+           
+           - Add support for LAMMPS as a MD method
+           
+           - Refactor supported delta-learning methods; give appropriate name
+           
+           - Refactor supported hierarchical transfer learning; give appropriate name
+           
+           - Add support for multi-resolution/scale model development (Frankenstein A-matrices/dual parameter files)
         
     """           
         
@@ -142,7 +153,10 @@ def main(args):
     if ((config.BULK_QM_METHOD == "DFTB+") or (config.IGAS_QM_METHOD == "DFTB+")):
         config.DFTB_POSTPRC   = config.HPC_PYTHON + " " + config.DFTB_POSTPRC
     if ((config.BULK_QM_METHOD == "CP2K") or (config.IGAS_QM_METHOD == "CP2K")):
-        config.CP2K_POSTPRC   = config.HPC_PYTHON + " " + config.CP2K_POSTPRC        
+        config.CP2K_POSTPRC   = config.HPC_PYTHON + " " + config.CP2K_POSTPRC     
+    if ((config.BULK_QM_METHOD == "LMP") or (config.IGAS_QM_METHOD == "LMP")):
+        config.LMP_POSTPRC   = config.HPC_PYTHON + " " + config.LMP_POSTPRC        
+
     
     if config.EMAIL_ADD:
         EMAIL_ADD = config.EMAIL_ADD    
@@ -153,6 +167,18 @@ def main(args):
         print("Will use a smearing temperature of",SMEARING,"K")
     else:
         print("Will read smearing temperatures from traj_list.dat file")    
+        
+
+    # Needed for backward compatibility
+    
+    if hasattr(config, "CHIMES_MD_MPI") and not hasattr(config,"MD_MPI"):
+        config.MD_MPI = config.CHIMES_MD_MPI
+    
+    if hasattr(config, "CHIMES_MD_SER") and not hasattr(config,"MD_SER"):
+        config.MD_SER = config.CHIMES_MD_SER 
+        
+    if hasattr(config, "CHIMES_MD_MODULES") and not hasattr(config,"MD_MODULES"):
+        config.MD_MODULES = config.CHIMES_MD_MODULES         
 
     ################################
     ################################
@@ -237,7 +263,7 @@ def main(args):
                 active_job = gen_ff.build_amat(THIS_ALC,
                         do_hierarch        = config.DO_HIERARCH,
                         hierarch_files     = config.HIERARCH_PARAM_FILES,    
-                        hierarch_exe       = config.CHIMES_MD_SER,
+                        hierarch_exe       = config.MD_SER,
                         do_correction      = config.FIT_CORRECTION,
                         correction_method  = config.CORRECTED_TYPE,
                         correction_files   = config.CORRECTED_TYPE_FILES,
@@ -427,7 +453,7 @@ def main(args):
                         job_cent_walltime = str(config.CALC_REPO_ENER_CENT_TIME), 
                         job_account    = config.HPC_ACCOUNT, 
                         job_system     = config.HPC_SYSTEM,
-                        job_executable = config.CHIMES_MD_SER)    
+                        job_executable = config.MD_SER)    
                         
                 helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
             
@@ -521,10 +547,18 @@ def main(args):
                         Gaussian_exe   = config.GAUS_EXE,
                         Gaussian_scr   = config.GAUS_SCR,
                         Gaussian_nodes = config.GAUS_NODES,
-                        Gaussian_mem       = config.GAUS_MEM,
+                        Gaussian_mem   = config.GAUS_MEM,
                         Gaussian_ppn   = config.GAUS_PPN,
                         Gaussian_time  = config.GAUS_TIME,
-                        Gaussian_queue = config.GAUS_QUEUE,
+                        Gaussian_queue = config.GAUS_QUEUE,       
+                        LMP_exe        = config.LMP_EXE,
+                        LMP_units      = config.LMP_UNITS,
+                        LMP_nodes      = config.LMP_NODES,
+                        LMP_ppn        = config.LMP_PPN,
+                        LMP_mem        = config.LMP_MEM,
+                        LMP_time       = config.LMP_TIME,
+                        LMP_queue      = config.LMP_QUEUE,
+                        LMP_modules    = config.LMP_MODULES,                      
                         job_ppn        = config.HPC_PPN,
                         job_account    = config.HPC_ACCOUNT,
                         job_system     = config.HPC_SYSTEM,
@@ -618,6 +652,7 @@ def main(args):
                     vasp_postproc = config.VASP_POSTPRC,
                     dftb_postproc = config.DFTB_POSTPRC, 
                     cp2k_postproc = config.CP2K_POSTPRC,
+                    lmp_postproc  = config.LMP_POSTPRC,
                     gaus_reffile  = config.GAUS_REF)
                     # gaus_postproc = config.GAUS_POSTPRC) -- this is unused
 
@@ -651,6 +686,8 @@ def main(args):
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/CP2K-all/"
             elif config.IGAS_QM_METHOD == "Gaussian":
                 qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/GAUS-all/"
+            elif config.IGAS_QM_METHOD == "LMP":
+                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/LMP-all/"                
             else:
                 print("Error in main driver while building Amat: unkown IGAS QM method:", config.IGAS_QM_METHOD)
                 exit()
@@ -662,7 +699,9 @@ def main(args):
                 elif config.BULK_QM_METHOD == "DFTB+":
                     qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-20/"  
                 elif config.BULK_QM_METHOD == "CP2K":
-                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/CP2K-20/"          
+                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/CP2K-20/"   
+                elif config.BULK_QM_METHOD == "LMP":
+                    qm_20F_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/LMP-20/"          
                 else:
                     print("Error in main driver while building Amat: unkown BULK QM method:", config.BULK_QM_METHOD)
                     exit()
@@ -676,15 +715,16 @@ def main(args):
                 
                 if (not config.DO_CLUSTER) and (THIS_ALC == 1):    
                 
-                    active_job = gen_ff.build_amat(THIS_ALC,
+                    active_jobs = gen_ff.build_amat(THIS_ALC,
                             do_hierarch        = config.DO_HIERARCH,
                             hierarch_files     = config.HIERARCH_PARAM_FILES,
-                            hierarch_exe       = config.CHIMES_MD_SER,
+                            hierarch_exe       = config.MD_SER,
                             do_correction      = config.FIT_CORRECTION,
                             correction_method  = config.CORRECTED_TYPE,
                             correction_files   = config.CORRECTED_TYPE_FILES,
                             correction_exe     = config.CORRECTED_TYPE_EXE,                            
                             correction_temps   = config.CORRECTED_TEMPS_BY_FILE,                            
+                            n_hyper_sets       = config.N_HYPER_SETS,
                             do_cluster         = config.DO_CLUSTER,
                             prev_gen_path      = config.ALC0_FILES,
                             job_email          = config.HPC_EMAIL,
@@ -698,17 +738,18 @@ def main(args):
                             job_modules        = config.CHIMES_LSQ_MODULES)    
                 else:
             
-                    active_job = gen_ff.build_amat(THIS_ALC, 
+                    active_jobs = gen_ff.build_amat(THIS_ALC, 
                         prev_qm_all_path = qm_all_path,
                         prev_qm_20_path  = qm_20F_path,
                         do_hierarch      = config.DO_HIERARCH,
                         hierarch_files   = config.HIERARCH_PARAM_FILES,    
-                        hierarch_exe     = config.CHIMES_MD_SER,
-                        do_correction      = config.FIT_CORRECTION,
-                        correction_method  = config.CORRECTED_TYPE,
-                        correction_files   = config.CORRECTED_TYPE_FILES,
-                        correction_exe     = config.CORRECTED_TYPE_EXE,                            
-                        correction_temps   = config.CORRECTED_TEMPS_BY_FILE,                        
+                        hierarch_exe     = config.MD_SER,
+                        do_correction    = config.FIT_CORRECTION,
+                        correction_method= config.CORRECTED_TYPE,
+                        correction_files = config.CORRECTED_TYPE_FILES,
+                        correction_exe   = config.CORRECTED_TYPE_EXE,                            
+                        correction_temps = config.CORRECTED_TEMPS_BY_FILE,  
+                        n_hyper_sets     = config.N_HYPER_SETS,                      
                         do_cluster       = config.DO_CLUSTER,
                         include_stress   = do_stress,    
                         stress_style     = config.STRS_STYLE,
@@ -723,7 +764,10 @@ def main(args):
                         job_modules      = config.CHIMES_LSQ_MODULES
                         )
             
-                helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")
+                if len(active_jobs) == 1:
+                    helpers.wait_for_job(active_jobs[0], job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")
+                else:
+                    helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")                    
             
                 restart_controller.update_file("BUILD_AMAT: COMPLETE" + '\n')
                 
@@ -737,12 +781,11 @@ def main(args):
                 # Check whether we have previously started 
                 # only works for dlasso/dlars... for all other algorithms, assumes false
             
-                if not gen_ff.solve_amat_started(): 
-                
+                if not gen_ff.solve_amat_started(config.N_HYPER_SETS): 
                     print("Starting solve_amat from scratch")
             
                     active_job = gen_ff.solve_amat(THIS_ALC, 
-                        do_cluster       = config.DO_CLUSTER,
+                        do_cluster         = config.DO_CLUSTER,
                         weights_set_alc_0  = config.WEIGHTS_SET_ALC_0,
                         weights_alc_0      = config.WEIGHTS_ALC_0,                        
                         weights_force      = config.WEIGHTS_FORCE,
@@ -752,7 +795,8 @@ def main(args):
                         weights_stress     = config.WEIGHTS_STRES,
                         regression_alg     = config.REGRESS_ALG,
                         regression_nrm     = config.REGRESS_NRM,
-                        regression_var     = config.REGRESS_VAR,    
+                        regression_var     = config.REGRESS_VAR,  
+			            n_hyper_sets       = config.N_HYPER_SETS,  
                         job_email          = config.HPC_EMAIL,                    
                         job_ppn            = config.CHIMES_SOLVE_PPN,
                         node_ppn           = config.HPC_PPN,
@@ -770,7 +814,7 @@ def main(args):
                 # Check whether the amat_solve job has completed and keep track of how many times it has run
 
                 n_restarts = 0
-                
+                print("Prior to solve_amat_completed")
                 while not gen_ff.solve_amat_completed():
                 
                     n_restarts += 1
@@ -790,24 +834,48 @@ def main(args):
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
                         job_executable     = config.CHIMES_SOLVER,
-                        job_modules        = config.CHIMES_LSQ_MODULES
+                        job_modules        = config.CHIMES_MODULES
                         )    
                     
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "restart_solve_amat")
+                
+                if config.N_HYPER_SETS > 1:
+                
+                    gen_ff.parse_hyper_params(
+                        n_hyper_sets     = config.N_HYPER_SETS, 
+                        job_executable   = config.CHIMES_SOLVER
+                        )
                     
                 
                 #if n_restarts > 0: # Then we need to manually build the parameter file
                 
-                if not os.path.isfile("GEN_FF/params.txt"):
+                if (not os.path.isfile("GEN_FF/params.txt")) and (config.N_HYPER_SETS == 1):
                     print("ERROR: No file ALC-" + repr(THIS_ALC) + "/GEN_FF/params.txt exists:")
                     print("Cannot post-process. Exiting.")
                     
                     exit()
+                elif config.N_HYPER_SETS > 1:
+                
+                    param_files =  glob.glob("GEN_FF-*/params.txt")
                     
-                if config.DO_HIERARCH:
+                    if len(param_files) < config.N_HYPER_SETS:
+                    
+                        print("ERROR: Didn't find expected number of parameter files (",config.N_HYPER_SETS, "):")
+                        print(param_files)
+                        print("Cannot post-process. Exiting.")
+                        
+                        exit()
+  
+                    
+                if config.DO_HIERARCH and config.N_HYPER_SET == 1:
                     gen_ff.combine("GEN_FF/params.txt", config.HIERARCH_PARAM_FILES)    
                     helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " hierarch.params.txt")                    
                     helpers.run_bash_cmnd("mv  hierarch.params.txt.reduced GEN_FF/params.txt.reduced")                
+
+                elif config.N_HYPER_SETS > 1:
+                
+                    for i in range(config.N_HYPER_SETS):
+                        helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF-" + str(i) + "/params.txt")
                 else:
                     
                     helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " GEN_FF/params.txt")
@@ -845,7 +913,8 @@ def main(args):
                         driver_dir     = config.DRIVER_DIR,
                         penalty_pref   = 1.0E6,        
                         penalty_dist   = 0.02,         
-                        chimes_exe     = config.CHIMES_MD_SER,
+                        n_hyper_sets   = config.N_HYPER_SETS,     
+                        chimes_exe     = config.MD_SER,
                         job_name       = "ALC-"+ str(THIS_ALC) +"-md-c" + str(THIS_CASE) +"-i" + str(THIS_INDEP),
                         job_email      = config.HPC_EMAIL,            
                         job_ppn        = config.HPC_PPN,            
@@ -853,10 +922,10 @@ def main(args):
                         job_walltime   = config.MD_TIME [THIS_CASE],      
                         job_queue      = config.MD_QUEUE[THIS_CASE],      
                         job_account    = config.HPC_ACCOUNT, 
-                        job_executable = config.CHIMES_MD_MPI,     
-                        job_system     = "slurm",       
+                        job_executable = config.MD_MPI,     
+                        job_system     = config.HPC_SYSTEM,       
                         job_file       = "run.cmd",
-                        job_modules    = config.CHIMES_MD_MODULES
+                        job_modules    = config.MD_MODULES
                         )
                         
         
@@ -953,7 +1022,7 @@ def main(args):
                             job_cent_walltime = str(config.CALC_REPO_ENER_CENT_TIME), 
                             job_account    = config.HPC_ACCOUNT, 
                             job_system     = config.HPC_SYSTEM,
-                            job_executable = config.CHIMES_MD_SER)    
+                            job_executable = config.MD_SER)    
                             
                     helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
                 
@@ -1002,7 +1071,7 @@ def main(args):
                 restart_controller.update_file("CLEANSETUP_QM: COMPLETE" + '\n')    
             else:
                 restart_controller.update_file("CLEANSETUP_QM: COMPLETE" + '\n')
-                            
+                           
             if not restart_controller.INIT_QMJOB:    
             
                 active_jobs = []
@@ -1045,7 +1114,15 @@ def main(args):
                         CP2K_time      = config.CP2K_TIME,
                         CP2K_queue     = config.CP2K_QUEUE,
                         CP2K_modules   = config.CP2K_MODULES,
-                        CP2K_data_dir  = config.CP2K_DATADIR,                                                
+                        CP2K_data_dir  = config.CP2K_DATADIR,  
+                        LMP_exe     = config.LMP_EXE,
+                        LMP_units   = config.LMP_UNITS,
+                        LMP_nodes   = config.LMP_NODES,
+                        LMP_ppn     = config.LMP_PPN,
+                        LMP_mem     = config.LMP_MEM,
+                        LMP_time    = config.LMP_TIME,
+                        LMP_queue   = config.LMP_QUEUE,
+                        LMP_modules = config.LMP_MODULES,                                                                       
                         Gaussian_exe   = config.GAUS_EXE,
                         Gaussian_scr   = config.GAUS_SCR,
                         Gaussian_nodes = config.GAUS_NODES,
@@ -1154,6 +1231,7 @@ def main(args):
                         vasp_postproc = config.VASP_POSTPRC,
                         dftb_postproc = config.DFTB_POSTPRC,
                         cp2k_postproc = config.CP2K_POSTPRC,
+                        lmp_postproc  = config.LMP_POSTPRC,
                         gaus_reffile  = config.GAUS_REF)
                         #gaus_postproc = config.GAUS_POSTPRC) -- this is unused
                         
@@ -1172,6 +1250,7 @@ def main(args):
                     vasp_postproc = config.VASP_POSTPRC,
                     dftb_postproc = config.DFTB_POSTPRC,
                     cp2k_postproc = config.CP2K_POSTPRC,
+                    lmp_postproc  = config.LMP_POSTPRC,
                     gaus_reffile  = config.GAUS_REF)
                     #gaus_postproc = config.GAUS_POSTPRC) -- this is unused
                         

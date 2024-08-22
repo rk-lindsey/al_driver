@@ -1,0 +1,47 @@
+units           real        
+newton          on     
+atom_style      molecular # No charges as in full      
+atom_modify     sort 0 0.0 
+
+
+#### Neighbor list setup ####
+
+neighbor        1.0 bin
+neigh_modify    delay 0 every 1 check yes
+
+#### Specify NB model/parameters and read in data file
+
+pair_style   lj/smooth 5.0 7.0 # Parameters are dist to start smoothing and outer cutoff
+read_data    data.in
+pair_coeff   1 1 0.2 3.75
+
+#### Specify bonded model/parameters
+
+bond_style      harmonic          # morse
+bond_coeff      1 2000.0 1.54
+
+angle_style     class2
+angle_coeff     1 112.0 1000.0 0.0 0.0 
+angle_coeff     1 bb 100.0 1.54 1.54
+angle_coeff     1 ba 1000.0 1000.0 1.54 1.54
+
+dihedral_style  none
+improper_style  none
+
+#### Initiate dynamics and set i/o
+
+timestep        0.05
+
+compute         ke_tensor all temp
+
+
+dump            1 all custom 1 traj.lammpstrj element xu yu zu fx fy fz
+dump_modify     1 element C
+
+
+thermo_style    custom step time ke pe etotal temp press pxx pyy pzz pxy pxz pyz vol c_ke_tensor[1] c_ke_tensor[2] c_ke_tensor[3] c_ke_tensor[4] c_ke_tensor[5] c_ke_tensor[6]
+thermo_modify   line one format float %20.5f flush yes
+thermo          1
+run             0
+
+
