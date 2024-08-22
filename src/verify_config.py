@@ -156,11 +156,25 @@ def check_VASP(user_config):
             print("WARNING: Option config.VASP_NODES was not set")
             print("         Will use a value of 6")
 
-        user_config.VASP_NODES = 6
-
+        user_config.VASP_NODES = [6] * user_config.NO_CASES
+    else:
         if isinstance(user_config.VASP_NODES, int):
             user_config.VASP_NODES = [user_config.VASP_NODES] * user_config.NO_CASES
-        
+        elif isinstance(user_config.VASP_NODES, list):
+            if len(user_config.VASP_NODES) > user_config.NO_CASES:
+                print("WARNING: Option config.VASP_NODES was set to a list longer than the number of cases")
+                print("         Will use the first " + str(user_config.NO_CASES) + " values")
+                user_config.VASP_NODES = user_config.VASP_NODES[:user_config.NO_CASES]
+            elif len(user_config.VASP_NODES) < user_config.NO_CASES:
+                print("WARNING: Option config.VASP_NODES was set to a list shorter than the number of cases")
+                print("         Will repeat the last value to fill the list")
+                user_config.VASP_NODES = user_config.VASP_NODES + [user_config.VASP_NODES[-1]] * (user_config.NO_CASES - len(user_config.VASP_NODES))
+        else:
+            print("ERROR: Option config.VASP_NODES was set to an invalid type")
+            print("         Acceptable settings are of the form: [int] or int")
+            exit()
+
+
     if not hasattr(user_config,'VASP_PPN'):
 
         # Number of nodes to use for a VASP calculation

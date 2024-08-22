@@ -342,7 +342,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
             incars += glob.glob("CASE-" + repr(j) + "/*.INCAR")
             kpoints += glob.glob("CASE-" + repr(j) + "/*.KPOINTS")
 
-        assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match"
+        #assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match"
     
         for j in range(len(incars)):
         
@@ -849,7 +849,7 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         incars = sorted(glob.glob("*.INCAR"))
         kpoints = sorted(glob.glob("*.KPOINTS"))
 
-        assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match in setup_vasp 1"
+        #assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match in setup_vasp 1"
         
         tag = glob.glob("*#*POSCAR")
         tag = len(str(len(tag)))
@@ -858,9 +858,11 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         temp   = helpers.head(glob.glob("*" + tag + "*POSCAR")[0],1)[0].split()[-2]
 
         incars.remove(temp +".INCAR")
-        kpoints.remove(temp +".KPOINTS")
 
-        assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match in setup_vasp 2"
+        if len(kpoints) > 0:
+            kpoints.remove(temp +".KPOINTS")
+
+        #assert len(incars) == len(kpoints), "Number of INCARs and KPOINTS files don't match in setup_vasp 2"
 
         helpers.run_bash_cmnd("rm -f " + ' '.join(incars))
         helpers.run_bash_cmnd("rm -f " + ' '.join(kpoints))
@@ -894,7 +896,7 @@ def setup_vasp(my_ALC, *argv, **kwargs):
         job_task.append("    TEMP=`awk '{print $(NF-1); exit}' POSCAR`")
         job_task.append("    cp ${TEMP}.INCAR INCAR    ")
 
-        job_task.append("   if [ -n ${TEMP}.KPOINTS ] ; then         ")
+        job_task.append("   if [ -e ${TEMP}.KPOINTS ] ; then         ")
         job_task.append("       cp ${TEMP}.KPOINTS KPOINTS    ")
         job_task.append("   fi                                ")
 
