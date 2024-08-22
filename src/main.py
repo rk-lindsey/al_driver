@@ -19,14 +19,8 @@ import pretty_stuff
 
 local_path = os.path.normpath(helpers.run_bash_cmnd("pwd").rstrip())
 sys.path.append(local_path)
-#print('***************', local_path)
+
 import config  # User-specified "global" vars
-#print(dir(config))
-#print(config.MDFILES)
-#print(config.MD_QUEUE)
-#sys.exit(1)
-
-
 
 def main(args):
 
