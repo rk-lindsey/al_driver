@@ -24,7 +24,17 @@ def findinfile(search_str,search_file):
     
     return matches
     
-    
+def getlineno(search_str,search_file):
+    matches = []
+    index   = 0
+    with open(search_file) as ifstream:
+        for line in ifstream:
+            if search_str in line:
+                matches.append(index)
+            index += 1
+                                                                    
+    return matches  
+
 
 def readlines(infile,start_line=0, nlines=-1):
 
@@ -186,37 +196,74 @@ def cat_to_var(*argv):
         
     return contents  
     
-def cat_specific(outfilename, *argv):
+# def cat_specific(outfilename, *argv):
 
-    """ 
+#     """ 
     
-    Concatenates a list of files and returns result. 
+#     Concatenates a list of files and returns result. 
     
-    Usage: cat_specific("my_outfile.dat", "file1.dat", "file2.dat", "file3.dat")    
+#     Usage: cat_specific("my_outfile.dat", "file1.dat", "file2.dat", "file3.dat")    
     
-    Notes: Linux wildcards will not work as expected. Use the glob if needed.
+#     Notes: Linux wildcards will not work as expected. Use the glob if needed.
     
+#     """
+    
+#     # Assumes first file is large, so avoids reading contents
+
+#     files_to_cat = argv[0][0]
+
+#     run_bash_cmnd("cp " + files_to_cat + " " + outfilename)
+    
+#     files_to_cat = argv[0][1:]
+
+#     with open(outfilename, "a") as ofstream:
+#         for f in files_to_cat:
+        
+#             with open(f, "r") as ifstream:
+        
+#                 if os.path.getsize(f)/1E9 > 15:
+
+#                     for line in ifstream:
+#                         ofstream.write(line)
+#                 else:
+#                     ofstream.write(ifstream.read()) # Memory issues with large files
+
+def cat_specific(outfilename, *argv):
+    """
+    Concatenates a list of files using chunked reading and writing with 1GB chunks,
+    interpreted as 1 billion bytes (10^9 bytes).
+    This method is designed to prevent MemoryError while efficiently handling large files.
+    
+    Usage: 
+        cat_specific("my_outfile.dat", ["file1.dat", "file2.dat", "file3.dat"])
+    
+    Notes:
+        - The function operates in binary mode ('b'), ensuring that no data is lost or altered during the process.
+        - It assumes that up to 1GB of memory in decimal notation (10^9 bytes) is acceptable per chunk.
     """
     
-    # Assumes first file is large, so avoids reading contents
+    # Set the chunk_size to 1GB, interpreted as 1 billion bytes (10^9).
+    chunk_size = 10**9  # 1GB in bytes using decimal notation
 
-    files_to_cat = argv[0][0]
-
-    run_bash_cmnd("cp " + files_to_cat + " " + outfilename)
-    
-    files_to_cat = argv[0][1:]
-
-    with open(outfilename, "a") as ofstream:
-        for f in files_to_cat:
-        
-            with open(f, "r") as ifstream:
-        
-                if os.path.getsize(f)/1E9 > 50:
-
-                    for line in ifstream:
-                        ofstream.write(line)
-                else:
-                    ofstream.write(ifstream.read()) # Memory issues with large files
+    # Open the output file in binary write mode.
+    with open(outfilename, "wb") as ofstream:
+        # Iterate over each input filename provided in the argument list.
+        for f in argv[0]:
+            # Open each input file in binary read mode.
+            with open(f, "rb") as ifstream:
+                # Read the file in chunks until the end of file is reached.
+                while True:
+                    # Read a segment of the file into memory.
+                    # The read operation is based on the number of bytes, and we're
+                    # reading 1 billion bytes (or 1GB in decimal notation) at a time.
+                    chunk = ifstream.read(chunk_size)
+                    if not chunk:
+                        # If the chunk is empty, we've reached the end of this file.
+                        # Break out of the while loop and proceed to the next file.
+                        break
+                    # Write the chunk of data to the output file.
+                    # The data is written as-is with no transformations or processing.
+                    ofstream.write(chunk)
 
 def cat_pattern(outfilename, pattern):
 
@@ -239,6 +286,8 @@ def cat_pattern(outfilename, pattern):
             with open(f, "rb") as ifstream:
                 ofstream.write(ifstream.read())
                 
+
+
 def head(*argv):
     
     """ 
@@ -483,7 +532,7 @@ def create_and_launch_job(*argv, **kwargs):
     default_keys[8 ] = "job_file"          ; default_values[8 ] =     "run.cmd"      # Name of the resulting submit script    
     default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Should emails be sent?
     default_keys[10] = "job_modules"       ; default_values[10] =     ""             # Name of the resulting submit script    
-    default_keys[11] = "job_mem"           ; default_values[11] =     ""             # GB
+    default_keys[11] = "job_mem"           ; default_values[11] =     "128"             # GB
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -500,7 +549,7 @@ def create_and_launch_job(*argv, **kwargs):
     JOB.append(" -J " + args["job_name"])
     JOB.append(" -N " + args["job_nodes"])
     JOB.append(" --ntasks-per-node " + args["job_ppn"])
-    if args["job_mem"]:
+    if args["job_mem"] and args["job_system"] == "UM-ARC":
         JOB.append("--mem-per-cpu="+str(int(int(args["job_mem"])/int(args["job_ppn"])))+"G")
     JOB.append(" -t " + args["job_walltime"])             
     JOB.append(" -p " + args["job_queue"])
@@ -515,7 +564,7 @@ def create_and_launch_job(*argv, **kwargs):
     
     for i in range(len(JOB)):
     
-        if args["job_system"] == "slurm":
+        if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
             JOB[i] = "#SBATCH" + JOB[i]
         elif args["job_system"] == "torque":
             JOB[i] = "#PBS"  + JOB[i]
@@ -546,7 +595,7 @@ def create_and_launch_job(*argv, **kwargs):
 
     jobid = None
     
-    if args["job_system"] == "slurm":
+    if args["job_system"] == "slurm" or "TACC":
         jobid = run_bash_cmnd("sbatch " + args["job_file"]).split()[-1]
     else:    
         jobid = run_bash_cmnd("qsub " + args["job_file"])
@@ -592,7 +641,7 @@ def wait_for_job(active_job, **kwargs):
         
         check_job = ""
         
-        if args["job_system"] == "slurm":
+        if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
             check_job = "squeue -j " + active_job
             
         elif args["job_system"] == "torque":
@@ -660,7 +709,7 @@ def wait_for_jobs(*argv, **kwargs):
             if type(active_jobs[i]) == type(1):
                 active_jobs[i] = str(active_jobs[i])
         
-            if args["job_system"] == "slurm":
+            if args["job_system"] == "slurm" or "TACC":
 
                 check_job = "squeue -j " + active_jobs[i]
             

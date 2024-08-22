@@ -12,7 +12,7 @@ def cleanup_and_setup(*argv, **kwargs):
     
     """ 
     
-    Removes CP2K-X folders, if they exist in the build_dir.
+    Removes CP2K-X folders, if they exist in the build_dir.ss
     
     Usage: cleanup_and_setup(<arguments>)
     
@@ -148,7 +148,8 @@ def continue_job(*argv, **kwargs):
             
             # Check for convergence issues
             
-            check_convergence(-1, args_case,args_targets, True) # First arg isn't used
+            ###This has been commented out but should be checked at some point to know why it was here when main also calls it?
+            # check_convergence(-1, args_case,args_targets, True) # First arg isn't used
          
             # Count the number of completed jobs
             
@@ -165,7 +166,7 @@ def continue_job(*argv, **kwargs):
             
                 print("            Resubmitting.")
 
-                if args["job_system"] == "slurm":
+                if args["job_system"] == "slurm" or "TACC":
                     job_list.append(helpers.run_bash_cmnd("sbatch run_cp2k.cmd").split()[-1])
                 else:    
                     job_list.append(helpers.run_bash_cmnd("qsub run_cp2k.cmd").replace('\n', ''))
@@ -227,7 +228,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
     
     
     ######
-    # Generate a list of all DFTB+ jobs that crashed
+    # Generate a list of all CP2K jobs that crashed
 
     loc = helpers.run_bash_cmnd("pwd").strip()
     
@@ -253,8 +254,10 @@ def check_convergence(my_ALC, *argv, **kwargs):
         
         # Clear out the "tries" file so we try to achieve convergence one more time
 
-        helpers.run_bash_cmnd("rm -f *.tries")
-        
+        # THIS LINE IS COMMENTED OUT AND NEEDS TO BE INVESTIGATED!!!!!
+        #####
+        # helpers.run_bash_cmnd("rm -f *.tries")
+        #####
         # Build the list of failed jobs for the current CP2K job type (i.e. "all" or "20")
     
         base_list = []    
@@ -283,11 +286,13 @@ def check_convergence(my_ALC, *argv, **kwargs):
         
         total_failed += len(base_list)
         
-        # Renaiming corresponding .out and .tag files
+        # Renaiming corresponding .out and .xyz files
         
         for j in range(len(base_list)):
-            helpers.run_bash_cmnd("mv " + base_list[j] + ".cp2k.out "    + base_list[j] + ".ignored")
-            helpers.run_bash_cmnd("mv " + base_list[j] + ".xyz  "        + base_list[j] + ".ignored")            
+            helpers.run_bash_cmnd("mv " + base_list[j] + ".cp2k.out "                 + base_list[j] + ".cp2k.out"           + ".ignored")   
+            helpers.run_bash_cmnd("mv " + base_list[j] + ".xyz "                      + base_list[j] + ".xyz"                + ".ignored")   
+            helpers.run_bash_cmnd("mv " + base_list[j] + ".cp2k_traj.forces "         + base_list[j] + ".cp2k_traj.forces"   + ".ignored")   
+
 
 
     total_failed = 0
@@ -393,7 +398,7 @@ def post_process(*argv, **kwargs):
 
     """ 
     
-    Converts a converts a CP2K output files to .xyzf
+    Converts a CP2K output files to .xyzf
     Expects stress and energy to be printed to stdout (cp2k.out)
     Expects forces to be printed to  cp2k_traj.forces
     
@@ -473,14 +478,14 @@ def post_process(*argv, **kwargs):
             cp2k_to_xyz.cp2k_to_xyzf(crd_list[j], out_list[j], frc_list[j], args_properties)
             
             outfile = crd_list[j].split(".xyz")
-            outfile = ''.join(outfile) + ".xyz.xyzf"
+            outfile = ''.join(outfile) + ".xyzf"
 
             # Figure out the temperature
             
             tmp_temp = helpers.findinfile("MD_PAR| Temperature [K]",out_list[j])[0].split()[-1]
 
             tmpfile = crd_list[j].split(".xyz")
-            tmpfile = ''.join(outfile) + ".xyz.temps"
+            tmpfile = ''.join(outfile) + ".temps"
             tmpstream = open(tmpfile,'w')
             tmpstream.write(tmp_temp + '\n')
             tmpstream.close()
@@ -814,7 +819,7 @@ def setup_cp2k(my_ALC, *argv, **kwargs):
         job_task.append("    TAG=${j%*.xyz}             ")      
         job_task.append("    cp ${TAG}.xyz incfg.xyz    ")
         job_task.append("    cp ${TAG}.cell incfg.cell  ")
-        job_task.append("    CHECK=${TAG}.cp2k.out      ")
+        job_task.append("    CHECK=${TAG}.cp2k_traj.forces      ")
         job_task.append("    if [ -e ${CHECK} ] ; then  ")  
         job_task.append("        continue               ")
         job_task.append("    fi                         ")
@@ -823,7 +828,7 @@ def setup_cp2k(my_ALC, *argv, **kwargs):
         job_task.append("       prev_tries=`wc -l ${TAG}.tries | awk '{print $1}'`")
         job_task.append("       if [ $prev_tries -ge 2 ]; then ")
         job_task.append("            continue                   ")
-        job_task.append("        fi                             ")
+        job_task.append("       fi                              ")
         job_task.append("    fi                                 ")
         job_task.append("    echo \"Attempt\" >> ${TAG}.tries")
         job_task.append("    TEMP=`awk '{if(NR==2){print $(NF-1);exit}}' incfg.xyz`")
@@ -837,7 +842,11 @@ def setup_cp2k(my_ALC, *argv, **kwargs):
         job_task.append("            cat ${k}.cp2k.qm_basis-block.inp >> cp2k.qm_basis-block.inp ")
         job_task.append("        fi                             ")
         job_task.append("    done                               ")
-        job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
+        if args["job_system"] == "TACC":
+            job_task.append("    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
+        else:
+            job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
+        
         job_task.append("    mv cp2k_traj.forces  ${TAG}.cp2k_traj.forces ")   
         job_task.append("done")
         
@@ -850,8 +859,8 @@ def setup_cp2k(my_ALC, *argv, **kwargs):
             job_queue      =     args["job_queue"   ] ,
             job_account    =     args["job_account" ] ,
             job_system     =     args["job_system"  ] ,
-            job_mem        =     args["job_mem"     ] ,
-            job_file       =     "run_cp2k.cmd")
+            job_file       =     "run_cp2k.cmd",
+            job_mem=args["job_mem"] if args["job_system"] == "UM-ARC" else None)
             
         run_cp2k_jobid.append(this_jobid.split()[0])    
     
