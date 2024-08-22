@@ -20,7 +20,7 @@ TurboChIMES framework is designed to account for both short and long-range inter
 -------
 
 ============================
-Example Fit: Solid C/N
+Example Fit: Propane system
 ============================
 
 
@@ -31,7 +31,7 @@ Example Fit: Solid C/N
 In this section, an example 3-iteration fit for propane. The example allows us to look at the short-range effect within a propane molecule and the long-range Van der Waal effect between different propane molecules within the simulation box.
 
 
-The neccesary input files and directory tree structure are provided in the example folder, i.e.:
+The necessary input files and directory tree structure are provided in the example folder, i.e.:
 
 .. code-block :: 
     :emphasize-lines: 4,14-16
@@ -58,7 +58,7 @@ The neccesary input files and directory tree structure are provided in the examp
     └── KPOINTS
 
     
-Comparing with the ``ALC-0_BASEFILES`` folder provided in the :ref:`page-basic`, the primary difference is the ``LMPMD_BASEFILES`` and ``LMP_BASEFILES`` directory, i.e., which contains the files required to run the LAMMPs simulation and QM respectively. Other differences includes the 0.fm_setup.in includes the hyperparameters and cut_offs  for the short-range interaction while the 1.fm_setup.in includes that for the long range.
+Compared with the ``ALC-0_BASEFILES`` folder provided in the:ref:`page-basic`, the primary difference is the ``LMPMD_BASEFILES`` and ``LMP_BASEFILES`` directory, i.e., which contains the files required to run the LAMMPs simulation and QM respectively. Other differences include the 0.fm_setup.in includes the hyperparameters and cut_offs  for the short-range interaction while the 1.fm_setup.in includes that for the long range.
 
 
 -------
@@ -71,7 +71,7 @@ Input Files
 The ALC-0_BASEFILES Files 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. Warning ::
+.. Warning::
 
     The ``ALC-0_BASEFILES/fm_setup.in`` requires a few special edits for hierarchical learning mode:
 
