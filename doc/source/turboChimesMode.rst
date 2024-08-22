@@ -5,7 +5,7 @@ TurboChIMES Fitting Mode
 ***************************************
 
 
-.. figure:: hierarchy.pdf
+.. figure:: turbo_ChIMES.png
   :width: 500
   :align: center
   
