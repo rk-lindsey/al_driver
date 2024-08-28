@@ -8,7 +8,7 @@
    
    #KPAR   = 4
    #NCORE  = 36
-   NPAR = 15 # sqrt of TOTAL cores, i.e. 8N*36PPN = 288 cores; sqrt(288) = 18 
+   NPAR = 8 # sqrt of TOTAL cores, i.e. 8N*36PPN = 288 cores; sqrt(288) = 18 
 
 #   LSCALAPACK = .FALSE.
 

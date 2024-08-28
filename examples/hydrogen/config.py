@@ -12,7 +12,7 @@
 ##### General variables
 ################################
 
-EMAIL_ADD     = "salzaim@umich.edu" # driver will send updates on the status of the current run ... If blank (""), no emails are sent
+#  EMAIL_ADD     = "salzaim@umich.edu" # driver will send updates on the status of the current run ... If blank (""), no emails are sent
 
 SEED          = 1
 ATOM_TYPES    = ["H"]
@@ -28,13 +28,15 @@ MOLANAL_SPECIES = ["H"]
 USE_AL_STRS   = 0     # A cycle number. 
 STRS_STYLE    = "ALL" # Options: "DIAG" or "ALL"
 
-DRIVER_DIR    = "/p/lustre1/fmatchDB/for_Safa/al_driver-LLfork-main-2_editedKpts/"
-WORKING_DIR   = "/p/lustre2/alzaim1/ALD_tester/"
-CHIMES_SRCDIR = "/p/lustre1/alzaim1/chimes_lsq-LLfork/"
+DRIVER_DIR    = "/work2/09981/btsund/stampede3/codes/ALD/"
+WORKING_DIR   = "/work2/09981/btsund/stampede3/codes/938_Fix/examples/hydrogen/"
+CHIMES_SRCDIR = "/work2/09981/btsund/stampede3/codes/lsq/"
 
 
-HPC_PYTHON="/usr/tce/bin/python3"
-HPC_ACCOUNT = "iap"
+HPC_PYTHON="/scratch/projects/compilers/intel24.0/oneapi/intelpython/python3.9/bin/python"
+HPC_ACCOUNT = "TG-CHM240010"
+HPC_SYSTEM  = "TACC"
+
 
 
 
@@ -58,15 +60,14 @@ REGRESS_VAR   = "1.0E-8" # For 2-body, can't get below ~1.0E-7
 REGRESS_NRM   = True
 
 CHIMES_BUILD_NODES = 1
-CHIMES_BUILD_QUEUE = "pdebug"
+CHIMES_BUILD_QUEUE = "skx-dev"
 CHIMES_BUILD_TIME  = "1:00:00"
 
 CHIMES_SOLVE_NODES = 1
-CHIMES_SOLVE_QUEUE = "pdebug"
+CHIMES_SOLVE_QUEUE = "skx"
 CHIMES_SOLVE_TIME  = "1:00:00"
 
-CHIMES_LSQ_MODULES = "cmake/3.21.1 intel/18.0.1 impi/2018.0 mkl"
-
+CHIMES_LSQ_MODULES = "cmake/3.28.1 intel/24.0 impi/21.11"
 ################################
 ##### Molecular Dynamics
 ################################
@@ -74,14 +75,14 @@ CHIMES_LSQ_MODULES = "cmake/3.21.1 intel/18.0.1 impi/2018.0 mkl"
 MD_STYLE     = "CHIMES"
 CHIMES_MD_MPI = CHIMES_SRCDIR + "build/chimes_md-mpi"
 CHIMES_MD_SER = CHIMES_SRCDIR + "build/chimes_md-serial"
-CHIMES_MOLANAL= "/g/g17/rlindsey/CURR_TRACKED-GEN/contrib/molanlal/"
+# CHIMES_MOLANAL= "/g/g17/rlindsey/CURR_TRACKED-GEN/contrib/molanlal/"
 MDFILES= WORKING_DIR + "ALL_BASE_FILES/CHIMESMD_BASEFILES/"
 
 CHIMES_PEN_PREFAC = 1.0E6
 CHIMES_PEN_DIST   = 0.02
 
 MD_NODES = [1, 2] # [4] *NO_CASES # 4 nodes for all jobs
-MD_QUEUE = ["pdebug",  "pdebug"] # ["pbatch"]*NO_CASES # pbatch queue for all
+MD_QUEUE = ["skx",  "skx"] # ["pbatch"]*NO_CASES # pbatch queue for all
 MD_TIME  = ["1:00:00", "1:00:00"] # ["4:00:00"]*NO_CASES # 4 hour walltime for all
 
 MOLANAL         = CHIMES_SRCDIR + "contrib/molanal/src/"
@@ -92,10 +93,10 @@ MOLANAL_SPECIES = ["H1"]
 ################################
 
 QM_FILES = WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
-VASP_EXE = "/p/lustre1/fmatchDB/for_Safa/vaspnew/vasp.5.4.4.pl2/bin/vasp_gam"
-VASP_QUEUE = "pdebug"
+VASP_EXE = "/work2/09981/btsund/stampede3/software/bin/vasp_std"
+VASP_QUEUE = "skx"
 VASP_TIME    = "01:00:00"
-VASP_NODES   = [10, 15]
-VASP_PPN     = 50
-VASP_MODULES = "intel-classic/2021.6.0-magic mkl-interfaces/2022.1.0 mkl/2022.1.0 mvapich2/2.3.7"
+VASP_NODES   = [1, 2]
+VASP_PPN     = 48   # if this is changed 
+VASP_MODULES = "intel/24.0 impi/21.11"
 
