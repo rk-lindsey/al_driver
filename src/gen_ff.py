@@ -935,12 +935,6 @@ def build_amat(my_ALC, **kwargs):
     
         os.chdir(GEN_FF)                    
     
-    if args["job_system"]  == "slurm":
-        job_task = "srun "   + job_task
-    elif args["job_system"] == "TACC":
-        job_task = "ibrun "  + job_task
-    else:
-        job_task = "mpirun " + job_task    
 
     # Launch the job
     
