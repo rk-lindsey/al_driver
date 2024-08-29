@@ -1,0 +1,5 @@
+For each case there is an INCAR files which determines the input to VASP, in general the current INCARS should work but NPAR may need to be changed.
+The INCARS are located in /examples/hydrogen/ALL_BASE_FILES/QM_BASEFILES
+The number of processors being ran on needs to be divisable by NPAR (if you have 16 processors, NPAR could be 1,2,4,8,16)
+The best value to set it to is the sqrt of n (4 for above example) 
+NPAR needs to be set for each CASE, 2 for this hydrogen example
