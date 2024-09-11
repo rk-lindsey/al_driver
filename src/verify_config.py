@@ -1050,7 +1050,8 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_POSTPRC was not set")
         print("         Will use config.CHIMES_SRCDIR + \"/../build/post_proc_chimes_lsq.py\"")
         
-        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "/../build/post_proc_chimes_lsq.py"
+        user_config.CHIMES_POSTPRC = user_config.CHIMES_SRCDIR + "/../build/post_proc_chimes_lsq.py"
+
 
     if not hasattr(user_config,'N_HYPER_SETS'):
 
@@ -1615,7 +1616,7 @@ def verify(user_config):
         user_config.GAUS_SCR     = None
         user_config.GAUS_REF     = None
 
-    if (user_config.IGAS_QM_METHOD == "VASP") or (user_config.BULK_QM_METHOD == "LMP"):
+    if (user_config.IGAS_QM_METHOD == "LMP") or (user_config.BULK_QM_METHOD == "LMP"):
         check_LMP(user_config)
     else:
         user_config.LMP_POSTPRC = None
@@ -1626,10 +1627,4 @@ def verify(user_config):
         user_config.LMP_QUEUE   = None
         user_config.LMP_MODULES = None
         user_config.LMP_EXE     = None
-
-
-
-
-
-
-
+        user_config.LMP_UNITS   = None
