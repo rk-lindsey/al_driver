@@ -1,4 +1,4 @@
-# Global (python) modules
+143526# Global (python) modules
 
 import os.path
 import os
@@ -612,6 +612,7 @@ def parse_hyper_params(**kwargs):
     
     # Save the result_matrix to a file
         np.savetxt("GEN_FF-" + str(i) + "/force.txt", result_matrix)
+        np.savetxt("GEN_FF-" + str(i) + "/Ax.txt", result_matrix)
         np.savetxt("GEN_FF-" + str(i) + "/x.txt", x_matrix)
     
         npar += dim[i]
@@ -619,7 +620,7 @@ def parse_hyper_params(**kwargs):
     # Convert x.txt to a real params.txt file
         os.chdir("GEN_FF-" + str(i))
         print("...Generating param.txt file for GEN_FF-" + str(i))
-        job_task = args["job_executable"] + " > params.txt "
+        job_task = args["job_executable"] + "  --algorithm=dlasso --read_output True  " + " > params.txt "
         exit_code = os.system(job_task)
 	# Check the exit code to see if the command ran successfully
         if exit_code == 0:
@@ -935,8 +936,6 @@ def build_amat(my_ALC, **kwargs):
     
         os.chdir(GEN_FF)                    
     
-
-    # Launch the job
     
         # Create the task string
         print("Starting job: " + GEN_FF) # Added by BL
@@ -1056,16 +1055,12 @@ def solve_amat(my_ALC, **kwargs):
         os.mkdir("GEN_FF")  # Create the GEN_FF directory
 
     # Copy common files from GEN_FF-0 and GEN_FF-1 to GEN_FF
-    #Need to test for systems for more than 2 fm_setup.in
         shutil.copy("GEN_FF-0/A.txt", "GEN_FF")
         shutil.copy("GEN_FF-0/b.txt", "GEN_FF")
         shutil.copy("GEN_FF-0/b-labeled.txt", "GEN_FF")
         shutil.copy("GEN_FF-0/natoms.txt", "GEN_FF")
         shutil.copy("GEN_FF-0/traj_list.dat", "GEN_FF")
         shutil.copy("GEN_FF-0/fm_setup.in", "GEN_FF")
-        # shutil.move("GEN_FF/fm_setup.in", "GEN_FF/0.fm_setup.in")
-        # shutil.copy("GEN_FF-1/fm_setup.in", "GEN_FF")
-        # shutil.move("GEN_FF/fm_setup.in", "GEN_FF/1.fm_setup.in")
 
 
 
@@ -1227,8 +1222,6 @@ def solve_amat(my_ALC, **kwargs):
         
     job_task += " --b b_comb.txt --weights weights_comb.dat --algorithm " + args["regression_alg"]  + " "
     
-    if int(args["n_hyper_sets"]) > 1:
-       job_task += "--hyper_sets True " 
           
     if "dlasso" in args["regression_alg"]:
         job_task += "--active True " 
