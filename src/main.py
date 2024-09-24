@@ -836,7 +836,7 @@ def main(args):
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
                         job_executable     = config.CHIMES_SOLVER,
-                        job_modules        = config.CHIMES_MODULES
+                        job_modules        = config.CHIMES_LSQ_MODULES
                         )    
                     
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "restart_solve_amat")
@@ -869,7 +869,7 @@ def main(args):
                         exit()
   
                     
-                if config.DO_HIERARCH and config.N_HYPER_SET == 1:
+                if config.DO_HIERARCH and config.N_HYPER_SETS == 1:
                     gen_ff.combine("GEN_FF/params.txt", config.HIERARCH_PARAM_FILES)    
                     helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " hierarch.params.txt")                    
                     helpers.run_bash_cmnd("mv  hierarch.params.txt.reduced GEN_FF/params.txt.reduced")                
