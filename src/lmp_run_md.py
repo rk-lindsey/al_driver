@@ -117,22 +117,29 @@ def generate_trajbads():
 
         # Determine the frame badness
 
-        badness = raw_badness[bad_idx_start][1] # Get the first badness assigned to this frame
+        badness =  0 # Create a variable to store how bad the frame is. Intalize as zero
         
         #print("here:",int(badness), "note:",len(raw_badness))
         
         for j in range(bad_idx_start, len(raw_badness)):
         
             #print("trying i,j:",i,j,"; raw has frame:",raw_badness[j][0], "trj has frame:",frame)
+
+            # Check if the current frame stored in raw_badness[j][0] matches the frame we are operating on (i)
+
+            if int(raw_badness[j][0]) == int(frame):
+                if int(raw_badness[j][1]) >= int(badness):
+                    badness =  raw_badness[j][1]
+
+            # rawbadness is sorted by frame index, so If the current frame sstored in  raw_badness[j][1] 
+            # is greater than i, then nothing else interesting is in this file. Break so we can move on to the next frame i
+            # and update the bad_idx_start so we don't waste time iterating through raw_badness data for frames with index < i
         
-            if int(raw_badness[j][0]) != int(frame):
+            elif int(raw_badness[j][0]) > int(frame):
                 bad_idx_start = j
                 #print("\tBreaking - set start to:",bad_idx_start)
                 break
-            
-            elif int(raw_badness[j][1]) >= int(badness):
-                #print("\tUpdating badness to:",raw_badness[j][1])
-                badness = raw_badness[j][1]
+
             else:
                 print("\tSomething strange happened...")
                 
