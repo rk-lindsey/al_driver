@@ -945,7 +945,7 @@ def build_amat(my_ALC, **kwargs):
         job_task = args["job_executable"] + " fm_setup.in | tee fm_setup.log"
         if int(args["n_hyper_sets"]) == 1:
             job_task = "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + job_task
-        if args["job_system"] == "slurm" and int(args["n_hyper_sets"]) == 1:
+        if args["job_system"] == "slurm"  or "UM-ARC" and int(args["n_hyper_sets"]) == 1:
             job_task = "srun "   + job_task
         elif args["job_system"] == "TACC" and int(args["n_hyper_sets"]) == 1:
             job_task = "ibrun "   + job_task
