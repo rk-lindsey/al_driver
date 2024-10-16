@@ -253,7 +253,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
     # Generate a list of all VASP jobs with n-SC >= NELM
     ################################
 
-    print("Checking convergence ofVASP jobs")
+    print("Checking convergence of VASP jobs")
 
     for i in range(len(args_targets)): # 20 all
 
