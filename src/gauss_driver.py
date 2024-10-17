@@ -479,10 +479,10 @@ def post_process(*argv, **kwargs):
                     if os.path.isfile("OUTCAR.xyzf"):
             
                         helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf", xyzfname])
-                        helpers.appendlines("OUTCAR.temps" ["0.0"])
+                        helpers.appendlines("OUTCAR.temps", ["0.0"])
                     else:
                         helpers.cat_specific("tmp.dat", [xyzfname])
-                        helpers.writelines("OUTCAR.temps" ["0.0"])
+                        helpers.writelines("OUTCAR.temps", ["0.0"])
                         
                     helpers.run_bash_cmnd("mv tmp.dat OUTCAR.xyzf")    
 
