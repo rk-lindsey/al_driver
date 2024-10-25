@@ -420,7 +420,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     job_task = ""
     
 
-    if args["job_system"] == "slurm" or "UM-ARC":
+    if (args["job_system"] == "slurm" or args["job_system"] == "UM-ARC"):
         job_task += "srun -N "   + repr(int(args["job_nodes" ])) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
     elif args["job_system"] == "TACC":
         job_task == "    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
