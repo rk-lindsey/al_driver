@@ -900,7 +900,6 @@ def build_amat(my_ALC, **kwargs):
         for i in range(n_traj_files):
             if i < len(traj_files):
                 temper_file.append(  '.'.join(traj_files[i].split(".")[0:-1]) + ".temps")
-                print(temper_file)
             else:
                     print(f"Index {i} is out of range for traj_files")
             
@@ -934,8 +933,9 @@ def build_amat(my_ALC, **kwargs):
         # 3. Set up and submit the .cmd file for the job
         ################################
     
-        os.chdir(GEN_FF)                    
-    
+        os.chdir(GEN_FF)   
+
+      
     
         # Create the task string
         print("Starting job: " + GEN_FF) # Added by BL
