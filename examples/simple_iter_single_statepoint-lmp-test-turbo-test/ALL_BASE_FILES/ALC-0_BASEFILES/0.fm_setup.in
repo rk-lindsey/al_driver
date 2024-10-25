@@ -1,11 +1,11 @@
 ####### CONTROL VARIABLES #######
 
 # TRJFILE #
-        MULTI traj_list.dat
+        test_data.xyzf
 # WRAPTRJ # 
         true
 # NFRAMES # 
-        321
+        3001
 # NLAYERS #
         1
 # FITCOUL #
@@ -17,28 +17,37 @@
 # FITPOVR # 
         false
 # PAIRTYP #  
-        CHEBYSHEV 6 4 0
+        CHEBYSHEV 6 6 0
 # CHBTYPE #
         MORSE
 # USECHNS # 
-        false # true
+        false
 # SPLITFI #
         false                           ! Should the design matrix be split into multiple files?
 
 ####### TOPOLOGY VARIABLES #######
 
 # NATMTYP # 
-        1
+        2
 
 # TYPEIDX #     # ATM_TYP #     # ATMCHRG #     # ATMMASS # 
-1               C                0.0            14.5
+1               C1                0.0            14.5
+2               C2                0.0            14.5
 
 # PAIRIDX #     # ATM_TY1 #     # ATM_TY1 #     # S_MINIM #     # S_MAXIM #     # S_DELTA #     # MORSE_LAMBDA #        # USEOVRP #     # NIJBINS #     # NIKBINS #     # NJKBINS #
-1               C               C               1.46            3.75           0.01            1.54                    false           0               0               0
+1               C1               C1               2.05            2.75           0.01            1.54                    false           0               0               0
+2               C1               C2               1.09            2.75           0.01            1.54                    false           0               0               0
+3               C2               C2               2.18            2.75           0.01            1.54                    false           0               0               0
+
 
 
 # FCUTTYP #
         TERSOFF 0.75   
+
+EXCLUDE 3B INTERACTION: 3
+C1 C1 C1
+C2 C2 C2
+C1 C2 C2
 
 # ENDFILE #
 
