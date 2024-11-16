@@ -195,6 +195,8 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
     
     E. w = n_atoms^a0
     
+    F. w = a0*exp(a1[ X/n_atoms-a2]/a3)
+    
     Example wXX value: ["C",[a0,a1,a2]]
     
                
@@ -243,7 +245,7 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
             print(w_method)
             exit()
     
-        weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * (abs(float(b_labeled_i))-float(w_method[1][2])) / float(w_method[1][3]) )        
+        weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * (float(b_labeled_i)-float(w_method[1][2])) / float(w_method[1][3]) )        
         
     
     elif w_method[0] == "E":
@@ -252,9 +254,18 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
             print("ERROR: Found weight request with wrong number of parameters:")
             print(w_method)
             exit()
+
+        weight =  float(natoms_i)**float(w_method[1][0])
+	
+    elif w_method[0] == "F":
     
-        weight =  float(natoms_i)**float(w_method[1][1])
+        if len(w_method[1]) != 4:
+            print("ERROR: Found weight request with wrong number of parameters:")
+            print(w_method)
+            exit()
     
+        weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * (float(b_labeled_i)/float(natoms_i)-float(w_method[1][2])) / float(w_method[1][3]) )        
+
     else:
         print("ERROR: Unknown weight method!")
         exit()
@@ -282,6 +293,8 @@ def gen_weights(w_method, this_ALC, b_labeled_i, natoms_i):
     D. w = a0*exp(a1[X-a2]/a3)
     
     E. w = n_atoms^a0
+    
+    F. w = a0*exp(a1[ X/n_atoms-a2]/a3)
     
     Example wXX value: [ ["A","B","C"] , [[a0],[a0,a1],[a0,a1,a2]] ]
     

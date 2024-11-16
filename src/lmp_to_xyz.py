@@ -76,10 +76,14 @@ def lmp_to_xyzf(units, trjfile, logfile):  # , argv):
     # Check that the number of lines/frames match
 
     if frames != nstat_lines:
-        print("ERROR: Number of frames and number of stats lines in log.lammps do not match!")
+        print("Warning: Number of frames and number of stats lines in log.lammps do not match!")
         print("Frames:", frames)
         print("Stats: ", nstat_lines)
-        exit()
+        print("Taking smaller of the two.")
+        if frames < nstat_lines:
+            nstat_lines = frames
+        else:
+            frames = nstat_lines
     else:
         print("\tCounted frames:           " + str(frames))
         print("\tPrinting every nth frame: " + str(skip))

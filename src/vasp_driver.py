@@ -369,10 +369,12 @@ def check_convergence(my_ALC, *argv, **kwargs):
             line = contents[targ].split('=')
             
             # Make sure it contains the expected value, then replace with 38/Normal
+	    
+            line[1] = line[1].split()[0]
             
             if "IALGO" in line[0]:
 
-                if int(line[1]) != 48:
+                if int(line[1]) != "48":
                     print("        WARNING: Expected IALGO = 48, got",line[1])
                     print("        Would have replaced with 38") 
                     print("        Declaring the problem impossible and ignoring: ",base_list[j] +".OUTCAR","\n")
