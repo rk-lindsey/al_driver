@@ -539,7 +539,7 @@ def main(args):
                         DFTB_exe       = config.DFTB_EXE,    
                         DFTB_modules   = config.DFTB_MODULES,
                         CP2K_exe       = config.CP2K_EXE,
-                        CP2K_nodes     = config.CP2K_NODES,
+                        CP2K_nodes     = config.CP2K_NODES[THIS_CASE],
                         CP2K_ppn       = config.CP2K_PPN,
                         CP2K_mem       = config.CP2K_MEM,
                         CP2K_time      = config.CP2K_TIME,
@@ -836,7 +836,7 @@ def main(args):
                         job_account        = config.HPC_ACCOUNT, 
                         job_system         = config.HPC_SYSTEM,
                         job_executable     = config.CHIMES_SOLVER,
-                        job_modules        = config.CHIMES_MODULES
+                        job_modules        = config.CHIMES_LSQ_MODULES
                         )    
                     
                     helpers.wait_for_job(active_job, job_system = config.HPC_SYSTEM, verbose = True, job_name = "restart_solve_amat")
@@ -869,7 +869,7 @@ def main(args):
                         exit()
   
                     
-                if config.DO_HIERARCH and config.N_HYPER_SET == 1:
+                if config.DO_HIERARCH and config.N_HYPER_SETS == 1:
                     gen_ff.combine("GEN_FF/params.txt", config.HIERARCH_PARAM_FILES)    
                     helpers.run_bash_cmnd(config.CHIMES_POSTPRC + " hierarch.params.txt")                    
                     helpers.run_bash_cmnd("mv  hierarch.params.txt.reduced GEN_FF/params.txt.reduced")                
@@ -1110,7 +1110,7 @@ def main(args):
                         DFTB_modules   = config.DFTB_MODULES,
                         DFTB_queue     = config.DFTB_QUEUE,
                         CP2K_exe       = config.CP2K_EXE,
-                        CP2K_nodes     = config.CP2K_NODES,
+                        CP2K_nodes     = config.CP2K_NODES[THIS_CASE],
                         CP2K_ppn       = config.CP2K_PPN,
                         CP2K_mem       = config.CP2K_MEM,
                         CP2K_time      = config.CP2K_TIME,

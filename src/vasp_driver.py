@@ -180,7 +180,7 @@ def continue_job(*argv, **kwargs):
 
                 print("            Resubmitting.")
 
-                if args["job_system"] == "slurm" or "TACC":
+                if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
                     job_list.append(helpers.run_bash_cmnd("sbatch run_vasp.cmd").split()[-1])
                 else:    
                     job_list.append(helpers.run_bash_cmnd("qsub run_vasp.cmd").replace('\n', ''))
@@ -253,7 +253,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
     # Generate a list of all VASP jobs with n-SC >= NELM
     ################################
 
-    print("Checking convergence ofVASP jobs")
+    print("Checking convergence of VASP jobs")
 
     for i in range(len(args_targets)): # 20 all
 

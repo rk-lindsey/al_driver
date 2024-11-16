@@ -100,7 +100,7 @@ def print_help():
     PARAM.append("DFTB_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for DFTB+ calculations, e.g. \"04:00:00\"")
     PARAM.append("DFTB_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit DFTB+ jobs to")
     PARAM.append("DFTB_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ executable")
-    PARAM.append("CP2K_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for CP2K jobs")
+    PARAM.append("CP2K_NODES");                     VARTYP.append("int list");      DETAILS.append("Number of nodes to use for CP2K jobs")
     PARAM.append("CP2K_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for CP2K jobs")
     PARAM.append("CP2K_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for CP2K calculations, e.g. \"04:00:00\"")
     PARAM.append("CP2K_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit CP2K jobs to")
@@ -160,7 +160,7 @@ def check_VASP(user_config):
 
     if not hasattr(user_config, 'VASP_NODES'):
 
-        # Number of nodes to use for a VASP calculation
+        # Number of processors per node to use for a VASP calculation
 
         if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
             print("WARNING: Option config.VASP_NODES was not set")
@@ -363,7 +363,7 @@ def check_CP2K(user_config):
     
     if not hasattr(user_config,'CP2K_FILES'):
 
-        # Location of basic DFTB+ input files (dftb_in.hsd)
+        # Location of basic CP2K input files (inp and potentials)
 
         if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
             print("WARNING: Option config.CP2K_FILES was not set")
@@ -381,19 +381,32 @@ def check_CP2K(user_config):
 
         user_config.CP2K_POSTPRC = user_config.DRIVER_DIR + "/src/cp2k_to_xyz.py"            
     
-    if not hasattr(user_config,'CP2K_NODES'):
-
+    if not hasattr(user_config, 'CP2K_NODES'):
         # Number of nodes to use for a CP2K calculation
-
         if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
             print("WARNING: Option config.CP2K_NODES was not set")
-            print("         Will use a value of 1")
-
-        user_config.CP2K_NODES = 1
+            print("         Will use a value of 3")
+        user_config.CP2K_NODES = [3] * user_config.NO_CASES
+    else:
+        if isinstance(user_config.CP2K_NODES, int):
+            user_config.CP2K_NODES = [user_config.CP2K_NODES] * user_config.NO_CASES
+        elif isinstance(user_config.CP2K_NODES, list):
+            if len(user_config.CP2K_NODES) > user_config.NO_CASES:
+                print("WARNING: Option config.CP2K_NODES was set to a list longer than the number of cases")
+                print("         Will use the first " + str(user_config.NO_CASES) + " values")
+                user_config.CP2K_NODES = user_config.CP2K_NODES[:user_config.NO_CASES]
+            elif len(user_config.CP2K_NODES) < user_config.NO_CASES:
+                print("WARNING: Option config.CP2K_NODES was set to a list shorter than the number of cases")
+                print("         Will repeat the last value to fill the list")
+                user_config.CP2K_NODES = user_config.CP2K_NODES + [user_config.CP2K_NODES[-1]] * (user_config.NO_CASES - len(user_config.CP2K_NODES))
+        else:
+            print("ERROR: Option config.CP2K_NODES was set to an invalid type")
+            print("         Acceptable settings are of the form: [int] or int")
+            exit()
     
     if not hasattr(user_config,'CP2K_PPN'):
 
-        # Number of nodes to use for a CP2K calculation
+        # Number of processors per node to use for a CP2K calculation
         
         if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
             print("WARNING: Option config.CP2K_PPN was not set")
@@ -1050,7 +1063,8 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_POSTPRC was not set")
         print("         Will use config.CHIMES_SRCDIR + \"/../build/post_proc_chimes_lsq.py\"")
         
-        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "/../build/post_proc_chimes_lsq.py"
+        user_config.CHIMES_POSTPRC = user_config.CHIMES_SRCDIR + "/../build/post_proc_chimes_lsq.py"
+
 
     if not hasattr(user_config,'N_HYPER_SETS'):
 
@@ -1568,7 +1582,7 @@ def verify(user_config):
         check_VASP(user_config)
     else:
         user_config.VASP_POSTPRC = None
-        user_config.VASP_NODES   = None
+        user_config.VASP_NODES   = [None] * user_config.NO_CASES  #This needs to be a list since in main.py we enumarate it
         user_config.VASP_PPN     = None 
         user_config.VASP_MEM     = None 
         user_config.VASP_TIME    = None
@@ -1594,7 +1608,7 @@ def verify(user_config):
     else:
         user_config.CP2K_FILES   = None
         user_config.CP2K_POSTPRC = None
-        user_config.CP2K_NODES   = None 
+        user_config.CP2K_NODES   = [None] * user_config.NO_CASES #This needs to be a list since in main.py we enumarate it 
         user_config.CP2K_PPN     = None 
         user_config.CP2K_MEM     = None 
         user_config.CP2K_TIME    = None
@@ -1615,7 +1629,7 @@ def verify(user_config):
         user_config.GAUS_SCR     = None
         user_config.GAUS_REF     = None
 
-    if (user_config.IGAS_QM_METHOD == "VASP") or (user_config.BULK_QM_METHOD == "LMP"):
+    if (user_config.IGAS_QM_METHOD == "LMP") or (user_config.BULK_QM_METHOD == "LMP"):
         check_LMP(user_config)
     else:
         user_config.LMP_POSTPRC = None
@@ -1626,10 +1640,4 @@ def verify(user_config):
         user_config.LMP_QUEUE   = None
         user_config.LMP_MODULES = None
         user_config.LMP_EXE     = None
-
-
-
-
-
-
-
+        user_config.LMP_UNITS   = None
