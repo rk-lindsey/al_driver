@@ -369,6 +369,8 @@ def check_convergence(my_ALC, *argv, **kwargs):
             line = contents[targ].split('=')
             
             # Make sure it contains the expected value, then replace with 38/Normal
+	    
+            line[1] = line[1].split()[0]
             
             if "IALGO" in line[0]:
 
