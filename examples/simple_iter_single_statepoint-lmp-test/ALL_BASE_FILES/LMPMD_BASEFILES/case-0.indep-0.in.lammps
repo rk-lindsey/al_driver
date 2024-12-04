@@ -56,7 +56,7 @@ thermo_modify   line one format float %20.5f flush yes
 thermo          ${iofrq}
 
 dump            1 all custom ${iofrq} traj.lammpstrj element xu yu zu fx fy fz
-dump_modify     1 element C
+dump_modify     1 element C sort id
 
 
 run             30000
