@@ -4,7 +4,7 @@
 ##### General options
 ################################
 
-#EMAIL_ADD = "awwalola@umich.edu"
+
 
 ATOM_TYPES     = ["C"]
 NO_CASES       = 1
