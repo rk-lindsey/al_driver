@@ -63,7 +63,7 @@ MDFILES          = WORKING_DIR + "/ALL_BASE_FILES/LMPMD_BASEFILES/"
 MD_MPI            = "/work2/09982/aoladipupo/stampede3/codes/chimes_calculator-LLfork/etc/lmp/exe/lmp_mpi_chimes"
 MOLANAL         = CHIMES_SRCDIR + "../contrib/molanal/src/"
 MOLANAL_SPECIES = ["C1"]
-CHIMES_MODULES = "intel/24.0 impi/21.11 cmake/3.29.5"
+
 ################################
 ##### Single-Point QM
 ################################
