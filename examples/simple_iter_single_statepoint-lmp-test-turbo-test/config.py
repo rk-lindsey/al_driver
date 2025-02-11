@@ -49,6 +49,7 @@ CHIMES_BUILD_TIME  = "01:00:00"
 CHIMES_SOLVE_NODES = 1
 CHIMES_SOLVE_QUEUE = "skx"
 CHIMES_SOLVE_TIME  = "01:00:00"
+CHIMES_LSQ_MODULES = "intel/24.0 impi/21.11"
 
 ################################
 ##### Molecular Dynamics
@@ -57,13 +58,12 @@ CHIMES_SOLVE_TIME  = "01:00:00"
 MD_STYLE        = "LMP"
 MD_QUEUE          = ["skx"]*NO_CASES
 MD_TIME           = ["1:00:00"]*NO_CASES
-CHIMES_MD_MPI     = "/work2/09982/aoladipupo/stampede3/codes/chimes_calculator-LLfork/etc/lmp/exe/lmp_mpi_chimes"
 MD_NODES          = [1]*NO_CASES
 MDFILES          = WORKING_DIR + "/ALL_BASE_FILES/LMPMD_BASEFILES/"
 MD_MPI            = "/work2/09982/aoladipupo/stampede3/codes/chimes_calculator-LLfork/etc/lmp/exe/lmp_mpi_chimes"
 MOLANAL         = CHIMES_SRCDIR + "../contrib/molanal/src/"
 MOLANAL_SPECIES = ["C1"]
-CHIMES_MODULES = "intel/24.0 impi/21.11 cmake/3.29.5"
+
 ################################
 ##### Single-Point QM
 ################################
