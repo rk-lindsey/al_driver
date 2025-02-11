@@ -164,7 +164,7 @@ def continue_job(*argv, **kwargs):
             
                 print("            Resubmitting.")
 
-                if args["job_system"] == "slurm" or "TACC":
+                if args["job_system"] == "slurm" or args["job_system"] == "TACC" or args["job_system"] == "UM-ARC":
                     job_list.append(helpers.run_bash_cmnd("sbatch run_dftb.cmd").split()[-1])
                 else:    
                     job_list.append(helpers.run_bash_cmnd("qsub run_dftb.cmd").replace('\n', ''))
