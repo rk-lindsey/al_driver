@@ -254,7 +254,7 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
             exit()
 
         weight =  float(natoms_i)**float(w_method[1][0])
-	
+    
     elif w_method[0] == "F":
     
         if len(w_method[1]) != 4:
