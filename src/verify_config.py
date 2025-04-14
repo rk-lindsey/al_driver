@@ -120,7 +120,7 @@ def print_help():
     PARAM.append("LMP_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for LAMMPS calculations, e.g. \"04:00:00\"")
     PARAM.append("LMP_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit LAMMPS jobs to")
     PARAM.append("LMP_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to LAMMPS executable")
-    PARAM.append("LMP_MODULE");                    VARTYP.append("str");           DETAILS.append("System-specific modules needed to run LAMMPS")
+    PARAM.append("LMP_MODULES");                    VARTYP.append("str");           DETAILS.append("System-specific modules needed to run LAMMPS")
     PARAM.append("LMP_DATADIR");                   VARTYP.append("str");           DETAILS.append("Absolute path to CP2K scratch (\"data\") directory")
 
 

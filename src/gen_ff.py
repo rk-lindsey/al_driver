@@ -12,7 +12,6 @@ import helpers
 import hierarch
 import modify_FES
 
-import shutil
 
 def combine(to_file, from_files):
 
@@ -960,7 +959,7 @@ def build_amat(my_ALC, **kwargs):
         job_task = args["job_executable"] + " fm_setup.in | tee fm_setup.log"
         if int(args["n_hyper_sets"]) == 1:
             job_task = "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + job_task
-        if args["job_system"] == "slurm"  or "UM-ARC" and int(args["n_hyper_sets"]) == 1:
+        if (args["job_system"] == "slurm" or args["job_system"] == "UM-ARC") and int(args["n_hyper_sets"]) == 1:
             job_task = "srun "   + job_task
         elif args["job_system"] == "TACC" and int(args["n_hyper_sets"]) == 1:
             job_task = "ibrun "   + job_task
@@ -1066,24 +1065,24 @@ def solve_amat(my_ALC, **kwargs):
     
     if int(args["n_hyper_sets"]) > 1:
         if os.path.exists("GEN_FF"):
-            shutil.rmtree("GEN_FF")  # Remove the existing GEN_FF directory
+            helpers.run_bash_cmnd("rm -r " + " GEN_FF")# Remove the existing GEN_FF directory
         os.mkdir("GEN_FF")  # Create the GEN_FF directory
 
     # Copy common files from GEN_FF-0 and GEN_FF-1 to GEN_FF
-        shutil.copy("GEN_FF-0/A.txt", "GEN_FF")
-        shutil.copy("GEN_FF-0/b.txt", "GEN_FF")
-        shutil.copy("GEN_FF-0/b-labeled.txt", "GEN_FF")
-        shutil.copy("GEN_FF-0/natoms.txt", "GEN_FF")
-        shutil.copy("GEN_FF-0/traj_list.dat", "GEN_FF")
-        shutil.copy("GEN_FF-0/fm_setup.in", "GEN_FF")
+        helpers.run_bash_cmnd("cp " + " GEN_FF-0/A.txt" + " GEN_FF")
+        helpers.run_bash_cmnd("cp " + " GEN_FF-0/b.txt" + " GEN_FF")
+        helpers.run_bash_cmnd("cp " + " GEN_FF-0/b-labeled.txt" + " GEN_FF")
+        helpers.run_bash_cmnd("cp " + " GEN_FF-0/natoms.txt" + " GEN_FF")
+        helpers.run_bash_cmnd("cp " + " GEN_FF-0/traj_list.dat" + " GEN_FF")
+        helpers.run_bash_cmnd("cp " + " GEN_FF-0/fm_setup.in" + " GEN_FF")
 
 
 
         for i in range(1, int(args["n_hyper_sets"])):
             print("Pasting from:", i)
-            shutil.move("GEN_FF/fm_setup.in", "GEN_FF/0.fm_setup.in")
-            shutil.copy(f"GEN_FF-{i}/fm_setup.in", "GEN_FF")
-            shutil.move("GEN_FF/fm_setup.in", f"GEN_FF/{i}.fm_setup.in")
+            helpers.run_bash_cmnd("mv " + " GEN_FF/fm_setup.in" + " GEN_FF/0.fm_setup.in")
+            helpers.run_bash_cmnd("cp " + f" GEN_FF-{i}/fm_setup.in" + " GEN_FF")
+            helpers.run_bash_cmnd("mv " + " GEN_FF/fm_setup.in" + f" GEN_FF/{i}.fm_setup.in")
             paste_cmd = f"paste GEN_FF/A.txt GEN_FF-{i}/A.txt > tmp"
             print(paste_cmd)
             os.system(paste_cmd)

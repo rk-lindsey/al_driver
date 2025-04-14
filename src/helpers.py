@@ -595,7 +595,7 @@ def create_and_launch_job(*argv, **kwargs):
 
     jobid = None
     
-    if args["job_system"] == "slurm" or "TACC":
+    if args["job_system"] == "slurm" or args["job_system"] == "TACC" or args["job_system"] == "UM-ARC":
         jobid = run_bash_cmnd("sbatch " + args["job_file"]).split()[-1]
     else:    
         jobid = run_bash_cmnd("qsub " + args["job_file"])
