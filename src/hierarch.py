@@ -8,27 +8,37 @@ import helpers
 class bool_block:
 
     def __init__(self):
-        self.keys = [["USECOUL:", None], ["FITCOUL:", None], ["USEPOVR:", None], ["FITPOVR:", None], ["USE3BCH:", None],  ["USE4BCH:", None], ["EXCL1B:", "False"], ["EXCL2B:", "False"]]
+        self.keys = [["USECOUL:", None], ["FITCOUL:", None], ["USEPOVR:", None], ["FITPOVR:", None], ["USE3BCH:", None],  ["USE4BCH:", None], ["EXCLD1B:", "false"], ["EXCLD2B:", "false"]]
         
     def set_block(self,param_data):
-        
         for i in range(len(param_data)):
             for j in range(len(self.keys)):
                 if self.keys[j][0] in param_data[i]:
-                    if "EXCL" in self.keys[j][0]:
-                        self.keys[j][1] = ' '.join(param_data[i].split()[2:])
+                    if "EXCLD" in self.keys[j][0]:
+                        if "EXCLD1B" in self.keys[j][0]:
+                            self.keys[j][1] = ' '.join(param_data[i].split()[1:])
+                        elif "EXCLD2B" in self.keys[j][0]:
+                            self.keys[j][1] = ' '.join(param_data[i].split()[1:])
+                        else:
+                            print("ERROR: Unrecognized header exclusion type:", self.keys[j][0])
+                            print("Allowed header exclusion types are EXCLD1B and EXCLD2B")
                     else:
                         self.keys[j][1] = param_data[i].split()[-1]
     def print_block(self,to="stdout"):
 
         if to == "stdout":
             for j in range(len(self.keys)):
-                print(self.keys[j][0] + " " + self.keys[j][1])
+                if self.keys[j][1] is not None:
+                    print(self.keys[j][0] + " " + self.keys[j][1])
             print("")
     
         else:
             for j in range(len(self.keys)):
-                to.write(self.keys[j][0] + " " + self.keys[j][1] + '\n')
+                if self.keys[j][1] is not None:
+                    try:
+                    	to.write(self.keys[j][0] + " " + self.keys[j][1] + '\n')
+                    except:
+                    	to.write(self.keys[j][0] + " " + ' '.join(self.keys[j][1]) + '\n')                    
             to.write("\n")
 
 class complexity_block:
@@ -991,18 +1001,51 @@ class param_file():
             print("ERROR: USECOUL mismatch")
         if self.bool_block.keys[1][1] != other.bool_block.keys[1][1]:
             print("ERROR: FITCOUL mismatch")
-        if self.bool_block.keys[2][1] != other.bool_block.keys[2][1]:
-            print("     WARNING: USEPOVER mismatch - setting false!") 
-            self.bool_block.keys[2][1] = helpers.bool2str(False)   
-        if self.bool_block.keys[3][1] != other.bool_block.keys[3][1]:
-            print("     WARNING: FITPOVER mismatch - setting false!")  
-            self.bool_block.keys[3][1] = helpers.bool2str(False) 	       
+        try:
+            if self.bool_block.keys[2][1] != other.bool_block.keys[2][1]:
+               print("     WARNING: USEPOVER mismatch - setting false!") 
+               self.bool_block.keys[2][1] = helpers.bool2str(False) 
+        except:
+            print("     USEPOVER not found in at least one file - setting both false!")
+            self.bool_block.keys[2][1] = helpers.bool2str(False) 
+        try:
+            if self.bool_block.keys[3][1] != other.bool_block.keys[3][1]:
+               print("     WARNING: FITPOVER mismatch - setting false!")  
+               self.bool_block.keys[3][1] = helpers.bool2str(False) 	
+        except:       
+           print("     FITPOVER not found in at least one file - setting both false!")
+           self.bool_block.keys[3][1] = helpers.bool2str(False) 
         if self.bool_block.keys[4][1] != other.bool_block.keys[4][1]:
             print("     WARNING: USE3BCH mismatch - setting true!")
             self.bool_block.keys[4][1] = helpers.bool2str(True)
         if self.bool_block.keys[5][1] != other.bool_block.keys[5][1]:
             print("     WARNING: USE4BCH mismatch - setting true!")
-            self.bool_block.keys[5][1] = helpers.bool2str(True)    
+            self.bool_block.keys[5][1] = helpers.bool2str(True)
+           
+        # Handle for EXCLD1B
+            
+        if   other.bool_block.keys[6][1] == "false": # Then there should be no exclusions
+               self.bool_block.keys[6][1] = "false"
+        elif self .bool_block.keys[6][1] == "false": # Unexpected - only update if new parameter file provides more info
+               print("ERROR: Bad logic in update bool block")
+               exit(0)
+        else: # Save only the exclusions that exist in both
+               self.bool_block.keys[6][1] = list(set(self.bool_block.keys[6][1]) & set(other.bool_block.keys[6][1]))
+               self.bool_block.keys[6][1] = ' '.join(self.bool_block.keys[6][1]).split()
+               self.bool_block.keys[6][1] = sorted(self.bool_block.keys[6][1], key=int)    
+
+        # Handle for EXCLD2B
+                
+        if   other.bool_block.keys[7][1] == "false": # Then there should be no exclusions
+               self.bool_block.keys[7][1] = "false"
+        elif self .bool_block.keys[7][1] == "false": # Unexpected - only update if new parameter file provides more info
+               print("ERROR: Bad logic in update bool block")
+               exit(0)
+        else: # Save only the exclusions that exist in both
+               self.bool_block.keys[7][1] = list(set(self.bool_block.keys[7][1]) & set(other.bool_block.keys[7][1]))  
+               self.bool_block.keys[7][1] = ' '.join(self.bool_block.keys[7][1]).split()
+               self.bool_block.keys[7][1] = sorted(self.bool_block.keys[7][1], key=int)              
+                  
             
         # Update the model complexity block -- see below for rules
         
