@@ -180,7 +180,20 @@ def main(args):
         config.MD_SER = config.CHIMES_MD_SER 
         
     if hasattr(config, "CHIMES_MD_MODULES") and not hasattr(config,"MD_MODULES"):
-        config.MD_MODULES = config.CHIMES_MD_MODULES         
+        config.MD_MODULES = config.CHIMES_MD_MODULES   
+	
+
+if (config.DO_HIERARCH) and (config.HIERARCH_METHOD is None):
+        config.HIERARCH_METHOD = config.MD_STYLE
+            print("Set config.HIERARCH_METHOD to", config.MD_STYLE) 
+
+    if (config.DO_HIERARCH) and (config.HIERARCH_EXE is None):
+        try:
+            config.HIERARCH_EXE = config.MD_SER
+            print("Set config.HIERARCH_EXE to", config.MD_SER) 
+        except:
+            config.HIERARCH_EXE = config.MD_MPI 
+            print("Set config.HIERARCH_EXE to", config.MD_MPI)        
 
     ################################
     ################################
