@@ -153,9 +153,9 @@ def lmp_to_xyzf(units, trjfile, logfile):  # , argv):
         if len(tmp_lx) == 3: # Then its non-orthorhombic
           
             if (i + 1) % skip == 0:
-                ofstream.write("NON_ORTHO" + " " + ' '.join(tmp_lx) + " " + ' '.join(tmp_ly) + " " + ' '.join(tmp_lz)
+                ofstream.write("NON_ORTHO" + " " + ' '.join(tmp_lx) + " " + ' '.join(tmp_ly) + " " + ' '.join(tmp_lz))
                            
-        elif len(lmp_lx) == 2: # Then orthorhombic
+        elif len(tmp_lx) == 2: # Then orthorhombic
 
             lx = str(float(tmp_lx[1]) - float(tmp_lx[0]))
             ly = str(float(tmp_ly[1]) - float(tmp_ly[0]))
