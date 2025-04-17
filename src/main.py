@@ -183,9 +183,9 @@ def main(args):
         config.MD_MODULES = config.CHIMES_MD_MODULES   
 	
 
-if (config.DO_HIERARCH) and (config.HIERARCH_METHOD is None):
+    if (config.DO_HIERARCH) and (config.HIERARCH_METHOD is None):
         config.HIERARCH_METHOD = config.MD_STYLE
-            print("Set config.HIERARCH_METHOD to", config.MD_STYLE) 
+        print("Set config.HIERARCH_METHOD to", config.MD_STYLE) 
 
     if (config.DO_HIERARCH) and (config.HIERARCH_EXE is None):
         try:
