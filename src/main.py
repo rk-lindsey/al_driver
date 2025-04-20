@@ -277,7 +277,7 @@ def main(args):
             
                 active_job = gen_ff.build_amat(THIS_ALC,
                         do_hierarch        = config.DO_HIERARCH,
-			hierarch_method    = config.MD_STYLE,
+			hierarch_method    = config.HIERARCH_METHOD,
                         hierarch_files     = config.HIERARCH_PARAM_FILES,    
                         hierarch_exe       = config.HIERARCH_EXE,
                         do_correction      = config.FIT_CORRECTION,
@@ -733,7 +733,7 @@ def main(args):
                 
                     active_jobs = gen_ff.build_amat(THIS_ALC,
                             do_hierarch        = config.DO_HIERARCH,
-			    hierarch_method    = config.MD_STYLE,
+			    hierarch_method    = config.HIERARCH_METHOD,
                             hierarch_files     = config.HIERARCH_PARAM_FILES,
                             hierarch_exe       = config.HIERARCH_EXE,
                             do_correction      = config.FIT_CORRECTION,
@@ -759,7 +759,7 @@ def main(args):
                         prev_qm_all_path = qm_all_path,
                         prev_qm_20_path  = qm_20F_path,
                         do_hierarch      = config.DO_HIERARCH,
-			hierarch_method  = config.MD_STYLE,
+			hierarch_method  = config.HIERARCH_METHOD,
                         hierarch_files   = config.HIERARCH_PARAM_FILES,    
                         hierarch_exe     = config.HIERARCH_EXE, #config.MD_SER,
                         do_correction    = config.FIT_CORRECTION,
