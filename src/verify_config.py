@@ -1299,33 +1299,19 @@ def verify(user_config):
         
             user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"
 
-    elif user_config.MD_STYLE == "DFTB":
-    
-        if not hasattr(user_config,'DFTB_MD_SER'):
-
-            # Path to chimes_md executable
-
-            print("ERROR: Option config.DFTB_MD_SER was not set")
-            print("       Must be set as path to serial DFTBplus executable")
+    else:
+    	if not hasattr(user_config,'MD_MPI'):
+            print("ERROR: Option config.MD_MPI was not set")
+            exit(0)
             
-        
-        else:
-        
-            user_config.CHIMES_MD_MPI = user_config.DFTB_MD_SER
+    	if not hasattr(user_config,'MD_SER'): 
+            print("WARNING: Option config.MD_SER was not set")
+            print("         Attempting to set equal to config.MD_MPI")
             
-    elif user_config.MD_STYLE == "LMP":
-    
-        if not hasattr(user_config,'LMP_MD_SER'):
-
-            # Path to chimes_md executable
-
-            print("ERROR: Option config.DFTB_MD_SER was not set")
-            print("       Must be set as path to serial DFTBplus executable")
+            user_config.MD_SER = user_config.MD_MPI
             
-        
-        else:
-        
-            user_config.CHIMES_MD_MPI = None           
+    	user_config.CHIMES_MD_MPI = None
+    	user_config.CHIMES_MD_SER = None
         
     if not hasattr(user_config,'MOLANAL'):
 
