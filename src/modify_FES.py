@@ -95,11 +95,6 @@ def write_full_FES(traj_files):
 
             from_GPa = 6.9479
 	    
-            if stress_type != "no":	    
-                full.write("s_xx " + str(sxx[j]/from_GPa) + "\n")
-                full.write("s_yy " + str(syy[j]/from_GPa) + "\n")
-                full.write("s_zz " + str(szz[j]/from_GPa) + "\n")
-
             if stress_type == "all":	    
                 full.write("s_xx " + str(sxx[j]/from_GPa) + "\n")
                 full.write("s_xy " + str(sxy[j]/from_GPa) + "\n")
@@ -110,6 +105,13 @@ def write_full_FES(traj_files):
                 full.write("s_zx " + str(sxz[j]/from_GPa) + "\n")
                 full.write("s_zy " + str(syz[j]/from_GPa) + "\n")
                 full.write("s_zz " + str(szz[j]/from_GPa) + "\n")
+
+            elif stress_type != "no":	    
+                full.write("s_xx " + str(sxx[j]/from_GPa) + "\n")
+                full.write("s_yy " + str(syy[j]/from_GPa) + "\n")
+                full.write("s_zz " + str(szz[j]/from_GPa) + "\n")
+
+
 		
             if energy_type == "yes":	    
                 full.write("+1 "  + str(ener[j]) + "\n")
