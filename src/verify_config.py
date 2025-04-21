@@ -27,7 +27,8 @@ def print_help():
     PARAM.append("CHIMES_SRCDIR");                  VARTYP.append("str");           DETAILS.append("Path to directory containing the ChIMES_MD source code")
     PARAM.append("DO_HIERARCH");                    VARTYP.append("bool");          DETAILS.append("Is this a hierarchical fit (i.e., building on existing parameters?") 
     PARAM.append("HIERARCH_PARAM_FILES");           VARTYP.append("str list");      DETAILS.append("List of parameter files to build on, which chould be in ALL_BASE_FILES/HIERARCH_PARAMS")     
-    PARAM.append("HIERARCH_EXE");                   VARTYP.append("str");           DETAILS.append("Executable to use when subtracting existing parameter contributions")     
+    PARAM.append("HIERARCH_METHOD");                VARTYP.append("str");           DETAILS.append("MD method to use for subtracting existing parameter contributions - current options are CHIMES or LMP")     
+    PARAM.append("HIERARCH_EXE");                   VARTYP.append("str");           DETAILS.append("Executable to use when subtracting existing parameter contributions")         
     PARAM.append("FIT_CORRECTION");                 VARTYP.append("bool");          DETAILS.append("Is this ChIMES model being fit as a correction to another method?") 
     PARAM.append("CORRECTED_TYPE");                 VARTYP.append("str");           DETAILS.append("Method type being corrected. Currently only \"DFTB\" is supported")    
     PARAM.append("CORRECTED_TYPE_FILES");           VARTYP.append("str");           DETAILS.append("Files needed to run simulations/single points with the method to be corrected")    
@@ -832,6 +833,7 @@ def verify(user_config):
         
         user_config.DO_HIERARCH = False
         user_config.HIERARCH_PARAM_FILES = []
+        user_config.HIERARCH_EXE = None
     
     if user_config.DO_HIERARCH:
         
@@ -839,17 +841,11 @@ def verify(user_config):
 
             # Determines whether to build on existing parameter files
             
-            if user_config.DO_HIERARCH:
+            print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
+            print("config.HIERARCH_PARAM_FILES not specified")
             
-                print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
-                print("config.HIERARCH_PARAM_FILES not specified")
-            
-                exit()
-                
-            print("Warning: Option config.HIERARCH_PARAM_FILES was not set")
-            print("         Will use []")            
-                
-            user_config.HIERARCH_PARAM_FILES = []
+            exit()
+
         else:
             for i in range(len(user_config.HIERARCH_PARAM_FILES)):
                 user_config.HIERARCH_PARAM_FILES[i] = user_config.WORKING_DIR + "ALL_BASE_FILES/HIERARCH_PARAMS/" + user_config.HIERARCH_PARAM_FILES[i]
@@ -857,17 +853,24 @@ def verify(user_config):
             print("WARNING: config.HIERARCH_PARAM_FILES special cutoffs must") 
             print("         be specified with \"SPECIFIC\" and not \"ALL\"")
             
+        if not hasattr(user_config,'HIERARCH_METHOD'):
+
+            # Determines which MD method is used for HIERARCH interaction remoal
+            
+            print("WARNING: config.HIERARCH_METHOD was not set") 
+            print("         Will use config.MD_STYLE")            
+            
+            user_config.HIERARCH_METHOD = None 
+
         if not hasattr(user_config,'HIERARCH_EXE'):
 
             # Determines whether to build on existing parameter files
             
             if user_config.DO_HIERARCH:
             
-                print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
-                print("config.HIERARCH_EXE not specified")
+                print("Warning: Option config.DO_HIERARCH was set to \"True\", but")
+                print("         config.HIERARCH_EXE not specified. Will attempt to use MD_MPI or MD_SER")
             
-                exit()
-            else:
                 user_config.HIERARCH_EXE = None                
 
 
@@ -1263,7 +1266,7 @@ def verify(user_config):
         # Simulation method, i.e. ChIMES MD or DFTBplus+ChIMES
 
         print("ERROR: Simulation mode not specified!")
-        print("         config.MD_STYLE must be set to \"CHIMES\" or \"DFTB\"")
+        print("         config.MD_STYLE must be set to \"CHIMES\", \"LMP\", or \"DFTB\"")
         exit()
     else:
         print("Will run simulations using method: ", user_config.MD_STYLE)
@@ -1296,33 +1299,19 @@ def verify(user_config):
         
             user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"
 
-    elif user_config.MD_STYLE == "DFTB":
-    
-        if not hasattr(user_config,'DFTB_MD_SER'):
-
-            # Path to chimes_md executable
-
-            print("ERROR: Option config.DFTB_MD_SER was not set")
-            print("       Must be set as path to serial DFTBplus executable")
+    else:
+    	if not hasattr(user_config,'MD_MPI'):
+            print("ERROR: Option config.MD_MPI was not set")
+            exit(0)
             
-        
-        else:
-        
-            user_config.CHIMES_MD_MPI = user_config.DFTB_MD_SER
+    	if not hasattr(user_config,'MD_SER'): 
+            print("WARNING: Option config.MD_SER was not set")
+            print("         Attempting to set equal to config.MD_MPI")
             
-    elif user_config.MD_STYLE == "LMP":
-    
-        if not hasattr(user_config,'LMP_MD_SER'):
-
-            # Path to chimes_md executable
-
-            print("ERROR: Option config.DFTB_MD_SER was not set")
-            print("       Must be set as path to serial DFTBplus executable")
+            user_config.MD_SER = user_config.MD_MPI
             
-        
-        else:
-        
-            user_config.CHIMES_MD_MPI = None           
+    	user_config.CHIMES_MD_MPI = None
+    	user_config.CHIMES_MD_SER = None
         
     if not hasattr(user_config,'MOLANAL'):
 

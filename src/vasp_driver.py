@@ -374,7 +374,7 @@ def check_convergence(my_ALC, *argv, **kwargs):
             
             if "IALGO" in line[0]:
 
-                if int(line[1]) != 48:
+                if line[1] != "48":
                     print("        WARNING: Expected IALGO = 48, got",line[1])
                     print("        Would have replaced with 38") 
                     print("        Declaring the problem impossible and ignoring: ",base_list[j] +".OUTCAR","\n")
