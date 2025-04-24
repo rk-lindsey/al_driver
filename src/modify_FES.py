@@ -1,7 +1,9 @@
 import sys
+import os
 import helpers
 import chimes_modify_FES
 import dftbplus_modify_FES
+import lmp_modify_FES
 
 def clean_up(method):
     
@@ -9,6 +11,8 @@ def clean_up(method):
          chimes_modify_FES.clean_up()
     elif method == "DFTB":
         dftbplus_modify_FES.clean_up()
+    elif method == "LMP":
+        lmp_modify_FES.clean_up()
     else:
         print("ERROR: Unknown method in modify_FES.py:",method)
 
@@ -28,13 +32,17 @@ def write_full_FES(traj_files):
     # Process the trajectory file
     
     for i in range(len(traj_files)):
+    
+        if not os.path.isfile(traj_files[i]):
+            print("\t***WARNING*** File",traj_files[i],"does not exist - assuming it is a dummy file!")
+            continue
             
         print("\tOpening file:", "b-labeled_full.traj_file_idx-" + str(i)  + ".dat")
         helpers.run_bash_cmnd("rm -f b-labeled_full.traj_file_idx-" + str(i)  + ".dat")
         full = open("b-labeled_full.traj_file_idx-" + str(i)  + ".dat",'a')
             
         # Figure out what options the target .xyzf file has
-    
+
         box_type, stress_type, energy_type = get_format(traj_files[i])
     
         # Process file frame by frame...
@@ -86,19 +94,29 @@ def write_full_FES(traj_files):
                 full.write(line[0] + " " + str(float(line[6])/kcalpermolAng2HperB) + "\n")
 
             from_GPa = 6.9479
+	    
+            if stress_type == "all":	    
+                full.write("s_xx " + str(sxx[j]/from_GPa) + "\n")
+                full.write("s_xy " + str(sxy[j]/from_GPa) + "\n")
+                full.write("s_xz " + str(sxz[j]/from_GPa) + "\n")
+                full.write("s_yx " + str(sxy[j]/from_GPa) + "\n")
+                full.write("s_yy " + str(syy[j]/from_GPa) + "\n")
+                full.write("s_yz " + str(syz[j]/from_GPa) + "\n")
+                full.write("s_zx " + str(sxz[j]/from_GPa) + "\n")
+                full.write("s_zy " + str(syz[j]/from_GPa) + "\n")
+                full.write("s_zz " + str(szz[j]/from_GPa) + "\n")
 
-            full.write("s_xx " + str(sxx[j]/from_GPa) + "\n")
-            full.write("s_xy " + str(sxy[j]/from_GPa) + "\n")
-            full.write("s_xz " + str(sxz[j]/from_GPa) + "\n")
-            full.write("s_yx " + str(sxy[j]/from_GPa) + "\n")
-            full.write("s_yy " + str(syy[j]/from_GPa) + "\n")
-            full.write("s_yz " + str(syz[j]/from_GPa) + "\n")
-            full.write("s_zx " + str(sxz[j]/from_GPa) + "\n")
-            full.write("s_zy " + str(syz[j]/from_GPa) + "\n")
-            full.write("s_zz " + str(szz[j]/from_GPa) + "\n")
-            full.write("+1 "  + str(ener[j]) + "\n")
-            full.write("+1 "  + str(ener[j]) + "\n")
-            full.write("+1 "  + str(ener[j]) + "\n")
+            elif stress_type != "no":	    
+                full.write("s_xx " + str(sxx[j]/from_GPa) + "\n")
+                full.write("s_yy " + str(syy[j]/from_GPa) + "\n")
+                full.write("s_zz " + str(szz[j]/from_GPa) + "\n")
+
+
+		
+            if energy_type == "yes":	    
+                full.write("+1 "  + str(ener[j]) + "\n")
+                full.write("+1 "  + str(ener[j]) + "\n")
+                full.write("+1 "  + str(ener[j]) + "\n")
             
         full.close()
 
@@ -140,6 +158,8 @@ def subtract_off(param_file, md_driver, method, traj_files, temper_files=None):
         atmtyps = chimes_modify_FES.check_atomtypes(param_file)
     elif method == "DFTB":
         atmtyps = dftbplus_modify_FES.check_atomtypes(param_file)
+    elif method == "LMP":
+        atmtyps = lmp_modify_FES.check_atomtypes(param_file)
     else:
         print("ERROR: Unknown method in modify_FES.py:",method)
 
@@ -148,10 +168,14 @@ def subtract_off(param_file, md_driver, method, traj_files, temper_files=None):
         
     # Process the trajectory file
     
-    print("Will process traj files:",traj_files)
+    print("Will process traj files:\n\t",traj_files)
     
     
     for i in range(len(traj_files)):
+
+        if not os.path.isfile(traj_files[i]):
+            print("\t***WARNING*** File",traj_files[i],"does not exist - assuming it is a dummy file!")
+            continue
     
         print("\t...Subtracting from file:",traj_files[i])
     
@@ -342,6 +366,8 @@ def get_FES(xyz_file, param_file, md_driver, method, temperature=None):
         tmp_ener, tmp_stress, force_file = chimes_modify_FES.get_FES("tmp.xyz",param_file, md_driver) 
     elif method == "DFTB":
         tmp_ener, tmp_stress, force_file = dftbplus_modify_FES.get_FES("tmp.xyz",param_file, md_driver,temperature) 
+    elif method == "LMP":
+        tmp_ener, tmp_stress, force_file = lmp_modify_FES.get_FES("tmp.xyz",param_file, md_driver) 
     else:
         print("ERROR: Unrecognized method \"" + method + "\" for modify_FES.get_FES")
         print("Exiting.")
@@ -390,7 +416,7 @@ def get_format(traj_file):
     
 
     # Grab the header line
-
+    
     ifstream = open(traj_file,'r')
     header   = ifstream.readline() # Ignore number of atoms
     header   = ifstream.readline()
