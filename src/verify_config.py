@@ -834,6 +834,7 @@ def verify(user_config):
         user_config.DO_HIERARCH = False
         user_config.HIERARCH_PARAM_FILES = []
         user_config.HIERARCH_EXE = None
+        user_config.HIERARCH_METHOD = None
     
     if user_config.DO_HIERARCH:
         
