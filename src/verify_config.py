@@ -141,11 +141,7 @@ def print_help():
     PARAM.append("LMP_UNITS");                      VARTYP.append("str");           DETAILS.append("Units LAMMPS input/output is expected to be")
     PARAM.append("USE_AL_STRS");                    VARTYP.append("int");           DETAILS.append("Include stress tensors from the specified ALC onward")
     PARAM.append("STRS_STYLE");                     VARTYP.append("str");           DETAILS.append("Specify what stress tensors should be included in the fitting process, e.g "DIAG" or "ALLSTR")
-    
- 
-    
-    
-
+   
 
     print("Help info: ")
     print("Run with, e.g.: unbuffer python /path/to/al_driver/main.py 0 1 2 | tee driver.log")
