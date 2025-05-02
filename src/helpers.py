@@ -961,6 +961,51 @@ def xyz_to_dftbgen(xyzfile):
 
     return genfile 
     
+def get_xyz_boxdims(xyzfile, magnitudes=True):
+
+    """ 
+    
+    Reads a .xyz file and returns two things:
+    1. Is the box orthorhombic or triclinic
+    2. boxdims, as strings
+    
+    The user specifies if they want magnitudes or latvectors (a 9-element list). 
+    by default, returns magnitudes
+    
+    """
+
+    boxdims = head(xyzfile,2)[-1].split()
+    
+    offdiag_elements = [1,2,3,5,6,7]
+
+    
+    is_ortho = True
+    
+    if boxdims[0] != "NON_ORTHO":
+        if magnitudes: 
+            return is_ortho, boxdims
+        else:
+           return is_ortho, [boxdims[0], "0.0", "0.0", "0.0", boxdims[1], "0.0", "0.0", "0.0", boxdims[2]]
+    
+    else:
+       boxdims = boxdims[1:]
+       
+       for i in offdiag_elements:
+           if abs(float(boxdims[i])) > 0.0001:
+               is_ortho = False
+       
+       if not magnitudes:
+           return is_ortho, boxdims
+       elif magnitudes and not is_ortho:
+           print("ERROR in helpers.get_xyz_boxdims: requested boxdims for an orthorhomic cell, but input cell is triclinic")
+           print(xyzfile)
+           print(boxdims)
+           exit()
+       else:
+           return is_ortho, [boxdims[0], boxdims[4], boxdims[8]]
+
+       
+    
 def dftbgen_to_xyz(*argv):
 
     """ 

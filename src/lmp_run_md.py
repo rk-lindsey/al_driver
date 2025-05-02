@@ -38,14 +38,28 @@ def writeframe(frame, badness, badstream0, badstream1, badstream2):
         print("In writeframe, badness is:",badness)
         exit();
         
-    boxl_x = frame[5]; boxl_x = boxl_x.split()[-1]
-    boxl_y = frame[6]; boxl_y = boxl_y.split()[-1]
-    boxl_z = frame[7]; boxl_z = boxl_z.split()[-1]
-    
     xyz_text = []
     xyz_text.append(frame[3]) # Number of atoms
-    xyz_text.append(boxl_x + " " + boxl_y + " " + boxl_z + '\n')
     
+    boxl_x = frame[5]; boxl_x = boxl_x.split()
+    boxl_y = frame[6]; boxl_y = boxl_y.split()
+    boxl_z = frame[7]; boxl_z = boxl_z.split()
+
+    if len(boxl_x) == 3: # Then its non-orthorhombic
+        xyz_text.append("NON_ORTHO" + " " + ' '.join(boxl_x) + " " + ' '.join(boxl_y) + " " + ' '.join(boxl_z))
+                        
+    elif len(boxl_x) == 2: # Then orthorhombic
+
+        boxl_x = str(float(boxl_x[1]) - float(boxl_x[0]))
+        boxl_y = str(float(boxl_y[1]) - float(boxl_y[0]))
+        boxl_z = str(float(boxl_z[1]) - float(boxl_z[0]))
+
+        xyz_text.append(boxl_x + " " + boxl_y + " " + boxl_z + '\n')
+	
+    else:
+        print("ERROR: Unrecognized box dimension style in lammps traj file")
+        exit(0)
+
     fields = frame[8].split()
     
     elem = fields.index("element")-2

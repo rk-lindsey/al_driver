@@ -180,7 +180,20 @@ def main(args):
         config.MD_SER = config.CHIMES_MD_SER 
         
     if hasattr(config, "CHIMES_MD_MODULES") and not hasattr(config,"MD_MODULES"):
-        config.MD_MODULES = config.CHIMES_MD_MODULES         
+        config.MD_MODULES = config.CHIMES_MD_MODULES   
+	
+
+    if (config.DO_HIERARCH) and (config.HIERARCH_METHOD is None):
+        config.HIERARCH_METHOD = config.MD_STYLE
+        print("Set config.HIERARCH_METHOD to", config.MD_STYLE) 
+
+    if (config.DO_HIERARCH) and (config.HIERARCH_EXE is None):
+        try:
+            config.HIERARCH_EXE = config.MD_SER
+            print("Set config.HIERARCH_EXE to", config.MD_SER) 
+        except:
+            config.HIERARCH_EXE = config.MD_MPI 
+            print("Set config.HIERARCH_EXE to", config.MD_MPI)        
 
     ################################
     ################################
@@ -264,8 +277,9 @@ def main(args):
             
                 active_job = gen_ff.build_amat(THIS_ALC,
                         do_hierarch        = config.DO_HIERARCH,
+			hierarch_method    = config.HIERARCH_METHOD,
                         hierarch_files     = config.HIERARCH_PARAM_FILES,    
-                        hierarch_exe       = config.MD_SER,
+                        hierarch_exe       = config.HIERARCH_EXE,
                         do_correction      = config.FIT_CORRECTION,
                         correction_method  = config.CORRECTED_TYPE,
                         correction_files   = config.CORRECTED_TYPE_FILES,
@@ -719,8 +733,9 @@ def main(args):
                 
                     active_jobs = gen_ff.build_amat(THIS_ALC,
                             do_hierarch        = config.DO_HIERARCH,
+			    hierarch_method    = config.HIERARCH_METHOD,
                             hierarch_files     = config.HIERARCH_PARAM_FILES,
-                            hierarch_exe       = config.MD_SER,
+                            hierarch_exe       = config.HIERARCH_EXE,
                             do_correction      = config.FIT_CORRECTION,
                             correction_method  = config.CORRECTED_TYPE,
                             correction_files   = config.CORRECTED_TYPE_FILES,
@@ -744,8 +759,9 @@ def main(args):
                         prev_qm_all_path = qm_all_path,
                         prev_qm_20_path  = qm_20F_path,
                         do_hierarch      = config.DO_HIERARCH,
+			hierarch_method  = config.HIERARCH_METHOD,
                         hierarch_files   = config.HIERARCH_PARAM_FILES,    
-                        hierarch_exe     = config.MD_SER,
+                        hierarch_exe     = config.HIERARCH_EXE, #config.MD_SER,
                         do_correction    = config.FIT_CORRECTION,
                         correction_method= config.CORRECTED_TYPE,
                         correction_files = config.CORRECTED_TYPE_FILES,
