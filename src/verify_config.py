@@ -19,8 +19,8 @@ def print_help():
     PARAM.append("ATOM_TYPES");                     VARTYP.append("str list");      DETAILS.append("List of atom types in system of interest , e.g. [\"C\", \"H\", \"O\", \"N\"]")
     PARAM.append("NO_CASES");                       VARTYP.append("int");           DETAILS.append("Number of different state points considered")
     PARAM.append("MOLANAL_SPECIES");                VARTYP.append("str list");      DETAILS.append("List of species to track in molanal output, e.g. [\"C1 O1 1(O-C)\", \"C1 O2 2(O-C)\"] ")
-    PARAM.append("STRS_STYLE");                     VARTYP.append("int");           DETAILS.append("ALC at which to start including stress tensors from ALC generated configrations ")
-    PARAM.append("USE_AL_STRS");                    VARTYP.append("str");           DETAILS.append("How stress tensors should be included in the fit, e.g. \"DIAG\" or \"ALL\"")
+    PARAM.append("USE_AL_STRS");                    VARTYP.append("int");           DETAILS.append("ALC at which to start including stress tensors from ALC generated configrations ")
+    PARAM.append("STRS_STYLE");                     VARTYP.append("str");           DETAILS.append("How stress tensors should be included in the fit, e.g. \"DIAG\" or \"ALL\"")
     PARAM.append("THIS_SMEAR");                     VARTYP.append("float");         DETAILS.append("Thermal smearing T in K; if \"None\", different values are used for each case, set in the ALL_BASE_FILES traj_list.dat")
     PARAM.append("DRIVER_DIR");                     VARTYP.append("str");           DETAILS.append("Path to the al_driver code")
     PARAM.append("WORKING_DIR");                    VARTYP.append("str");           DETAILS.append("Path to directory in which code is being run")
@@ -139,8 +139,6 @@ def print_help():
     PARAM.append("LMP_EXE");                        VARTYP.append("str");           DETAILS.append("Absolute path to LAMMPS executable")
     PARAM.append("LMP_MEM");                        VARTYP.append("str");           DETAILS.append("Memory requirements for running LAMMPS jobs")
     PARAM.append("LMP_UNITS");                      VARTYP.append("str");           DETAILS.append("Units LAMMPS input/output is expected to be")
-    PARAM.append("USE_AL_STRS");                    VARTYP.append("int");           DETAILS.append("Include stress tensors from the specified ALC onward")
-    PARAM.append("STRS_STYLE");                     VARTYP.append("str");           DETAILS.append("Specify what stress tensors should be included in the fitting process, e.g "DIAG" or "ALLSTR")
    
 
     print("Help info: ")
