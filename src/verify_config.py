@@ -72,7 +72,7 @@ def print_help():
     PARAM.append("MD_SER");                         VARTYP.append("str");           DETAILS.append("Serial MD executable absolute path (either LAMMPS path or CHIMES_MD_SER)")
     PARAM.append("MD_TIME");                        VARTYP.append("str");           DETAILS.append("Walltime for md simulations (e.g. \"04:00:00\")")
     PARAM.append("DFTB_MD_SER");                    VARTYP.append("str");           DETAILS.append("DFTBplus executable absolute path")
-    PARAM.append("CHIMES_MD_SER");                  VARTYP.append("str");           DETAILS.append("Serial ChIMES_md executable absolute path (e.g. CHIMES_SRCDIR + /chimes_md-serial/)")
+    PARAM.append("CHIMES_MD_SER");                  VARTYP.append("str");           DETAILS.append("Serial ChIMES_md executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-serial\")")
     PARAM.append("CHIMES_MD_MODULES");              VARTYP.append("str");           DETAILS.append("System-specific modules needed to run ChIMES MD jobs")
     PARAM.append("CHIMES_MD_MPI");                  VARTYP.append("str");           DETAILS.append("MPI-compatible ChIMES_md exectuable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-mpi\")")    
     PARAM.append("CHIMES_PEN_PREFAC");              VARTYP.append("float");         DETAILS.append("ChIMES penalty function prefactor")
