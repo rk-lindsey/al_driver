@@ -256,7 +256,7 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
 
         weight =  float(natoms_i)**float(w_method[1][0])
 	
-elif w_method[0] == "F":
+    elif w_method[0] == "F":
     
         if len(w_method[1]) != 4:
             print("ERROR: Found weight request with wrong number of parameters:")
