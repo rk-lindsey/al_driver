@@ -77,17 +77,19 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     ################################
     # 1. Run molanal
     ################################
-    
-    if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
-    
-        helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
-    
-    
-    helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
-    helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
-    helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
-    
-    print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
+    if args["run_molanal"]:
+        if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
+
+            helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
+
+
+        helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
+        helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
+        helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
+
+        print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
+    else:
+        print("Skipping MOLANAL")
     
     ################################
     # 2. Cluster
