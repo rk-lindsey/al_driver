@@ -687,30 +687,30 @@ def build_amat(my_ALC, **kwargs):
     default_keys[5 ] = "include_stress"    ; default_values[5 ] =     False                  # Should stress tensors be included in the A-matrix?
     default_keys[6 ] = "stress_style"      ; default_values[6 ] =     "DIAG"                 # Should the full stress tensor or only diagonal componets be considered? Only used if include_stress is true
     default_keys[7 ] = "do_hierarch"       ; default_values[7 ] =     False                  # Are we building parameters hierarchically?
-    default_keys[8 ] = "hierarch_method"   ; default_values[7 ] =     "CHIMES"  	     # Method for determining hierarch. contributions
-    default_keys[9 ] = "hierarch_files"    ; default_values[8 ] =     []		     # List of existing parameter files for hierarchical fitting
-    default_keys[10] = "hierarch_exe"	   ; default_values[9 ] =     None		     # Executable for subtracting parameter file contributions
-    default_keys[11] = "do_correction"     ; default_values[10] =     False		     # Are we fitting a correction to an underlying method?
-    default_keys[12] = "correction_exe"    ; default_values[11] =     None		     # Exectuable to evaluate interactions via method to be corrected
-    default_keys[13] = "correction_files"  ; default_values[12] =     None                   # Path to directory containng files needed for calculating interactions via method to be corrected
-    default_keys[14] = "correction_exe"    ; default_values[13] =     None                   # Executable for method being corrected
-    default_keys[15] = "correction_temps"  ; default_values[14] =     None                   # How to handle electron temperatures for 1st ALC
-    default_keys[16] = "n_hyper_sets"      ; default_values[15] =     1                      # Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data
+    default_keys[8 ] = "hierarch_method"   ; default_values[8 ] =     "CHIMES"  	     # Method for determining hierarch. contributions
+    default_keys[9 ] = "hierarch_files"    ; default_values[9 ] =     []		     # List of existing parameter files for hierarchical fitting
+    default_keys[10] = "hierarch_exe"	   ; default_values[10 ] =     None		     # Executable for subtracting parameter file contributions
+    default_keys[11] = "do_correction"     ; default_values[11] =     False		     # Are we fitting a correction to an underlying method?
+    default_keys[12] = "correction_exe"    ; default_values[12] =     None		     # Exectuable to evaluate interactions via method to be corrected
+    default_keys[13] = "correction_files"  ; default_values[13] =     None                   # Path to directory containng files needed for calculating interactions via method to be corrected
+    default_keys[14] = "correction_exe"    ; default_values[14] =     None                   # Executable for method being corrected
+    default_keys[15] = "correction_temps"  ; default_values[15] =     None                   # How to handle electron temperatures for 1st ALC
+    default_keys[16] = "n_hyper_sets"      ; default_values[16] =     1                      # Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data
     
     
         
     # Job controls
     
-    default_keys[17] = "job_name"	   ; default_values[16] =     "ALC-"+ repr(my_ALC)+"-lsq-1"   # Name for ChIMES lsq job
-    default_keys[18] = "job_nodes"	   ; default_values[17] =     "2"			      # Number of nodes for ChIMES lsq job
-    default_keys[19] = "job_ppn"	   ; default_values[18] =     "36"			      # Number of processors per node for ChIMES lsq job
-    default_keys[20] = "job_walltime"	   ; default_values[19] =     "1"			      # Walltime in hours for ChIMES lsq job
-    default_keys[21] = "job_queue"	   ; default_values[20] =     "pdebug"  		      # Queue for ChIMES lsq job
-    default_keys[22] = "job_account"	   ; default_values[21] =     "pbronze" 		      # Account for ChIMES lsq job
-    default_keys[23] = "job_executable"    ; default_values[22] =     ""			      # Full path to executable for ChIMES lsq job
-    default_keys[24] = "job_system"	   ; default_values[23] =     "slurm"			      # slurm or torque    
-    default_keys[25] = "job_email"	   ; default_values[24] =      True			      # Send slurm emails?
-    default_keys[26] = "job_modules"       ; default_values[25] =     ""                              # Modules for the job
+    default_keys[17] = "job_name"	   ; default_values[17] =     "ALC-"+ repr(my_ALC)+"-lsq-1"   # Name for ChIMES lsq job
+    default_keys[18] = "job_nodes"	   ; default_values[18] =     "2"			      # Number of nodes for ChIMES lsq job
+    default_keys[19] = "job_ppn"	   ; default_values[19] =     "36"			      # Number of processors per node for ChIMES lsq job
+    default_keys[20] = "job_walltime"	   ; default_values[20] =     "1"			      # Walltime in hours for ChIMES lsq job
+    default_keys[21] = "job_queue"	   ; default_values[21] =     "pdebug"  		      # Queue for ChIMES lsq job
+    default_keys[22] = "job_account"	   ; default_values[22] =     "pbronze" 		      # Account for ChIMES lsq job
+    default_keys[23] = "job_executable"    ; default_values[23] =     ""			      # Full path to executable for ChIMES lsq job
+    default_keys[24] = "job_system"	   ; default_values[24] =     "slurm"			      # slurm or torque    
+    default_keys[25] = "job_email"	   ; default_values[25] =      True			      # Send slurm emails?
+    default_keys[26] = "job_modules"       ; default_values[26] =     ""                              # Modules for the job
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)
