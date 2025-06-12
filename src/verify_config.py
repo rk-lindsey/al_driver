@@ -64,6 +64,7 @@ def print_help():
     PARAM.append("CHIMES_SOLVE_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for lsq2.py/DLARS (lassolars) job (e.g. \"04:00:00\")")
     PARAM.append("MD_STYLE");                       VARTYP.append("str");           DETAILS.append("Should MD simulations be run as ChIMES-only (\"CHIMES\") or DFTB+ChIMES (\"DFTB\")?")    
     PARAM.append("MOLANAL");                        VARTYP.append("str");           DETAILS.append("Absolute path to the molanal src directory")
+    PARAM.append("RUN_MOLANAL");                    VARTYP.append("bool");          DETAILS.append("Determines if MOLANAL is ran")
     PARAM.append("MDFILES");                        VARTYP.append("str");           DETAILS.append("Absolute path to MD input files like case-0.indep-0.run_md.in (e.g. WORKING_DIR + \"ALL_BASE_FILES/CHIMESMD_FILES\")")
     PARAM.append("MD_MODULES");                     VARTYP.append("str");           DETAILS.append("System-specific modules needed to run MD")
     PARAM.append("MD_MPI");                         VARTYP.append("str");           DETAILS.append("MPI-compatible MD exectuable absolute path (either path to \"lmp_mpi_chimes\" or \"chimes_md-mpi\")  ) ")
@@ -1331,13 +1332,20 @@ def verify(user_config):
     	user_config.CHIMES_MD_MPI = None
     	user_config.CHIMES_MD_SER = None
         
+    if not hasattr(user_config,'RUN_MOLANAL'):
+
+        # Path to molanal executable
+        user_config.RUN_MOLANAL = True
+        print("WARNING: If MOLANAL path is defined, MOLANAL will be ran")
+        print("         RUN_MOLANAL set to True")
+        
     if not hasattr(user_config,'MOLANAL'):
 
         # Path to molanal executable
-
-        print("Error: Option config.MOLANAL was not set")
-        print("       Acceptable settings are of the form of an absolute path (Unix)")
-        
+        user_config.RUN_MOLANAL = False
+        print("WARNING: MOLANAL will not be ran.")
+        print("         RUN_MOLANAL set to False")
+    
     
         
     if not hasattr(user_config,'MDFILES'):
