@@ -147,25 +147,15 @@ def lmp_to_xyzf(units, trjfile, logfile):  # , argv):
         tmp_ly = ifstream.readline().split()
         tmp_lz = ifstream.readline().split()
 
+        lx = str(float(tmp_lx[1])-float(tmp_lx[0]))
+        ly = str(float(tmp_ly[1])-float(tmp_ly[0]))
+        lz = str(float(tmp_lz[1])-float(tmp_lz[0]))
+        xy = str(float(tmp_lx[2]))
+        xz = str(float(tmp_ly[2]))
+        yz = str(float(tmp_lz[2]))
 
-        # Determine if we're working with an orthorhombic or non-orthrhombic box
-
-        if len(tmp_lx) == 3: # Then its non-orthorhombic
-          
-            if (i + 1) % skip == 0:
-                ofstream.write("NON_ORTHO" + " " + ' '.join(tmp_lx) + " " + ' '.join(tmp_ly) + " " + ' '.join(tmp_lz)+ "\n")
-                           
-        elif len(tmp_lx) == 2: # Then orthorhombic
-
-            lx = str(float(tmp_lx[1]) - float(tmp_lx[0]))
-            ly = str(float(tmp_ly[1]) - float(tmp_ly[0]))
-            lz = str(float(tmp_lz[1]) - float(tmp_lz[0]))
-
-            if (i + 1) % skip == 0:
-                ofstream.write(lx + " " + ly + " " + lz + "\n")
-        else:
-            print("ERROR: Unrecognized box dimension style in lammps traj file")
-            exit(0)
+        if (i + 1) % skip == 0:
+            ofstream.write("NON_ORTHO "+lx + " 0 0 "+xy+" " + ly + " 0 " + xz+" " + yz+" "+lz + "\n")
 
         line = ifstream.readline()  # ITEM: ATOMS id type element xu yu zu
         line = line.split()

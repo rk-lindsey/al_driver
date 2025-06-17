@@ -36,7 +36,7 @@ def writeframe(frame, badness, badstream0, badstream1, badstream2):
     else:
         print("Something strange happened... ")
         print("In writeframe, badness is:",badness)
-        exit();
+        exit()
         
     xyz_text = []
     xyz_text.append(frame[3]) # Number of atoms
@@ -44,9 +44,18 @@ def writeframe(frame, badness, badstream0, badstream1, badstream2):
     boxl_x = frame[5]; boxl_x = boxl_x.split()
     boxl_y = frame[6]; boxl_y = boxl_y.split()
     boxl_z = frame[7]; boxl_z = boxl_z.split()
-
+    box_Ax = str(float(boxl_x[1])-float(boxl_x[0]))
+    box_Ay = "0.0"
+    box_Az = "0.0"
+    box_Bx = boxl_x[2]
+    box_By = str(float(boxl_y[1])-float(boxl_y[0]))
+    box_Bz = "0.0"
+    box_Cx = boxl_y[2]
+    box_Cy = boxl_z[2]
+    box_Cz = str(float(boxl_z[1])-float(boxl_z[0]))
     if len(boxl_x) == 3: # Then its non-orthorhombic
-        xyz_text.append("NON_ORTHO" + " " + ' '.join(boxl_x) + " " + ' '.join(boxl_y) + " " + ' '.join(boxl_z))
+        xyz_text.append("NON_ORTHO " + box_Ax + " " + box_Ay + " " + box_Az + " " + box_Bx + " " + box_By + " " + box_Bz + " " + box_Cx + " " + box_Cy + " " + box_Cz + " " +'\n')
+       # print("TESTING: NON_ORTHO " + box_Ax + " " + box_Ay + " " + box_Az + " " + box_Bx + " " + box_By + " " + box_Bz + " " + box_Cx + " " + box_Cy + " " + box_Cz + " " +'\n')
                         
     elif len(boxl_x) == 2: # Then orthorhombic
 
