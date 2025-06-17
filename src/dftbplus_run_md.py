@@ -76,54 +76,56 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     ################################
     # 1. Run molanal
     ################################
-    
-    if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
-    
-        helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
-    
-    
-    # Copy/convert geo_end.xyz traj.gen
-    
-    box = []
-    tmp = helpers.tail(args["basefile_dir"] + "case-" + str(my_case) + ".indep-" + str(my_indep) + ".gen",3)
-    
-    box.append(tmp[0].split()[0])
-    box.append(tmp[1].split()[1])
-    box.append(tmp[2].split()[2])
-    box = ' '.join(box)
-    
-    frames = helpers.count_xyzframes_general("geo_end.xyz")
+    if user_config.RUN_MOLANAL:
+        if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
+        
+            helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
+        
+        
+        # Copy/convert geo_end.xyz traj.gen
+        
+        box = []
+        tmp = helpers.tail(args["basefile_dir"] + "case-" + str(my_case) + ".indep-" + str(my_indep) + ".gen",3)
+        
+        box.append(tmp[0].split()[0])
+        box.append(tmp[1].split()[1])
+        box.append(tmp[2].split()[2])
+        box = ' '.join(box)
+        
+        frames = helpers.count_xyzframes_general("geo_end.xyz")
 
-    ifstream = open("geo_end.xyz",'r')
-    ofstream = open("traj.xyz",'w')
+        ifstream = open("geo_end.xyz",'r')
+        ofstream = open("traj.xyz",'w')
 
-    for i in range(frames):
-    
-        # Natoms line
-    
-        line = ifstream.readline()
-        ofstream.write(line)
-        natoms = int(line)
+        for i in range(frames):
         
-        # boxlens line
+            # Natoms line
         
-        line = ifstream.readline()
-        ofstream.write(box + '\n')
-        
-        # Coordinates
-        
-        for j in range(natoms):
-            
             line = ifstream.readline()
             ofstream.write(line)
-    
-    helpers.xyz_to_dftbgen("traj.xyz")
+            natoms = int(line)
+            
+            # boxlens line
+            
+            line = ifstream.readline()
+            ofstream.write(box + '\n')
+            
+            # Coordinates
+            
+            for j in range(natoms):
+                
+                line = ifstream.readline()
+                ofstream.write(line)
         
-    helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
-    helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
-    helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
+        helpers.xyz_to_dftbgen("traj.xyz")
+            
+        helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
+        helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
+        helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
 
-    print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
+        print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
+    else:
+        print("Skipping MOLANAL")
     
     ################################
     # 2. Cluster
