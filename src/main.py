@@ -887,7 +887,8 @@ def main(args):
                         job_executable = config.CHIMES_MD_MPI,     
                         job_system     = config.HPC_SYSTEM,       
                         job_file       = "run.cmd",
-                        job_modules    = config.CHIMES_MD_MODULES
+                        job_modules    = config.CHIMES_MD_MODULES,
+                        run_molanal    = config.RUN_MOLANAL
                         )
                         
         

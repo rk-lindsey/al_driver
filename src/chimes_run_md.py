@@ -167,6 +167,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     default_keys[13] = "job_file"      ; default_values[13] = "run.cmd"                      # Name of the resulting submit script
     default_keys[14] = "job_email"     ; default_values[14] = True                           # Send slurm emails?
     default_keys[15] = "job_modules"   ; default_values[15] = ""                             # Send slurm emails?
+    default_keys[16] = "run_molanal"   ; default_values[16] = False                          # If molanal should be ran
 
 
     args = dict(list(zip(default_keys, default_values)))
