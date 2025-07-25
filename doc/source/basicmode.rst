@@ -207,6 +207,26 @@ This figure shows how the conserved quantity varies during ChIMES-MD NVT simulat
 
 -------
 
+============================
+Additional Examples:
+============================
+
+Users can access additional examples in ``/path/to/ald_driver/examples/``. 
+
+=======================================================   ===============   =========================================================================================================================================   
+Example Name                                              System            Notes
+=======================================================   ===============   =========================================================================================================================================
+hierarch_fit                                              carbon/nitrogen   Hierarchical fit for carbon/nitrogen system. See details in this `link <https://al-driver.readthedocs.io/en/latest/hierarchmode.html>`_.
+hydrogen                                                  hydrogen          Simple ALD for hydrogen system with 2 cases.
+simple_bulk_MFI_cp2k                                      MFI zeolite       ALD with CP2K with 1 case ran on TACC Stampede3 HPC system. 
+simple_iter_single_statepoint-cp2k                        MFI zeolite       ALD with CP2K with 1 case ran on UM-ARC Greatlakes HPC system. 
+simple_iter_single_statepoint-MultiNode                   MFI zeolite       ALD with CP2K with 3 cases ran on different number nodes for each case. 
+simple_iter_single_statepoint-lmp-test                    molten carbon     ALD with LAMMPS as the MD module and the labeling method with 1 case.
+simple_iter_single_statepoint-lmp-test-turbo-test         molten carbon     ALD with LAMMPS for turbo ChIMES fit. Turbo ChIMES functionalities will be included later. 
+=======================================================   ===============   =========================================================================================================================================
+
+-------
+
 
 ========================================================
 In-depth Setup and Options Overview
