@@ -44,31 +44,33 @@ Input variable      Variable type  Required Default                 Value/Option
 ChIMES LSQ  Options
 ==========================
 
-========================    =============  ======== ======================================================      ============================
-Input variable              Variable type  Required Default                                                     Value/Options/Notes
-========================    =============  ======== ======================================================      ============================
-``ALC0_FILES         =``    str            N        ``WORKING_DIR`` + "ALL_BASE_FILES/ALC-0_BASEFILES/"         Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)-Note: In greatlakes, all paths provided must be absolute paths using the "realpath" command, not just the current working directory from "pwd".
-``CHIMES_LSQ         =``    str            N        ``CHIMES_SRCDIR`` + "chimes_lsq"                            Absolute path to ChIMES_lsq executable.
-``CHIMES_SOLVER      =``    str            N        ``CHIMES_SRCDIR`` + "lsq2.py"                               Absolute path to ChIMES_lsq.py (formely, lsq2.py).
-``CHIMES_POSTPRC     =``    str            N        ``CHIMES_SRCDIR`` + "post_proc_lsq2.py"                     Absolute path to post_proc_lsq2.py.
-``WEIGHTS_SET_ALC_0  =``    bool           N        False                                                       Should ALC-0 (or 1 if no clustering) weights be read directly from a user specified file?
-``WEIGHTS_ALC_0      =``    str            N        None                                                        Set if ``WEIGHTS_SET_ALC_0`` is true; path to user specified ALC-0 (or ALC-1) weights.
-``WEIGHTS_FORCE      =``    special        N        1.0                                                         Weights to apply to full-frame forces - many options, see note below.
-``WEIGHTS_FGAS       =``    special        N        5.0                                                         Weights to apply to gas phase forces - many options, see note below.
-``WEIGHTS_ENER       =``    special        N        0.1                                                         Weights to apply to full-frame energies - many options, see note below.
-``WEIGHTS_EGAS       =``    special        N        0.1                                                         Weights to apply to gas phase energies - many options, see note below.
-``WEIGHTS_STRES      =``    special        N        250.0                                                       Weights to apply to full-frame stress tensor components - many options, see note below.
-``REGRESS_ALG        =``    str            N        dlasso                                                      Regression algorithm to use for fitting; only dlasso supported for now
-``REGRESS_VAR        =``    float          N        1e-5                                                        Regression regularization variable.
-``REGRESS_NRM        =``    bool           N        True                                                        Controls whether A-matrix is normalized prior to solution.
-``CHIMES_BUILD_NODES =``    int            N        4                                                           Number of nodes to use when running chimes_lsq.
-``CHIMES_BUILD_QUEUE =``    str            N        pbatch                                                      Queue to submit chimes_lsq job to.
-``CHIMES_BUILD_TIME  =``    str            N        "04:00:00"                                                  Walltime for chimes_lsq job.
-``CHIMES_SOLVE_NODES =``    int            N        8                                                           Number of nodes to use when running dlasso
-``CHIMES_SOLVE_PPN   =``    int            N        ``HPC_PPN``                                                 Number of procs per node to use when running dlasso
-``CHIMES_SOLVE_QUEUE =``    str            N        pbatch                                                      Queue to submit the dlasso job to
-``CHIMES_SOLVE_TIME  =``    str            N        "04:00:00"                                                  Walltime for dlasso job
-========================    =============  ======== ======================================================      ============================
+========================    =============  ======== ======================================================================      ============================
+Input variable              Variable type  Required Default                                                                     Value/Options/Notes
+========================    =============  ======== ======================================================================      ============================
+``ALC0_FILES         =``    str            N        ``WORKING_DIR`` + "ALL_BASE_FILES/ALC-0_BASEFILES/"                         Path to LSQ base files required by the driver (e.g. traj_list.dat, fm_setup.in, etc.)-Note: In greatlakes, all paths provided must be absolute paths using the "realpath" command, not just the current working directory from "pwd".
+``CHIMES_LSQ         =``    str            N        ``CHIMES_SRCDIR`` + "chimes_lsq"                                            Absolute path to ChIMES_lsq executable.
+``CHIMES_LSQ_MODULES =``    str            N        "cmake/3.21.1 + mkl + intel-classic/2021.6.0-magic + mvapich2/2.3.7"        System-specific modules needed to run ChIMES-LSQ jobs
+``CHIMES_SOLVER      =``    str            N        ``CHIMES_SRCDIR`` + "lsq2.py"                                               Absolute path to ChIMES_lsq.py (formely, lsq2.py).
+``CHIMES_POSTPRC     =``    str            N        ``CHIMES_SRCDIR`` + "post_proc_lsq2.py"                                     Absolute path to post_proc_lsq2.py.
+``WEIGHTS_SET_ALC_0  =``    bool           N        False                                                                       Should ALC-0 (or 1 if no clustering) weights be read directly from a user specified file?
+``WEIGHTS_ALC_0      =``    str            N        None                                                                        Set if ``WEIGHTS_SET_ALC_0`` is true; path to user specified ALC-0 (or ALC-1) weights.
+``WEIGHTS_FORCE      =``    special        N        1.0                                                                         Weights to apply to full-frame forces - many options, see note below.
+``WEIGHTS_FGAS       =``    special        N        5.0                                                                         Weights to apply to gas phase forces - many options, see note below.
+``WEIGHTS_ENER       =``    special        N        0.1                                                                         Weights to apply to full-frame energies - many options, see note below.
+``WEIGHTS_EGAS       =``    special        N        0.1                                                                         Weights to apply to gas phase energies - many options, see note below.
+``WEIGHTS_STRES      =``    special        N        250.0                                                                       Weights to apply to full-frame stress tensor components - many options, see note below.
+``REGRESS_ALG        =``    str            N        dlasso                                                                      Regression algorithm to use for fitting; only dlasso supported for now
+``REGRESS_VAR        =``    float          N        1e-5                                                                        Regression regularization variable.
+``REGRESS_NRM        =``    bool           N        True                                                                        Controls whether A-matrix is normalized prior to solution.
+``CHIMES_BUILD_NODES =``    int            N        4                                                                           Number of nodes to use when running chimes_lsq.
+``CHIMES_BUILD_QUEUE =``    str            N        pbatch                                                                      Queue to submit chimes_lsq job to.
+``CHIMES_BUILD_TIME  =``    str            N        "04:00:00"                                                                  Walltime for chimes_lsq job.
+``CHIMES_SOLVE_NODES =``    int            N        8                                                                           Number of nodes to use when running dlasso
+``CHIMES_SOLVE_PPN   =``    int            N        ``HPC_PPN``                                                                 Number of procs per node to use when running dlasso
+``CHIMES_SOLVE_QUEUE =``    str            N        pbatch                                                                      Queue to submit the dlasso job to
+``CHIMES_SOLVE_TIME  =``    str            N        "04:00:00"                                                                  Walltime for dlasso job
+``N_HYPER_SETS  =``         int            N        "1"                                                                         Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data
+========================    =============  ======== ======================================================================      ============================
 
 .. Note ::
 
@@ -77,17 +79,20 @@ Input variable              Variable type  Required Default                     
     If a ``WEIGHTS_*`` option is set to a single floating point value, that value is applied to all candidate data of that type, e.g., if ``WEIGHTS_FORCE`` = 1.0, all full-frame forces will be assigned a weight of 1.0. 
     
     Additional weighting styles can be selected by letter:
+
+	(A) w = a0
+	
+	(B) w = a0*(this_cycle-1)^a1         # NOTE: treats this_cycle = 0 as this_cycle = 1
+	
+	(C) w = a0*exp(a1*|X|/a2)
+	
+	(D) w = a0*exp(a1[X-a2]/a3)
+	
+	(E) w = n_atoms^a0
+         
+        (F) w = a0*exp(a1[ X/n_atoms-a2]/a3)
     
-    
-	A. w = a0
-	
-	B. w = a0*(this_cycle-1)^a1         # NOTE: treats this_cycle = 0 as this_cycle = 1
-	
-	C. w = a0*exp(a1*|X|/a2)
-	
-	D. w = a0*exp(a1[X-a2]/a3)
-	
-	E. w = n_atoms^a0
+        (G) w = a0*exp(a1(|X|-a2)/a3)
     
     where "X" is the value being weighted.
     
@@ -131,15 +136,16 @@ Input variable                  Variable type  Required  Default                
 =============================   =============  ========  ====================    ============================
 ``FIT_CORRECTION          =``   bool           N         False                   Is this ChIMES model being fit as a correction to another method?
 ``CORRECTED_TYPE          =``   str            N         None                    Method type being corrected. Currently only "DFTB" is supported
-``CORRECTED_TYPE_FILES    =``   str            N         None                    ?!?!?!?!IS THIS A PATH OR A FILENAME? Files needed to run simulations/single points with the method to be corrected
+``CORRECTED_TYPE_FILES    =``   str            N         None                    List of parameter files needed to run simulations/single points with the method to be corrected 
 ``CORRECTED_TYPE_EXE      =``   str            N         None                    Executable to use when subtracting existing forces/energies/stresses from method to be corrected
-``CORRECTED_TEMPS_BY_FILE =``   bool           N         None                    ???!?!! String or path??? Should electron temperatures be set to values in traj_list.dat (false) or in specified file location, for correction calculation? Only needed if correction method is QM-based. 
+``CORRECTED_TEMPS_BY_FILE =``   bool           N         False                   Should electron temperatures be set to values in traj_list.dat (false) or in specified file location, for correction calculation? Only needed if correction method is QM-based. See notes below.
 =============================   =============  ========  ====================    ============================
 
 .. Note ::
 
-    Note: If corrections are used, ``ChIMES_MD_{NODES,QUEUE,TIME}`` are all used to specify DFTB runs. These should be renamed to ``simulation_{...}`` for the generalized MD block (which should become SIM block). If ``FIT_CORRECTION`` is ``True``, temperaturess in ``traj_list.dat`` are ignored by correction FES subtraction. Instead, searches for ``<filesnames>.temps`` where ``.temps`` replaces whatever last extension was, in ``CORRECTED_TYPE_FILES``.
-   
+    Note: If corrections are used, ``ChIMES_MD_{NODES,QUEUE,TIME}`` are all used to specify DFTB runs. These should be renamed to ``simulation_{...}`` for the generalized MD block (which should become SIM block). 
+
+    Note: If ``CORRECTED_TEMPS_BY_FILE`` is set to be ``True`` , temperaturess in ``traj_list.dat`` are ignored by correction FES subtraction. Instead, each training trajectory file in ``ALL_BASE_FILES/ALC-0_BASEFILES`` needs a corresponding .temps file that gives the temperature for each frame 
 
 
 ============================
