@@ -85,19 +85,19 @@ Input variable              Variable type  Required Default                     
     
     Additional weighting styles can be selected by letter:
 
-	(A) w = a0
+	``A`` w = a0
 	
-	(B) w = a0*(this_cycle-1)^a1         # NOTE: treats this_cycle = 0 as this_cycle = 1
+	``B`` w = a0*(this_cycle-1)^a1         # NOTE: treats this_cycle = 0 as this_cycle = 1
 	
-	(C) w = a0*exp(a1*|X|/a2)
+	``C`` w = a0*exp(a1*|X|/a2)
 	
-	(D) w = a0*exp(a1[X-a2]/a3)
+	``D`` w = a0*exp(a1[X-a2]/a3)
 	
-	(E) w = n_atoms^a0
+	``E`` w = n_atoms^a0
          
-        (F) w = a0*exp(a1[ X/n_atoms-a2]/a3)
+        ``F`` w = a0*exp(a1[ X/n_atoms-a2]/a3)
     
-        (G) w = a0*exp(a1(|X|-a2)/a3)
+        ``G`` w = a0*exp(a1(|X|-a2)/a3)
     
     where "X" is the value being weighted.
     
