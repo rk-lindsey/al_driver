@@ -47,7 +47,7 @@ ChIMES LSQ  Options
 ========================    =============  ======== ======================================================      ============================
 Input variable              Variable type  Required Default                                                     Value/Options/Notes
 ========================    =============  ======== ======================================================      ============================
-``ALC0_FILES         =``    str            N        ``WORKING_DIR`` + "ALL_BASE_FILES/ALC-0_BASEFILES/"         Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)
+``ALC0_FILES         =``    str            N        ``WORKING_DIR`` + "ALL_BASE_FILES/ALC-0_BASEFILES/"         Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)-Note: In greatlakes, all paths provided must be absolute paths using the "realpath" command, not just the current working directory from "pwd".
 ``CHIMES_LSQ         =``    str            N        ``CHIMES_SRCDIR`` + "chimes_lsq"                            Absolute path to ChIMES_lsq executable.
 ``CHIMES_SOLVER      =``    str            N        ``CHIMES_SRCDIR`` + "lsq2.py"                               Absolute path to ChIMES_lsq.py (formely, lsq2.py).
 ``CHIMES_POSTPRC     =``    str            N        ``CHIMES_SRCDIR`` + "post_proc_lsq2.py"                     Absolute path to post_proc_lsq2.py.
