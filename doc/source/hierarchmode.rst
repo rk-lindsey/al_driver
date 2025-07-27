@@ -5,7 +5,7 @@ Hierarchical Fitting Mode
 ***************************************
 
 
-.. figure:: hierarchy.pdf
+.. figure:: hierarchy.png
   :width: 500
   :align: center
   
@@ -90,9 +90,7 @@ The ALC-0_BASEFILES Files
     * ``TYPEIDX`` and ``PAIRIDX`` entries in the base fm_setup.in file must be consistent with respect to the ``HIERARCH_PARAM_FILES`` files
     * ``SPECIAL XB`` cutoffs must be set to ``SPECIFIC N``, where *N* is the number of **NON**-excluded *X*\B interaction types 
     
-    For additional information on how to configure these options, see the ChIMES LSQ manual `(link <UPDATE LINK>)`_.
-
-
+    For additional information on how to configure these options, see the ChIMES LSQ manual `(link) <https://chimes-lsq.readthedocs.io/en/latest/>`_.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The config.py File
@@ -176,11 +174,15 @@ The primary difference between the present ``config.py`` and that provided in th
 Running
 ------------------------------------------
 
+...
+
 -------
 
 ------------------------------------------
 Inspecting the output
 ------------------------------------------
+
+...
 
 -------
 
