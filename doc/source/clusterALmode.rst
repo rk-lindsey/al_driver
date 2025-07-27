@@ -12,6 +12,10 @@ Cluster AL Fitting Mode
 
 When developing models for molecular reacting systems, our cluster-based active learning (AL) can be advantageous. This AL strategy attemps to improve description of conformational energetics and nominal reaction barriers. This is achieved by supplementing the basic mode by carving out candidate molecules  and nominal transition states from DFT- and ChIMES-generated simulation trajectories , down-selecting a maximally informative subset, and adding them to the training set. Details of this strategy are outlined in `R.K. Lindsey et al, JCP 2020 <https://doi.org/10.1063/5.0021965>`_. 
 
+... Warning::
+
+    This capability will only run on Slurm systems, and may require a specific Slurm specification. See the ``utilities/new*sh`` files for details.
+
 
 
 -------
