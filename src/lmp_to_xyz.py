@@ -67,6 +67,8 @@ def lmp_to_xyzf(units, trjfile, logfile):  # , argv):
             stats_end = int(helpers.getlineno("ERROR", logfile)[-1]) - 1  # Index of last thermo output line
         except:
             stats_end = int(helpers.wc_l(logfile))  # Index of last thermo output line
+            stats_start += 1
+            
     nstat_lines = stats_end - stats_start + 1
 
     # Count the number of frames in the lammps file

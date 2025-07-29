@@ -4,7 +4,8 @@
 Hierarchical Fitting Mode
 ***************************************
 
-.. figure:: hierarchy.pdf
+.. figure:: hierarchy.png
+
   :width: 500
   :align: center
 
@@ -22,6 +23,7 @@ This section provides an overview of how to configure the ALD for a hierarchical
 =================================
 Why Use Hierarchical Fitting?
 =================================
+
 1. **Scalability** – Easier optimization of smaller parameter subsets.
 2. **Transferability** – Enables reuse of parameters across systems.
 3. **Interpretability** – Clear attribution of interactions to specific atom types or combinations.
@@ -29,6 +31,7 @@ Why Use Hierarchical Fitting?
 ===========================================
 Full vs Partial Hierarchical Fitting
 ===========================================
+
 ChIMES supports two hierarchical strategies:
 
 **Full Hierarchical Fitting**
@@ -62,7 +65,9 @@ Use when:
 For additional information on strategies and benefits of hierarchical fitting, see: 
 
 * R. K. Lindsey*, A. D. Oladipupo, S. Bastea, B. A. Steele, F. W. Kuo, N. Goldman. Hierarchical Transfer Learning: An Agile and Equitable Strategy for Machine-Learning Interatomic Models Under Review: npj Comput. Mater. (2025)
+
 -------
+
 ====================================================
 Example: Hierarchical Fit for Solid C/N System
 ====================================================
@@ -208,8 +213,6 @@ The ALC-0_BASEFILES Files
     
     Each training trajectory file in ALL_BASE_FILES/ALC-0_BASEFILES needs a corresponding .temps file that gives the temperature for each frame this ensures the right tempertaure corrections is done for each frame. 
     
-
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The config.py File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -302,6 +305,10 @@ The primary difference between the present ``config.py`` and that provided in :r
 ------------------------------------------
 Running
 ------------------------------------------
+
+...
+
+-------
 
 Same procedure as in the basic example, depending on standard queuing times for your system, the ALD could take quite some time (e.g., hours) finish. For this reason it is generally, it is recommended to run the ALD from within a screen session on your HPC system. To do so, log into your HPC system and execute the following commands:
 

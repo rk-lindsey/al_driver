@@ -315,10 +315,27 @@ void FRAME::READ(ifstream & TRAJ_FILE)
 		exit(0);
 	}
 	
-	BOXDIM.X = STR_TO_DOUB(LINE_VEC[0]);
-	BOXDIM.Y = STR_TO_DOUB(LINE_VEC[1]);
-	BOXDIM.Z = STR_TO_DOUB(LINE_VEC[2]);
+	if (LINE_VEC[0] == "NON_ORTHO")
+	{
+		if( (STR_TO_DOUB(LINE_VEC[2])+STR_TO_DOUB(LINE_VEC[3])+STR_TO_DOUB(LINE_VEC[4])+
+		STR_TO_DOUB(LINE_VEC[6])+STR_TO_DOUB(LINE_VEC[7])+STR_TO_DOUB(LINE_VEC[8])) > 1E-7)
+		{
+			cout << "ERROR: new_ts_clu.cpp only supprts orthorhombic boxes for now. Exiting." << endl;
+			exit(0);
+		}
+		
+		BOXDIM.X = STR_TO_DOUB(LINE_VEC[1]);
+		BOXDIM.Y = STR_TO_DOUB(LINE_VEC[5]);
+		BOXDIM.Z = STR_TO_DOUB(LINE_VEC[9]);		
+		
+	}
+	else
+	{
 	
+		BOXDIM.X = STR_TO_DOUB(LINE_VEC[0]);
+		BOXDIM.Y = STR_TO_DOUB(LINE_VEC[1]);
+		BOXDIM.Z = STR_TO_DOUB(LINE_VEC[2]);
+	}
 	// Determine the coordinates 
 	
 	for (int i=0; i<NATOMS; i++)
@@ -764,10 +781,17 @@ void CALC_AND_PRINT_CLU_INFO(vector<CLUSTER> & CLUSTERS, FRAME & TRAJ_FRAME, BON
 	
 	int clu_count = 0;
 	
+	stringstream tag;
+	int digit_count = std::to_string(CLUSTERS.size()).length();
+
 	for (int i=0; i<CLUSTERS.size(); i++)
 	{
+		tag.str("");     // Reset the buffer
+		tag.clear();     // Reset stream state flags (e.g., eofbit)
+		tag << setw(digit_count+1) << setfill('0') << clu_count;
+	
 		ofstream OUTFILE;
-		string   OUTNAME = "frame." + to_string(f) + ".cluster." + to_string(clu_count) + ".stats";
+		string   OUTNAME = "frame." + to_string(f) + ".cluster." + tag.str() + ".stats";
 		OUTFILE.open(OUTNAME.data());
 		
 		OUTFILE << "# NATOMS DENSITY COMPOSITION (";
@@ -794,28 +818,37 @@ void PRINT_WRAPPED_AND_UNWRAPPED_CLUSTERS(string KIND,vector<CLUSTER> & CLUSTERS
 	
 	int clu_count = 0;
 	
+	stringstream tag;
+
+	int digit_count = std::to_string(CLUSTERS.size()).length();
+	
+	
 	for (int i=0; i<CLUSTERS.size(); i++)
 	{
-			ofstream OUTFILE;
-			string   OUTNAME = KIND + ".unwrapped.frame." + to_string(f) + ".cluster." + to_string(clu_count) + ".xyz";
-			OUTFILE.open(OUTNAME.data());
+		tag.str("");     // Reset the buffer
+		tag.clear();     // Reset stream state flags (e.g., eofbit)	
+		tag << setw(digit_count+1) << setfill('0') << clu_count;
+		
+		ofstream OUTFILE;
+		string   OUTNAME = KIND + ".unwrapped.frame." + to_string(f) + ".cluster." + tag.str() + ".xyz";
+		OUTFILE.open(OUTNAME.data());
 
-			OUTFILE << CLUSTERS[i].NATOMS << endl;
-			OUTFILE << TRAJ_FRAME.BOXDIM.X << " " <<  TRAJ_FRAME.BOXDIM.Y << " " << TRAJ_FRAME.BOXDIM.Z << endl;
+		OUTFILE << CLUSTERS[i].NATOMS << endl;
+		OUTFILE << TRAJ_FRAME.BOXDIM.X << " " <<  TRAJ_FRAME.BOXDIM.Y << " " << TRAJ_FRAME.BOXDIM.Z << endl;
 
-			for(int j=0; j<CLUSTERS[i].NATOMS; j++)
-			{
-				int UNWRAPPED_IDX = CLUSTERS[i].ATOM_INDICES[j];
-				
-				
-				OUTFILE << TRAJ_FRAME.COORDS[UNWRAPPED_IDX].TYPE;
-				OUTFILE << " " << TRAJ_FRAME.COORDS[UNWRAPPED_IDX].X;
-				OUTFILE << " " << TRAJ_FRAME.COORDS[UNWRAPPED_IDX].Y;
-				OUTFILE << " " << TRAJ_FRAME.COORDS[UNWRAPPED_IDX].Z << endl; " ";
-			}
+		for(int j=0; j<CLUSTERS[i].NATOMS; j++)
+		{
+			int UNWRAPPED_IDX = CLUSTERS[i].ATOM_INDICES[j];
 			
-			OUTFILE.close();
-			clu_count++;
+			
+			OUTFILE << TRAJ_FRAME.COORDS[UNWRAPPED_IDX].TYPE;
+			OUTFILE << " " << TRAJ_FRAME.COORDS[UNWRAPPED_IDX].X;
+			OUTFILE << " " << TRAJ_FRAME.COORDS[UNWRAPPED_IDX].Y;
+			OUTFILE << " " << TRAJ_FRAME.COORDS[UNWRAPPED_IDX].Z << endl; " ";
+		}
+		
+		OUTFILE.close();
+		clu_count++;
 	}	
 	
 	// Print out cluster structures (wrapped)
@@ -824,8 +857,12 @@ void PRINT_WRAPPED_AND_UNWRAPPED_CLUSTERS(string KIND,vector<CLUSTER> & CLUSTERS
 	
 	for (int i=0; i<CLUSTERS.size(); i++)
 	{
+		tag.str("");     // Reset the buffer
+		tag.clear();     // Reset stream state flags (e.g., eofbit)	
+		tag << setw(digit_count+1) << setfill('0') << clu_count;
+		
 		ofstream OUTFILE;
-		string   OUTNAME =  KIND + ".wrapped.frame." + to_string(f) + ".cluster." + to_string(clu_count) + ".xyz";
+		string   OUTNAME =  KIND + ".wrapped.frame." + to_string(f) + ".cluster." + tag.str() + ".xyz";
 		OUTFILE.open(OUTNAME.data());
 
 		OUTFILE << CLUSTERS[i].NATOMS << endl;

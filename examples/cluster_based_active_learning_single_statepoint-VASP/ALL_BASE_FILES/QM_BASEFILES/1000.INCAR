@@ -1,0 +1,38 @@
+
+   LPETIM  = F      # write-flag & timer
+   ISTART  = 0      # job:  0-new  1-cont  2-samecut
+
+   LWAVE   = F
+   LCHARG  = F
+   ICHARG  = 0 job  # 0-new  1-cont  2-samecut
+   NCORE   = 12     # Number of processors per node -- CHANGE THIS!
+
+   ENCUT   = 1000
+   GGA     = PE
+   LVDW    = .TRUE. # Include dispersion correction? -- CHANGE THIS?
+
+   EDIFF   =  1E-06 # stopping-criterion for ELM
+   EDIFFG  = -1E-02 # stopping-criterion for IOM
+   ISPIN   = 1
+
+   ISIF    = 2      # stress and relaxation
+
+   NSW     = 0      # number of steps for IOM
+   IBRION  = 0      # ionic relax: 0-MD 1-quasi-New 2-CG
+   ADDGRID = .FALSE.
+   LCORR   = T      # Harris-correction to forces
+
+   ISMEAR  = -1
+   SIGMA   =  0.086 # 1000 K
+
+   NELMIN  = 4
+   NELM    = 200    
+   IALGO   = 38     # Normal
+   LREAL   = A      # real space projections
+
+   TEBEG   = 1000.0 # Starting temperature K
+   TEEND   = 1000.0
+   SMASS   = 0.13
+   POTIM   = 0.5    # Timestep in fs
+
+   ISYM    = 0
