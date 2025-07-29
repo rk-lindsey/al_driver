@@ -818,8 +818,8 @@ def setup_vasp(my_ALC, *argv, **kwargs):
                 if my_smear == "TRAJ_LIST":
 
                     for k in range(len(temps)):
-    
-                        if ("CASE-" + str(k) in sel_file) or (temps[k][2] in sel_file):
+
+                        if ("CASE-" + str(k) in sel_file) or (temps[k][1] in sel_file):
                     
                             temp = temps[k][2]
 

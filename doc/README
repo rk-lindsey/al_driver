@@ -1,0 +1,15 @@
+If spinx-build is missing, you can install it via:
+
+pip install -U sphinx
+pip install -U sphinx_rtd_theme
+
+Then update the Makefile to point to your installation.
+
+If you are on a machine that requires a virutal environment to install python packages, you can do this via virtual environments.
+For example, on the LLNL LC, you would execute:
+  
+/usr/tce/packages/python/python/bin/virtualenv --system-site-packages ~/
+~/bin/pip install -U sphinx
+~/bin/pip install -U sphinx_rtd_theme
+
+And then set SPHINXBUILD   = ~/bin/sphinx-build in the Makefile

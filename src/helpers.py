@@ -8,6 +8,8 @@ import sys
 import math
 import sys
 import os
+import subprocess
+
 
 """ Small helper functions and utilities general to the ALC process. """
 
@@ -111,6 +113,33 @@ def writelines(outfile, contents, nlines=-1):
             break
         
     ofstream.close()
+    
+def run_bash_rmbig(files, batch_size=1000):
+    """
+    Removes files in chunks to avoid 'Argument list too long' errors.
+    """
+    for i in range(0, len(files), batch_size):
+        chunk = files[i:i+batch_size]
+        subprocess.run(["rm", "-f"] + chunk, check=False)  
+	
+def run_bash_mvbig(files, target_dir, batch_size=1000):
+    """
+    Moves files to the given target directory in safe-size batches to avoid 'Argument list too long' errors.
+
+    Parameters:
+    - files: list of file paths (strings)
+    - target_dir: path to the destination directory
+    - batch_size: number of files to move per mv invocation
+    """
+    
+    os.makedirs(target_dir, exist_ok=True)
+
+    for i in range(0, len(files), batch_size):
+        chunk = files[i:i + batch_size]
+        try:
+            subprocess.run(["mv"] + chunk + [target_dir], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error moving files in batch {i // batch_size + 1}: {e}")	  
 
 def run_bash_cmnd(cmnd_str):
 
@@ -608,7 +637,7 @@ def wait_for_job(active_job, **kwargs):
     
     Pauses the code until a single SLURM job completes.
     
-    Usage: wait_for_job(2116091,<arguments>)
+    Usage: wait_for_job([2116091],<arguments>)
     
     Notes: Accepts a jobid and queries the queueing system to determine
            whether the job is active. Doesn't return until job completes.
@@ -630,7 +659,7 @@ def wait_for_job(active_job, **kwargs):
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)
     
-    active_job = str(active_job).split()[0]
+    active_job = active_job[0]
     
     
     ################################
