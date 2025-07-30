@@ -772,8 +772,7 @@ def verify(user_config):
             #               "O2 1(O-O)"]#
 
         print("WARNING: Option config.MOLANAL_SPECIES was not set")
-        print("         Will use:")
-        print("\t",user_config.MOLANAL_SPECIES)
+        print("         Will set to no species:")
         
         user_config.MOLANAL_SPECIES = [""]
 
@@ -909,8 +908,8 @@ def verify(user_config):
 
         # HPC Charge bank/account
 
-        print("WARNING: Option config.HPC_ACCOUNT was not set")
-        print("Exiting")    
+        print("ERROR: Option config.HPC_ACCOUNT was not set!")
+        print("       Exiting")    
         exit()   
         
     if not hasattr(user_config,'HPC_SYSTEM'):
@@ -1282,9 +1281,9 @@ def verify(user_config):
 
         # Simulation method, i.e. ChIMES MD or DFTBplus+ChIMES
 
-        print("ERROR: Simulation mode not specified!")
-        print("         config.MD_STYLE must be set to \"CHIMES\", \"LMP\", or \"DFTB\"")
-        user_config.CHIMES_SOLVE_TIME = "CHIMES"
+        print("Warning: Simulation mode not specified")
+        print("         config.MD_STYLE was set to \"CHIMES\" options are: \"CHIMES\", \"LMP\", or \"DFTB\"")
+        user_config.MD_STYLE = "CHIMES"
     else:
         print("Will run simulations using method: ", user_config.MD_STYLE)
     
@@ -1303,7 +1302,7 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_MD_SER was not set")
         print("         Will use config.CHIMES_SRCDIR + \"chimes_md-serial\"")
         
-        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "chimes_md-serial"        
+        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "/../build/chimes_md-serial"        
     
     if user_config.MD_STYLE == "CHIMES":
         
@@ -1314,7 +1313,7 @@ def verify(user_config):
             print("WARNING: Option config.CHIMES_MD_MPI was not set")
             print("         Will use config.CHIMES_SRCDIR + \"chimes_md-mpi\"")
         
-            user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"
+            user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "/../build/chimes_md-mpi"
 
     else:
     	if not hasattr(user_config,'MD_MPI'):
@@ -1341,6 +1340,7 @@ def verify(user_config):
 
         # Path to molanal executable
         user_config.RUN_MOLANAL = False
+        user_config.MOLANAL = ""
         print("WARNING: MOLANAL will not be ran.")
         print("         RUN_MOLANAL set to False")
     
