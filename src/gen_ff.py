@@ -1290,7 +1290,7 @@ def solve_amat(my_ALC, **kwargs):
 
     os.chdir("..")
     
-    return run_py_jobid.split()[0]
+    return [run_py_jobid]
 
 
 def split_weights():
