@@ -119,6 +119,7 @@ Contents of the ``config.py`` file must be modified to reflect your absolute pat
     ################################
 
     VASP_EXE = "/usr/gapps/emc-vasp/vasp.5.4.4/build/gam/vasp"
+    VASP_QUEUE  = "pdebug"
     VASP_TIME    = "01:00:00"
     VASP_NODES   = 2
     VASP_PPN     = 36
@@ -339,6 +340,7 @@ Finally, lines 25-27 specify how forces, energies, and stresses should be weight
     ################################
 
     QM_FILES = WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
+    VASP_QUEUE  = "pdebug"
     VASP_EXE = "/path/to/vasp"
     VASP_TIME    = "01:00:00"
     VASP_NODES   = 2

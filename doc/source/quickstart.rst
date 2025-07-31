@@ -74,7 +74,7 @@ The ALD currently supports VASP, DFTB+, CP2K, and LAMMPS for data lableing (i.e.
 
 .. Note ::
 
-   ALD compiled with these software versions are guaranteed to run. However, we are unable to confirm its compatibilities with later versions. Support for newer versions of these softwares is in progress.
+   ALD compiled with these software versions are guaranteed to run. However, we are unable to confirm its compatibilities with later versions, unless otherwise stated. Support for newer versions of these softwares is in progress.
 
 -----
 
