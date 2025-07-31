@@ -37,7 +37,7 @@ The ALD requires a specific version of the ChIMES LSQ/MD code. To download and c
 
 .. Warning :: 
 
-    If you are note running on an LLNL (Quartz) or UM (Great Lakes) system, you will need to manually configure your compilers. We recommend Intel OneAPI, which is freely available. You will need to compile dlars and molanal by hand (see install script for steps).
+    If you are note running on an LLNL (Quartz), UM (Great Lakes), or TACC (Stampede3) system, you will need to manually configure your compilers. We recommend Intel OneAPI, which is freely available. You will need to compile dlars and molanal by hand (see install script for steps).
     
 
 .. Warning :: 
@@ -64,7 +64,7 @@ If the above instructions are followed properly, the following executables/scrip
 Installing Reference (Data Labeling) Methods
 =============================================================
 
-The ALD currently supports VASP and DFTB+ for data lableing (i.e. providing forces, energies, and stresses for configurations) in periodic system and Gaussian for non-periodic systems. Current implmentations are configured for the following software versions:
+The ALD currently supports VASP, DFTB+, CP2K, and LAMMPS for data lableing (i.e. providing forces, energies, and stresses for configurations) in periodic system and Gaussian for non-periodic systems. Current implmentations are configured for the following software versions:
 
 * VASP 5.4.1 or later(`link <https://www.vasp.at>`_)
 * Gaussian 16 (`link <https://gaussian.com/gaussian16/>`_)
@@ -74,9 +74,7 @@ The ALD currently supports VASP and DFTB+ for data lableing (i.e. providing forc
 
 .. Note ::
 
-   ALD compiled with these software versions are guaranteed to run. However, we are unable to confirm its compatibilities with later versions. 
-
-Support for newer VASP and DFTB+ versions is in progress. Future efforts will also focus on supporting LAMMPS as a data labeling method, allowing, e.g., coarse-grained model development based on molecular mechanics potentials. 
+   ALD compiled with these software versions are guaranteed to run. However, we are unable to confirm its compatibilities with later versions. Support for newer versions of these softwares is in progress.
 
 -----
 
