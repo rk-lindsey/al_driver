@@ -254,45 +254,65 @@ Note that the above .xyzf files correspond to ``<my_fit>/ALL_BASE_FILES/ALC-0_BA
     
 
         
-Finally, options for this first phase of fitting ``config.py`` must be specified. A complete set of options and details default values are listed on this `page <https://al-driver.readthedocs.io/en/latest/options.html>`_. Note that for this basic overview we will assume:
+Finally, options for this first phase of fitting ``config.py`` must be specified. A complete set of options and details default values are listed on the `ALD Configuration File Options <https://al-driver.readthedocs.io/en/latest/options.html>`_ page. Note that for this basic overview we will assume:
 
 * The user is running on a SLURM/SBATCH based HPC system (**set by default**)
 * The HPC system has 36 processors per compute node (**set by default**)
-* We want to generate hydrogen parameters by iteratively fitting at 3 statepoints, simultaneously (**indicated by line 6**).
+* We want to generate hydrogen parameters by iteratively fitting at 3 statepoints, simultaneously (**indicated by line 6-7**).
 
 
-The minimal config.py lines necessary for steps 1 & 2 are provided in the code block below. Recalling that ALD functions primarily as a workflow tool, it must be linked with external software. Here, we tell the ALD:
+The example ``config.py`` lines necessary for steps 1 & 2 are provided in the code block below. Recalling that ALD functions primarily as a workflow tool, it must be linked with external software. Here, we tell the ALD:
 
-* Where the ALD source code is located (line 8),
-* Where the ALD will be run (line 9), and 
-* Where to find our ChIMES_LSQ installation (line 10). 
+* What element system we are running ALD on (line 7),
+* How many statepoints are we fitting to simultaneously (line 8),
+* Where the ALD source code is located (line 10),
+* Where the ALD will be run (line 11), and 
+* Where to find our ChIMES_LSQ installation (line 12). 
 
-Lines 16-19 tell the ALD where all the files needed to run chimes_lsq are, specifically:
+Lines 18-21 tell the ALD where all the files needed to run chimes_lsq are, specifically:
 
-* The ChIMES LSQ input files, fm_setup.in and traj_list.dat (line 16),
-* The ChIMES LSQ design matrix generation executable, chimes_lsq  (line 17),
-* The ChIMES LSQ matrix solution script, chimes_lsq.py (line 18), and 
-* The ChIMES LSQ parameter file scrubber, post_proc_chimes_lsq.py (line 19).
+* The ChIMES LSQ input files, ``fm_setup.in`` and ``traj_list.dat`` (line 18),
+* The ChIMES LSQ design matrix generation executable, chimes_lsq  (line 19),
+* The ChIMES LSQ matrix solution script, chimes_lsq.py (line 20), and 
+* The ChIMES LSQ parameter file scrubber, post_proc_chimes_lsq.py (line 21).
 
-Finally, lines 23-25 specify how forces, energies, and stresses should be weighted, while lines 27-29 specify how the matrix solution problem should be executed, i.e., using distributed lasso (line 27) with a regularization variable of 1e-8 (line 28), and with a normalized design matrix (line 29). Note that there are *many* options for these lines, described in detail in <PAGE>.
+Finally, lines 25-27 specify how forces, energies, and stresses should be weighted, while lines 29-31 specify how the matrix solution problem should be executed, i.e., using distributed lasso (line 29) with a regularization variable of 1e-8 (line 30), and with a normalized design matrix (line 31). Note that there are *many* options for these lines, described in detail in the `ALD Configuration File Options <https://al-driver.readthedocs.io/en/latest/options.html>`_ page.
 
 
 .. code-block :: text
     :linenos:
 
-    # Configured for seamless run on LLNL-LC (Quartz)
-
     ################################
     ##### General options
     ################################
 
-    ATOM_TYPES     = ["C"]
-    NO_CASES       = 1
+    EMAIL_ADD = "<your email>"
 
-    DRIVER_DIR     = "/usr/WS2/rlindsey/test_cp2k/al_driver/"
-    WORKING_DIR    = "/usr/WS2/rlindsey/test_cp2k/al_driver/examples/simple_iter_single_statepoint/"
-    CHIMES_SRCDIR  = "/usr/WS2/rlindsey/test_cp2k/chimes_lsq/src/"
-    HPC_ACCOUNT    = "pbronze"
+    ATOM_TYPES     = ["H"]
+    NO_CASES       = 3
+
+    DRIVER_DIR     = "/path/to/al_driver/"
+    WORKING_DIR    = "/path/to/this/dir/"
+    CHIMES_SRCDIR  = "/path/to/chimes_lsq/src/"
+
+    ################################
+    ##### ChIMES LSQ
+    ################################
+
+    ALC0_FILES    = WORKING_DIR + "ALL_BASE_FILES/ALC-0_BASEFILES/"
+    CHIMES_LSQ    = CHIMES_SRCDIR + "../build/chimes_lsq"
+    CHIMES_SOLVER = CHIMES_SRCDIR + "../build/chimes_lsq.py"
+    CHIMES_POSTPRC= CHIMES_SRCDIR + "../build/post_proc_chimes_lsq.py"
+
+    # Generic weight settings
+
+    WEIGHTS_FORCE =   1.0
+    WEIGHTS_ENER  =   0.1
+    WEIGHTS_STRES = 100.0
+
+    REGRESS_ALG   = "dlasso"
+    REGRESS_VAR   = "1.0E-8"
+    REGRESS_NRM   = True
 
     # Job submitting settings (avoid defaults because they will lead to long queue times)
 
@@ -305,20 +325,21 @@ Finally, lines 23-25 specify how forces, energies, and stresses should be weight
     CHIMES_SOLVE_TIME  = "01:00:00"
 
     ################################
-    ##### ChIMES-MD 
+    ##### Molecular Dynamics
     ################################
 
-    MD_QUEUE  = ["pbatch"] * NO_CASES
-    MD_NODES   = [2]*NO_CASES
-    MD_PPN     = [36]*NO_CASES
-    MD_TIME    = ["04:00:00"]*NO_CASES
+    MD_STYLE        = "CHIMES"
+    CHIMES_MD_MPI   = CHIMES_SRCDIR + "../build/chimes_md"
+
+    MOLANAL         = CHIMES_SRCDIR + "../contrib/molanal/src/"
+    MOLANAL_SPECIES = ["C1"]
 
     ################################
     ##### Single-Point QM
     ################################
 
-    VASP_EXE = "/usr/gapps/emc-vasp/vasp.5.4.4/build/gam/vasp"
-    VASP_QUEUE  = "pdebug"
+    QM_FILES = WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
+    VASP_EXE = "/path/to/vasp"
     VASP_TIME    = "01:00:00"
     VASP_NODES   = 2
     VASP_PPN     = 36
@@ -371,7 +392,7 @@ and
 
 Each ``case-*.indep-0.input.xyz`` is a ChIMES ``.xyz`` file containing initial coordinates for the system of interest for the corresponding case, while each ``case-*.indep-0.run_md.in`` is the corresponding ChIMES MD input file. Note that ``case-*.indep-0.run_md.in`` options ``# PRMFILE #`` and ``# CRDFILE #`` should be set to ``WILL_AUTO_UPDATE``. For more information on these files, see the `(ChIMES LSQ manual) <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_. The bonds.dat file will be described below.
 
-In the config.py file snipped above, lines 5 and 6 tell the ALD to use ChIMES MD for MD simulation runs, and provides a path to the MPI-enabled and serial compilations. Lines 9 and 10 provide information on how to post-process the trajectory. Specifically, the ALD will use the a molecular analyzer _`("molanal") <https://pubs.acs.org/doi/pdf/10.1021/ja808196e>`_ to determine speciation for the generated MD trajectories. Once speciation is determined, the ALD will provide a summary of lifetimes and molefractions for species listed in ``MOLANAL_SPECIES``. Note that the species names must match the "Molecule type" fields produced by molanal *exactly*. These strings are usually determined by running molanal on DFT-MD trajectories, prior to any ALD. Finally, the ``bonds.dat`` file specifies bond length and lifetime criteria for molanal. See the molanal ``readme.txt`` file for additional information. Be sure to verify specified bonds.dat lifetime criteria are consistent with the timestep and output frequency specified in ``case-*.indep-0.run_md.in``
+In the config.py file snipped above, lines 5 and 6 tell the ALD to use ChIMES MD for MD simulation runs, and provides a path to the MPI-enabled and serial compilations. Lines 9 and 10 provide information on how to post-process the trajectory. Specifically, the ALD will use the a molecular analyzer `("molanal") <https://pubs.acs.org/doi/pdf/10.1021/ja808196e>`_ to determine speciation for the generated MD trajectories. Once speciation is determined, the ALD will provide a summary of lifetimes and molefractions for species listed in ``MOLANAL_SPECIES``. Note that the species names must match the "Molecule type" fields produced by molanal *exactly*. These strings are usually determined by running molanal on DFT-MD trajectories, prior to any ALD. Finally, the ``bonds.dat`` file specifies bond length and lifetime criteria for molanal. See the molanal ``readme.txt`` file for additional information. Be sure to verify specified bonds.dat lifetime criteria are consistent with the timestep and output frequency specified in ``case-*.indep-0.run_md.in``
 
 -------
 
@@ -402,7 +423,7 @@ The latter configurations are included to inform the short-ranged region of the 
 Setting up Step 6
 ------------------------------------------
 
-Step 6 comprises single point evaluation of configurations selected in step 5 via the user's requested quantum-based reference method. In this overview, we will assume the user is employing VASP but additional options are described in `options`_. To do so, the following must be provided, at a minimum:
+Step 6 comprises single point evaluation of configurations selected in step 5 via the user's requested quantum-based reference method. In this overview, we will assume the user is employing VASP but additional options are described in the `ALD Configuration File Options <https://al-driver.readthedocs.io/en/latest/options.html>`_ page. To do so, the following must be provided, at a minimum:
 
 .. code-block :: text
 
@@ -420,6 +441,10 @@ and
     
     QM_FILES = WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
     VASP_EXE = "/path/to/vasp/executable"
+    VASP_TIME    = "01:00:00"
+    VASP_NODES   = 2
+    VASP_PPN     = 36
+    VASP_MODULES = "mkl intel/18.0.1 impi/2018.0"
     
     
 There should be one ``*.INCAR`` file for each case temperature, i.e. ``{1000,2000,3000}.INCAR`` for the present example, with all options set to user desired values for single point evaluation. Note that ``IALGO = 48`` should be used to specifiy the electronic minimization algorithm, and any variable related to restart should be set to the corresponding "new" value. There should also be one ``.*POTCAR`` file for each atom type considered, i.e. H.POTCAR for the present example.
