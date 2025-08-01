@@ -1,4 +1,4 @@
-.. _page-basic:
+.. _page-options:
 
 ########################################################
 ChIMES Active Learning Driver Configuration File Options

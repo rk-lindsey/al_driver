@@ -19,7 +19,6 @@ def post_proc(my_ALC, my_case, my_indep, style, *argv, **kwargs):
     Usage: run_md(1, 0, 0, <arguments>)
     
     Notes: See function definition in *_run_md.py for a full list of options. 
-           Requrires config.CHIMES_MOLANAL (should contain molanal.new and findmolecules.pl)
            Expects to be called from ALC-my_ALC's base folder.
            Assumes job is being launched from ALC-X.
            Supports ~parallel learning~ via file structure:
@@ -55,7 +54,6 @@ def run_md(my_ALC, my_case, my_indep, style, *argv, **kwargs):
     
     Notes: See function definition in *_run_md.py for a full list of options. 
            Requrires config.CHIMES_MD.
-           Requrires config.CHIMES_MOLANAL (should contain molanal.new and findmolecules.pl)
            Expects to be called from ALC-my_ALC's base folder.
            Assumes job is being launched from ALC-X.
            Supports ~parallel learning~ via file structure:
@@ -75,7 +73,7 @@ def run_md(my_ALC, my_case, my_indep, style, *argv, **kwargs):
     elif style == "LMP":
         md_jobid = lmp_run_md.run_md(my_ALC, my_case, my_indep, *argv, **kwargs)        
     else:
-        print("ERROR: Unknown post_proc style in run_md.py: ", style)
+        print("ERROR: Unknown run_md style in run_md.py: ", style)
     
     return md_jobid    
     

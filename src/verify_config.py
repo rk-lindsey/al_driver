@@ -41,8 +41,8 @@ def print_help():
     PARAM.append("HPC_EMAIL");                      VARTYP.append("bool");          DETAILS.append("Controls whether driver status updates are e-mailed to user")
     PARAM.append("ALC0_FILES");                     VARTYP.append("str");           DETAILS.append("Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)")
     PARAM.append("CHIMES_LSQ");                     VARTYP.append("str");           DETAILS.append("ChIMES_lsq executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_lsq\")")
-    PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"lsq2.py\")")
-    PARAM.append("CHIMES_POSTPRC");                 VARTYP.append("str");           DETAILS.append("post_proc_lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"post_proc_lsq2.py\")")
+    PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"../build/chimes_lsq.py\")")
+    PARAM.append("CHIMES_POSTPRC");                 VARTYP.append("str");           DETAILS.append("post_proc_chimes_lsq.py executable absolute path (e.g. CHIMES_SRCDIR + \"../build/post_proc_chimes_lsq.py\")")
     PARAM.append("N_HYPER_SETS");                   VARTYP.append("int");           DETAILS.append("Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data")
     PARAM.append("WEIGHTS_SET_ALC_0");              VARTYP.append("bool");          DETAILS.append("Should ALC-0 (or 1 if no clustering) weights be read directly from a user specified file? ")
     PARAM.append("WEIGHTS_ALC_0");                  VARTYP.append("str");           DETAILS.append("Set if WEIGHTS_SET_ALC_0 is true; path to user specified ALC-0 (or ALC-1) weights ")
@@ -120,7 +120,6 @@ def print_help():
     PARAM.append("CP2K_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit CP2K jobs to")
     PARAM.append("CP2K_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to CP2K executable")
     PARAM.append("CP2K_DATADIR");                   VARTYP.append("str");           DETAILS.append("Absolute path to CP2K scratch (\"data\") directory")
-    PARAM.append("CP2K_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to cp2k_to_xyz.py ")
     PARAM.append("GAUS_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for Gaussian jobs")
     PARAM.append("GAUS_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for Gaussian jobs")
     PARAM.append("GAUS_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for Gaussian calculations, e.g. \"04:00:00\"")
@@ -759,24 +758,6 @@ def verify(user_config):
         exit()    
     else:    
         user_config.NO_CASES = int(user_config.NO_CASES)
-        
-
-    if not hasattr(user_config,'MOLANAL_SPECIES'):
-
-        # Species to track/plot from molanal... only used for post-processing
-        # MOLANAL_SPECIES
-        #MOLANAL_SPECIES = ["C1 O1 1(O-C)",
-            #               "C1 O2 2(O-C)",
-            #               "N2 1(N-N)",
-            #               "N1 O1 1(O-N)",
-            #               "N2 O1 1(N-N) 1(O-N)",
-            #               "O2 1(O-O)"]#
-
-        print("WARNING: Option config.MOLANAL_SPECIES was not set")
-        print("         Will use:")
-        print("\t",user_config.MOLANAL_SPECIES)
-        
-        user_config.MOLANAL_SPECIES = user_config.MOLANAL_SPECIES
 
     if not hasattr(user_config,'USE_AL_STRS'):
 
@@ -910,10 +891,9 @@ def verify(user_config):
 
         # HPC Charge bank/account
 
-        print("WARNING: Option config.HPC_ACCOUNT was not set")
-        print("         Will use pbronze")    
-        
-        user_config.HPC_ACCOUNT = "pbronze"    
+        print("ERROR: Option config.HPC_ACCOUNT was not set!")
+        print("       Exiting")    
+        exit()   
         
     if not hasattr(user_config,'HPC_SYSTEM'):
 
@@ -1056,7 +1036,7 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_LSQ was not set")
         print("         Will use config.CHIMES_SRCDIR + \"chimes_lsq\"")
         
-        user_config.CHIMES_LSQ    = user_config.CHIMES_SRCDIR + "chimes_lsq"
+        user_config.CHIMES_LSQ    = user_config.CHIMES_SRCDIR + "../build/chimes_lsq"
         
     if not hasattr(user_config,'CHIMES_LSQ_MODULES'):
     
@@ -1074,9 +1054,9 @@ def verify(user_config):
         # Location of lsq2.py script
 
         print("WARNING: Option config.CHIMES_SOLVER was not set")
-        print("         Will use config.CHIMES_SRCDIR + \"lsq2.py\"")
+        print("         Will use config.CHIMES_SRCDIR + \"/build/chimes_lsq.py\"")
         
-        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "lsq2.py"
+        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "../build/chimes_lsq.py"
         
     if not hasattr(user_config,'CHIMES_POSTPRC'):
 
@@ -1284,9 +1264,9 @@ def verify(user_config):
 
         # Simulation method, i.e. ChIMES MD or DFTBplus+ChIMES
 
-        print("ERROR: Simulation mode not specified!")
-        print("         config.MD_STYLE must be set to \"CHIMES\", \"LMP\", or \"DFTB\"")
-        exit()
+        print("Warning: Simulation mode not specified")
+        print("         config.MD_STYLE was set to \"CHIMES\" options are: \"CHIMES\", \"LMP\", or \"DFTB\"")
+        user_config.MD_STYLE = "CHIMES"
     else:
         print("Will run simulations using method: ", user_config.MD_STYLE)
     
@@ -1305,7 +1285,7 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_MD_SER was not set")
         print("         Will use config.CHIMES_SRCDIR + \"chimes_md-serial\"")
         
-        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "chimes_md-serial"        
+        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "/../build/chimes_md-serial"        
     
     if user_config.MD_STYLE == "CHIMES":
         
@@ -1316,7 +1296,7 @@ def verify(user_config):
             print("WARNING: Option config.CHIMES_MD_MPI was not set")
             print("         Will use config.CHIMES_SRCDIR + \"chimes_md-mpi\"")
         
-            user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"
+            user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "/../build/chimes_md-mpi"
 
     else:
     	if not hasattr(user_config,'MD_MPI'):
@@ -1334,7 +1314,7 @@ def verify(user_config):
         
     if not hasattr(user_config,'RUN_MOLANAL'):
 
-        # Path to molanal executable
+        # If molanal post process script should be run
         user_config.RUN_MOLANAL = True
         print("WARNING: If MOLANAL path is defined, MOLANAL will be ran")
         print("         RUN_MOLANAL set to True")
@@ -1343,9 +1323,25 @@ def verify(user_config):
 
         # Path to molanal executable
         user_config.RUN_MOLANAL = False
+        user_config.MOLANAL = ""
         print("WARNING: MOLANAL will not be ran.")
         print("         RUN_MOLANAL set to False")
     
+    if not hasattr(user_config,'MOLANAL_SPECIES') and user_config.RUN_MOLANAL:
+
+        # Species to track/plot from molanal... only used for post-processing
+        # MOLANAL_SPECIES
+        #MOLANAL_SPECIES = ["C1 O1 1(O-C)",
+            #               "C1 O2 2(O-C)",
+            #               "N2 1(N-N)",
+            #               "N1 O1 1(O-N)",
+            #               "N2 O1 1(N-N) 1(O-N)",
+            #               "O2 1(O-O)"]#
+
+        print("WARNING: Option config.MOLANAL_SPECIES was not set")
+        print("         Will set to no species.")
+        
+        user_config.MOLANAL_SPECIES = [""]
     
         
     if not hasattr(user_config,'MDFILES'):
