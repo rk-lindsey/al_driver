@@ -112,8 +112,8 @@ Input variable              Variable type Required  Default                     
 ========================    ============= ========  =====================================================================      ============================
 ``MD_STYLE          =``     str           Y         None                                                                       Iterative MD method. Options are "CHIMES" (used for ChIMES model development) or "DFTB" (used when generating ChIMES corrections to DFTB).
 ``DFTB_MD_SER       =``     str           N         None                                                                       Only used when ``MD_STYLE`` set to "DFTB". DFTBplus executable absolute path.
-``CHIMES_MD_MPI     =``     str           N         ``CHIMES_SRCDIR`` + "chimes_md-mpi"                                        Only used when ``MD_STYLE`` set to "CHIMES". MPI-compatible ChIMES_md exectuable absolute path.
-``CHIMES_MD_SER     =``     str           N         ``CHIMES_SRCDIR`` + "chimes_md-serial"                                     Used when ``MD_STYLE`` set to either "CHIMES" or "DFTB*". Serial ChIMES_md executable absolute path. (See note below)
+``CHIMES_MD_MPI     =``     str           N         ``CHIMES_SRCDIR`` + "/../build/chimes_md-mpi"                              Only used when ``MD_STYLE`` set to "CHIMES". MPI-compatible ChIMES_md exectuable absolute path.
+``CHIMES_MD_SER     =``     str           N         ``CHIMES_SRCDIR`` + "/../build/chimes_md-serial"                           Used when ``MD_STYLE`` set to either "CHIMES" or "DFTB*". Serial ChIMES_md executable absolute path. (See note below)
 ``MD_NODES          =``     list of int   N         [4] * ``NO_CASES``                                                         Number of nodes to use for MD jobs at each case. Number can be different for each case (e.g., [2,2,4,8] for four cases).
 ``MD_QUEUE          =``     list of str   N         ["pbatch"] * ``NO_CASES``                                                  Queue type to use for MD jobs at each case. Can be different for each case.
 ``MD_TIME           =``     list of str   N         ["4:00:00"] * ``NO_CASES``                                                 Walltime to use for MD jobs at each case. Can be different for each case.
@@ -171,7 +171,7 @@ Input variable                  Variable type   Default                 Value/Op
 =============================   =============   ====================    ============================
 ``DO_HIERARCH          =``      bool            False                   Is this a hierarchical fit (i.e., building on existing parameters?")
 ``HIERARCH_PARAM_FILES =``      list of str     None                    List of parameter files to build on, which should be in ALL_BASE_FILES/HIERARCH_PARAMS
-``HIERARCH_METHOD      =``      str             None                      MD method to use for subtracting existing parameter contributions - current options are CHIMES or LMP
+``HIERARCH_METHOD      =``      str             None                    MD method to use for subtracting existing parameter contributions - current options are CHIMES or LMP
 ``HIERARCH_EXE         =``      str             None                    Executable to use when subtracting existing parameter contributions
 =============================   =============   ====================    ============================
 
@@ -181,13 +181,13 @@ Reference QM Method Options
 =================================
 
 
-=============================   =============   =============================================   ============================
-Input variable                  Variable type   Default                                         Value/Options/Notes
-=============================   =============   =============================================   ============================
-``QM_FILES       =``            str             WORKING_DIR + "ALL_BASE_FILES/VASP_BASEFILES"   Absolute path to QM input files generic to all QM methods. Can specify separately if multiple methods are being used (see code-specific options below)
-``BULK_QM_METHOD =``            str             VASP                                            Specifies which nominal QM code to use for bulk configurations; options are "VASP" or "DFTB+"
-``IGAS_QM_METHOD =``            int             VASP                                            Specifies which nominal QM code to use for gas configurations; options are "VASP", "DFTB+", and "Gaussian"
-=============================   =============   =============================================   ============================
+=============================   =============   ===================================================   ============================
+Input variable                  Variable type   Default                                               Value/Options/Notes
+=============================   =============   ===================================================   ============================
+``QM_FILES       =``            str             ``WORKING_DIR`` + "ALL_BASE_FILES/VASP_BASEFILES"     Absolute path to QM input files generic to all QM methods. Can specify separately if multiple methods are being used (see code-specific options below)
+``BULK_QM_METHOD =``            str             VASP                                                  Specifies which nominal QM code to use for bulk configurations; options are "VASP" or "DFTB+"
+``IGAS_QM_METHOD =``            int             VASP                                                  Specifies which nominal QM code to use for gas configurations; options are "VASP", "DFTB+", and "Gaussian"
+=============================   =============   ===================================================   ============================
 
 ---------------------
 VASP-Specific Options
@@ -221,7 +221,7 @@ Input variable                  Variable type   Default                         
 ``DFTB_EXE     =``              str             None                                                             A path to a VASP executable **must** be specified if ``BULK_QM_METHOD`` or ``IGAS_QM_METHOD`` are set to "DFTB+"
 ``DFTB_MODULES =``              str             "mkl"                                                            Modules to load during VASP run
 ``DFTB_MEM     =``              str             ""                                                               Memory requirements for running DFTB+ jobs
-``DFTB_POST_PROC =``            str             "user_config.CHIMES_SRCDIR + "/../contrib/dftbgen_to_xyz.py"     Absolute path to dftgen_to_xyz.py 
+``DFTB_POST_PROC =``            str             ``CHIMES_SRCDIR`` + "/../contrib/dftbgen_to_xyz.py"              Absolute path to dftgen_to_xyz.py 
 =============================   =============   =============================================================    ============================
 
 ---------------------
@@ -237,7 +237,7 @@ Input variable                  Variable type    Default                        
 ``CP2K_QUEUE   =``              str              "pbatch"                                            Queue to submit CP2K jobs to
 ``CP2K_EXE     =``              str              None                                                A path to a CP2K executable **must** be specified if ``BULK_QM_METHOD`` or ``IGAS_QM_METHOD`` are set to "CP2K"
 ``CP2K_MODULES =``              str              "mkl"                                               Modules to load during CP2K run
-``CP2K_POSTPRC =``              str              user_config.DRIVER_DIR + "/src/cp2k_to_xyz.py"      Absolute path to CP2K2yzf.py
+``CP2K_POSTPRC =``              str              ``DRIVER_DIR`` + "/src/cp2k_to_xyz.py"              Absolute path to CP2K2yzf.py
 ``CP2K_MEM =``                  str              ""                                                  Memory requirements for running CP2K jobs
 ``CP2K_DATDIR =``               str              None                                                Path to the directory containing potential and functional files for CP2K
 =============================   =============    ================================================    ============================
