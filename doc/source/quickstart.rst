@@ -11,7 +11,7 @@ The ALD is a workflow tool that autonomously generates ChIMES models by orchestr
     System requirements for the ALD include: 
 
 
-    * An HPC platform with job queueing - currently only SLURM/SBATCH systems are supported
+    * An HPC platform with job queueing - currently support SLURM/SBATCH and PBS/qsub systems
     * C, C++11, and Fortran 77, 90, and 08 compilers
     * MPI compilers
     * MKL
@@ -37,9 +37,15 @@ The ALD requires a specific version of the ChIMES LSQ/MD code. To download and c
 
 .. Warning :: 
 
-    If you are note running on an LLNL (Quartz) or UM (Great Lakes) system, you will need to manually configure your compilers. We recommend Intel OneAPI, which is freely available. You will need to compile dlars and molanal by hand (see install script for steps).
+    If you are note running on an LLNL (Quartz), UM (Great Lakes), or TACC (Stampede3) system, you will need to manually configure your compilers. We recommend Intel OneAPI, which is freely available. You will need to compile dlars and molanal by hand (see install script for steps).
     
- 
+
+.. Warning :: 
+
+    The installation command will only work if the appropriate modules are loaded and the user has specified the hosttype. 
+    To specify hosttype, run `export hosttype=<machine name>`. For further infomation, refer to `ChIMES LSQ Documentation <https://chimes-lsq.readthedocs.io/en/latest/>`_.
+    
+
 If the above instructions are followed properly, the following executables/scripts should be generated:
 
 .. code-block :: bash
@@ -58,13 +64,17 @@ If the above instructions are followed properly, the following executables/scrip
 Installing Reference (Data Labeling) Methods
 =============================================================
 
-The ALD currently supports VASP and DFTB+ for data lableing (i.e. providing forces, energies, and stresses for configurations) in periodic system and Gaussian for non-periodic systems. Current implmentations are configured for the following software versions:
+The ALD currently supports VASP, DFTB+, CP2K, and LAMMPS for data lableing (i.e. providing forces, energies, and stresses for configurations) in periodic system and Gaussian for non-periodic systems. Current implmentations are configured for the following software versions:
 
-* VASP 5.4.1 (`link <https://www.vasp.at>`_)
+* VASP 5.4.1 or later(`link <https://www.vasp.at>`_)
 * Gaussian 16 (`link <https://gaussian.com/gaussian16/>`_)
-* DFTB+ 17.1 (`link <https://dftbplus.org/download/deprecated/dftb-171>`_)
+* DFTB+ 17.1 (`link <https://github.com/dftbplus/dftbplus/releases/tag/17.1>`_)
+* CP2K 2022.2 (`link <https://github.com/cp2k/cp2k/releases/tag/v2022.2>`_)
+* LAMMPS/29Oct2020 (`link <https://download.lammps.org/tars/index.html>`_)
 
-Support for newer VASP and DFTB+ versions is in progress. Future efforts will also focus on supporting LAMMPS as a data labeling method, allowing, e.g., coarse-grained model development based on molecular mechanics potentials. 
+.. Note ::
+
+   ALD compiled with these software versions are guaranteed to run. However, we are unable to confirm its compatibilities with later versions, unless otherwise stated. Support for newer versions of these softwares is in progress.
 
 -----
 
