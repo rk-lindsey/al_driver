@@ -5,10 +5,10 @@ Basic Fitting Mode
 ***************************************
 
 
-.. figure:: ALD_workflow.pdf
+.. figure:: ALD_workflow.png
   :width: 600
   :align: center
-  
+
   **Fig. 1:** The ChIMES Active Learning Driver Workflow.
 
 The "active learning" portion of the ALD largely entails intelligent strategies for selecting candidate unlabeled training data (step 5 in the schematic above). However, the ALD can also be run in a simpler iterative refinement scheme, which is quite efficient for low complexity non-reactive problems. In this page, a single-state-point fit is demonstrated using VASP, and all additional options for fitting in this model are overviewed.
@@ -155,6 +155,11 @@ Note that in the final line above, the sequence of numbers indicates 3 active le
 Inspecting the output
 ------------------------------------------
 
+.. Warning::
+
+   When running the Active Learning Driver, ALWAYS read through the resulting log file carefully. If driver sets a large number of default parameters if the user does not specify them manually, which may or many not be conducive to the user's end goal. The top portion of the log file tells the user every default that it sets. 
+
+
 Once the ALD has finished running, execute the following commands:
 
 .. code-block :: bash
@@ -164,7 +169,7 @@ Once the ALD has finished running, execute the following commands:
     
 Then, plot ``ALC-{3,2,1}/GEN_FF/compare.txt`` with your favorite plotting software. This file may contain force, energy, and stress values. For a force-only fit, the resulting figure should look like the following:
 
-.. figure:: compare-simple_iter_single_statepoint.pdf
+.. figure:: compare-simple_iter_single_statepoint.png
      :width: 400
      :align: center
   
@@ -175,7 +180,7 @@ This force parity plot provides DFT-assigned per-atom forces on the x-axis, and 
 
 Next, plot the ``ALC-{1..3}/CASE-0_INDEP_0/md_statistics.out`` files. If LAMMPS is used to run molecular dynamics (MD) simulations, plot the ``etotal`` values from ``log.lammps`` instead. The resulting figure should look like the following:
 
-.. figure:: econs-simple_iter_single_statepoint.pdf
+.. figure:: econs-simple_iter_single_statepoint.png
      :width: 400
      :align: center
   
@@ -425,7 +430,7 @@ The latter configurations are included to inform the short-ranged region of the 
 Setting up Step 6
 ------------------------------------------
 
-Step 6 comprises single point evaluation of configurations selected in step 5 via the user's requested quantum-based reference method. In this overview, we will assume the user is employing VASP but additional options are described in the `ALD Configuration File Options <https://al-driver.readthedocs.io/en/latest/options.html>`_ page. To do so, the following must be provided, at a minimum:
+Step 6 comprises single point evaluation of configurations selected in step 5 via the user's requested quantum-based reference method. In this overview, we will assume the user is employing VASP but additional options are described in :ref:`Options page <page-options>`. To do so, the following must be provided, at a minimum:
 
 .. code-block :: text
 
@@ -453,7 +458,11 @@ There should be one ``*.INCAR`` file for each case temperature, i.e. ``{1000,200
 
 .. Note ::
 
-    Support for additional data labeling schemes (i.e., both quantum- and molecular mechanics-based) are incoming.
+    Support for additional data labeling schemes (i.e., both quantum- and moleuclar mechanics-based) are incoming.
+    
+.. Tip ::
+
+    The VASP INCAR files provided in ``ALL_BASE_FILES/QM_BASEFILES`` for examples using VASP specify either ``NPAR`` or ``NCORE``. These values must be consistent with the resources requested in config.py (i.e., ``VASP_NODES`` * ``VASP_PPN``). For more details, see the VASP documentation for `NPAR <https://www.vasp.at/wiki/index.php/NPAR>`_ and `NCORE <https://www.vasp.at/wiki/index.php/NCORE>`_.
 
 .. Warning ::
 

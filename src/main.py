@@ -284,7 +284,8 @@ def main(args):
                         correction_method  = config.CORRECTED_TYPE,
                         correction_files   = config.CORRECTED_TYPE_FILES,
                         correction_exe     = config.CORRECTED_TYPE_EXE,
-                        correction_temps   = config.CORRECTED_TEMPS_BY_FILE,                        
+                        correction_temps   = config.CORRECTED_TEMPS_BY_FILE, 
+			n_hyper_sets       = config.N_HYPER_SETS,                       
                         prev_gen_path      = config.ALC0_FILES,
                         job_email          = config.HPC_EMAIL,
                         job_ppn            = str(config.HPC_PPN),
@@ -472,10 +473,7 @@ def main(args):
                         job_executable = config.MD_SER)    
                         
                 helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "get_repo_energies")
-            
-                print(helpers.run_bash_cmnd("pwd"))
-                print(helpers.run_bash_cmnd("ls -lrt"))    
-            
+           
                 restart_controller.update_file("CLUENER_CALC: COMPLETE" + '\n')    
                 
                 helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUENER_CALC: COMPLETE ")
@@ -783,7 +781,7 @@ def main(args):
                         )
             
                 if len(active_jobs) == 1:
-                    helpers.wait_for_job(active_jobs[0], job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")
+                    helpers.wait_for_job(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")
                 else:
                     helpers.wait_for_jobs(active_jobs, job_system = config.HPC_SYSTEM, verbose = True, job_name = "build_amat")                    
             
@@ -1003,18 +1001,18 @@ def main(args):
                         else:
                             cluster.list_clusters(repo, config.ATOM_TYPES)        
                 
-                            helpers.run_bash_cmnd("mv xyzlist.dat     " + "CASE-" + str(THIS_CASE) + ".xyzlist.dat"   )
-                            helpers.run_bash_cmnd("mv ts_xyzlist.dat " + "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat")
+                        helpers.run_bash_cmnd("mv xyzlist.dat     " + "CASE-" + str(THIS_CASE) + ".xyzlist.dat"   )
+                        helpers.run_bash_cmnd("mv ts_xyzlist.dat " + "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat")
                 
-                            cat_xyzlist_cmnd    += "CASE-" + str(THIS_CASE) + ".xyzlist.dat "
-                            cat_ts_xyzlist_cmnd += "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat "
-                
+                        cat_xyzlist_cmnd    += "CASE-" + str(THIS_CASE) + ".xyzlist.dat "
+                        cat_ts_xyzlist_cmnd += "CASE-" + str(THIS_CASE) + ".ts_xyzlist.dat "
+
                     helpers.cat_specific("xyzlist.dat"   , cat_xyzlist_cmnd   .split())
                     helpers.cat_specific("ts_xyzlist.dat", cat_ts_xyzlist_cmnd.split())
                 
                     helpers.run_bash_cmnd("rm -f " + cat_xyzlist_cmnd   )
                     helpers.run_bash_cmnd("rm -f " + cat_ts_xyzlist_cmnd)
-                    
+
                     restart_controller.update_file("CLUSTER_EXTRACTION: COMPLETE" + '\n')    
                     
                     helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "CLUSTER_EXTRACTION: COMPLETE ")                
