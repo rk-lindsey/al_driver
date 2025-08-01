@@ -973,7 +973,8 @@ def main(args):
                         tight_crit     = config.TIGHT_CRIT,    
                         loose_crit     = config.LOOSE_CRIT,    
                         clu_code       = config.CLU_CODE,      
-                        compilation    = "g++ -std=c++11 -O3")
+                        compilation    = "g++ -std=c++11 -O3",
+                        run_molanal    = config.RUN_MOLANAL)
 
                 restart_controller.update_file("POST_PROC: COMPLETE" + '\n')
                 

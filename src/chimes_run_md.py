@@ -42,8 +42,8 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*11
-    default_values = [""]*11
+    default_keys   = [""]*12
+    default_values = [""]*12
 
 
     # MD specific controls
@@ -62,6 +62,7 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     default_keys[8 ] = "loose_crit"  ; default_values[8 ] = "../../../../loose_bond_crit.dat"                            # File with loose bonding criteria for clustering
     default_keys[9 ] = "clu_code"     ; default_values[9 ] = "/p/lscratchrza/rlindsey/RC4B_RAG/11-12-18/new_ts_clu.cpp"  # Clustering code
     default_keys[10] = "compilation" ; default_values[10] = "g++ -std=c++11 -O3"                                         # Command to compile clustering code
+    default_keys[11] = "run_molanal" ; default_values[11] = False              
     
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)
