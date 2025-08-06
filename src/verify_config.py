@@ -1328,7 +1328,7 @@ def verify(user_config):
         print("         RUN_MOLANAL set to False")
     
     if not hasattr(user_config,'MOLANAL_SPECIES'):
-
+        
         # Species to track/plot from molanal... only used for post-processing
         # MOLANAL_SPECIES
         #MOLANAL_SPECIES = ["C1 O1 1(O-C)",
@@ -1337,9 +1337,10 @@ def verify(user_config):
             #               "N1 O1 1(O-N)",
             #               "N2 O1 1(N-N) 1(O-N)",
             #               "O2 1(O-O)"]#
-            if user_config.RUN_MOLANAL:
-                print("WARNING: Option config.MOLANAL_SPECIES was not set")
-                print("         Will set to no species.")
+            
+        if user_config.RUN_MOLANAL:
+            print("WARNING: Option config.MOLANAL_SPECIES was not set")
+            print("         Will set to no species.")
         
         user_config.MOLANAL_SPECIES = [""]
     

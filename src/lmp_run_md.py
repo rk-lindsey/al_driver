@@ -258,18 +258,19 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     # Convert the resulting trajectory file to .gen file named traj.gen
     
     lmp_to_xyz.lmp_to_xyzf("REAL", "traj.lammpstrj", "log.lammps") # Creates a file called traj.lammptrj.xyzf
-    helpers.xyz_to_dftbgen("traj.lammpstrj.xyzf") # Creates a file named traj.lammpstrj.gen
-    helpers.run_bash_cmnd("mv traj.lammpstrj.gen traj.gen")
+    if args["run_molanal"]:
+        helpers.xyz_to_dftbgen("traj.lammpstrj.xyzf") # Creates a file named traj.lammpstrj.gen
+        helpers.run_bash_cmnd("mv traj.lammpstrj.gen traj.gen")
 
-    if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
-    
-        helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
-    
-    
-    helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
-    helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
-    helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
-    
+        if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
+        
+            helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
+        
+        
+        helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
+        helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
+        helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
+        
     print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
     
     ################################
