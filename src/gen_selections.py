@@ -118,6 +118,7 @@ def cleanup_repo(my_ALC):
     
     print("...done.")
     
+    
 
 def GET_BIN(val,bins):
 
@@ -430,10 +431,10 @@ def gen_subset(**kwargs): # time python gen_subset.py  all.energies_normed $SELE
     print("Values above energy cutoff: ", NCUTOFF)
         
     # Step 1: Select NSELECT-NPOPPED random energies only from SELE elemnts from ENER! (repetition not allowed)
-    
-    #print "Selecting random values on: ",0, NENER-NPOPPED
-    #print "Selecting nvalues:          ",NSELECT-NPOPPED
-    
+        
+    if (NENER-NPOPPED-NCUTOFF) < (NSELECT-NPOPPED):
+        print("ERROR: not enough candidate clusters to select from. Try increasing energy cutoff.")
+        exit(0)    
 
     SELE = random.sample(REPO[0:(NENER-NPOPPED-NCUTOFF)],NSELECT-NPOPPED)     # random sample returns *VALUES* of REPO to SELE... so SELE[i] = energy list index
 

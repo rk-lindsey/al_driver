@@ -19,8 +19,8 @@ def print_help():
     PARAM.append("ATOM_TYPES");                     VARTYP.append("str list");      DETAILS.append("List of atom types in system of interest , e.g. [\"C\", \"H\", \"O\", \"N\"]")
     PARAM.append("NO_CASES");                       VARTYP.append("int");           DETAILS.append("Number of different state points considered")
     PARAM.append("MOLANAL_SPECIES");                VARTYP.append("str list");      DETAILS.append("List of species to track in molanal output, e.g. [\"C1 O1 1(O-C)\", \"C1 O2 2(O-C)\"] ")
-    PARAM.append("STRS_STYLE");                     VARTYP.append("int");           DETAILS.append("ALC at which to start including stress tensors from ALC generated configrations ")
-    PARAM.append("USE_AL_STRS");                    VARTYP.append("str");           DETAILS.append("How stress tensors should be included in the fit, e.g. \"DIAG\" or \"ALL\"")
+    PARAM.append("USE_AL_STRS");                    VARTYP.append("int");           DETAILS.append("ALC at which to start including stress tensors from ALC generated configrations ")
+    PARAM.append("STRS_STYLE");                     VARTYP.append("str");           DETAILS.append("How stress tensors should be included in the fit, e.g. \"DIAG\" or \"ALL\"")
     PARAM.append("THIS_SMEAR");                     VARTYP.append("float");         DETAILS.append("Thermal smearing T in K; if \"None\", different values are used for each case, set in the ALL_BASE_FILES traj_list.dat")
     PARAM.append("DRIVER_DIR");                     VARTYP.append("str");           DETAILS.append("Path to the al_driver code")
     PARAM.append("WORKING_DIR");                    VARTYP.append("str");           DETAILS.append("Path to directory in which code is being run")
@@ -41,8 +41,8 @@ def print_help():
     PARAM.append("HPC_EMAIL");                      VARTYP.append("bool");          DETAILS.append("Controls whether driver status updates are e-mailed to user")
     PARAM.append("ALC0_FILES");                     VARTYP.append("str");           DETAILS.append("Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)")
     PARAM.append("CHIMES_LSQ");                     VARTYP.append("str");           DETAILS.append("ChIMES_lsq executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_lsq\")")
-    PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"lsq2.py\")")
-    PARAM.append("CHIMES_POSTPRC");                 VARTYP.append("str");           DETAILS.append("post_proc_lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"post_proc_lsq2.py\")")
+    PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"../build/chimes_lsq.py\")")
+    PARAM.append("CHIMES_POSTPRC");                 VARTYP.append("str");           DETAILS.append("post_proc_chimes_lsq.py executable absolute path (e.g. CHIMES_SRCDIR + \"../build/post_proc_chimes_lsq.py\")")
     PARAM.append("N_HYPER_SETS");                   VARTYP.append("int");           DETAILS.append("Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data")
     PARAM.append("WEIGHTS_SET_ALC_0");              VARTYP.append("bool");          DETAILS.append("Should ALC-0 (or 1 if no clustering) weights be read directly from a user specified file? ")
     PARAM.append("WEIGHTS_ALC_0");                  VARTYP.append("str");           DETAILS.append("Set if WEIGHTS_SET_ALC_0 is true; path to user specified ALC-0 (or ALC-1) weights ")
@@ -54,6 +54,7 @@ def print_help():
     PARAM.append("REGRESS_ALG");                    VARTYP.append("str");           DETAILS.append("Regression algorithm to use for fitting; only \"lassolars\" supported for now")
     PARAM.append("REGRESS_NRM");                    VARTYP.append("bool");          DETAILS.append("Controls whether A-matrix is normalized prior to solution")
     PARAM.append("REGRESS_VAR");                    VARTYP.append("bool");          DETAILS.append("Regression regularization variable")
+    PARAM.append("CHIMES_LSQ_MODULES");             VARTYP.append("str");           DETAILS.append("System-specific modules needed to run ChIMES-LSQ jobs")
     PARAM.append("CHIMES_BUILD_NODES");             VARTYP.append("int");           DETAILS.append("Number of nodes to use when running chimes_lsq")
     PARAM.append("CHIMES_BUILD_QUEUE");             VARTYP.append("int");           DETAILS.append("Queue to submit chimes_lsq job to")
     PARAM.append("CHIMES_BUILD_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for chimes_lsq job (e.g. \"04:00:00\")")
@@ -63,12 +64,17 @@ def print_help():
     PARAM.append("CHIMES_SOLVE_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for lsq2.py/DLARS (lassolars) job (e.g. \"04:00:00\")")
     PARAM.append("MD_STYLE");                       VARTYP.append("str");           DETAILS.append("Should MD simulations be run as ChIMES-only (\"CHIMES\") or DFTB+ChIMES (\"DFTB\")?")    
     PARAM.append("MOLANAL");                        VARTYP.append("str");           DETAILS.append("Absolute path to the molanal src directory")
+    PARAM.append("RUN_MOLANAL");                    VARTYP.append("bool");          DETAILS.append("Determines if MOLANAL is ran")
     PARAM.append("MDFILES");                        VARTYP.append("str");           DETAILS.append("Absolute path to MD input files like case-0.indep-0.run_md.in (e.g. WORKING_DIR + \"ALL_BASE_FILES/CHIMESMD_FILES\")")
+    PARAM.append("MD_MODULES");                     VARTYP.append("str");           DETAILS.append("System-specific modules needed to run MD")
+    PARAM.append("MD_MPI");                         VARTYP.append("str");           DETAILS.append("MPI-compatible MD exectuable absolute path (either path to \"lmp_mpi_chimes\" or \"chimes_md-mpi\")  ) ")
     PARAM.append("MD_NODES");                       VARTYP.append("int");           DETAILS.append("Number of nodes to use when running md simulations")
     PARAM.append("MD_QUEUE");                       VARTYP.append("str");           DETAILS.append("Queue to submit md simulations to to")
+    PARAM.append("MD_SER");                         VARTYP.append("str");           DETAILS.append("Serial MD executable absolute path (either LAMMPS path or CHIMES_MD_SER)")
     PARAM.append("MD_TIME");                        VARTYP.append("str");           DETAILS.append("Walltime for md simulations (e.g. \"04:00:00\")")
     PARAM.append("DFTB_MD_SER");                    VARTYP.append("str");           DETAILS.append("DFTBplus executable absolute path")
     PARAM.append("CHIMES_MD_SER");                  VARTYP.append("str");           DETAILS.append("Serial ChIMES_md executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-serial\")")
+    PARAM.append("CHIMES_MD_MODULES");              VARTYP.append("str");           DETAILS.append("System-specific modules needed to run ChIMES MD jobs")
     PARAM.append("CHIMES_MD_MPI");                  VARTYP.append("str");           DETAILS.append("MPI-compatible ChIMES_md exectuable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-mpi\")")    
     PARAM.append("CHIMES_PEN_PREFAC");              VARTYP.append("float");         DETAILS.append("ChIMES penalty function prefactor")
     PARAM.append("CHIMES_PEN_DIST");                VARTYP.append("float");         DETAILS.append("ChIMES pentalty function kick-in distance")
@@ -89,19 +95,26 @@ def print_help():
     PARAM.append("IGAS_QM_METHOD");                 VARTYP.append("str");           DETAILS.append("Specifies which nominal QM code to use for gas configurations; options are \"VASP\", \"DFTB+\", and \"Gaussian\"")
     PARAM.append("QM_FILES");                       VARTYP.append("str");           DETAILS.append("Absolute path to QM input files")
     PARAM.append("VASP_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to vasp2yzf.py ")
+    PARAM.append("VASP_MEM");                       VARTYP.append("str");           DETAILS.append("Memory requirements for running VASP jobs")
+    PARAM.append("VASP_MODULES");                   VARTYP.append("str");           DETAILS.append("System-specific modules needed to run VASP jobs")
     PARAM.append("VASP_NODES");                     VARTYP.append("int list");      DETAILS.append("Number of nodes to use for VASP jobs")
     PARAM.append("VASP_PPN");                       VARTYP.append("int");           DETAILS.append("Number of processors to use per node for VASP jobs")
     PARAM.append("VASP_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for VASP calculations, e.g. \"04:00:00\"")
     PARAM.append("VASP_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit VASP jobs to")
     PARAM.append("VASP_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to VASP executable")
     PARAM.append("DFTB_FILES");                     VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ input file ")
-    PARAM.append("DFTB_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to dftb+2yzf.py ")
+    PARAM.append("DFTB_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to dftgen_to_xyz.py ")
+    PARAM.append("DFTB_MEM");                       VARTYP.append("str");           DETAILS.append("Memory requirements for running DFTB+ jobs")
+    PARAM.append("DFTB_MODULES");                   VARTYP.append("str");           DETAILS.append("System-specific modules needed to run DFTB+ jobs")
     PARAM.append("DFTB_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for DFTB+ jobs")
     PARAM.append("DFTB_PPN");                       VARTYP.append("int");           DETAILS.append("Number of processors to use per node for DFTB+ jobs")
     PARAM.append("DFTB_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for DFTB+ calculations, e.g. \"04:00:00\"")
     PARAM.append("DFTB_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit DFTB+ jobs to")
     PARAM.append("DFTB_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ executable")
+    PARAM.append("CP2K_MEM");                       VARTYP.append("str");           DETAILS.append("Memory requirements for running CP2K jobs")
+    PARAM.append("CP2K_MODULES");                   VARTYP.append("str");           DETAILS.append("System-specific modules needed to run CP2K jobs")
     PARAM.append("CP2K_NODES");                     VARTYP.append("int list");      DETAILS.append("Number of nodes to use for CP2K jobs")
+    PARAM.append("CP2K_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to cp2k_to_xyz.py ")
     PARAM.append("CP2K_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for CP2K jobs")
     PARAM.append("CP2K_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for CP2K calculations, e.g. \"04:00:00\"")
     PARAM.append("CP2K_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit CP2K jobs to")
@@ -112,18 +125,22 @@ def print_help():
     PARAM.append("GAUS_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for Gaussian calculations, e.g. \"04:00:00\"")
     PARAM.append("GAUS_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit Gaussian jobs to")
     PARAM.append("GAUS_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian executable")
+    PARAM.append("GAUS_MEM");                       VARTYP.append("str");           DETAILS.append("Memory requirements for running Gaussian jobs")
     PARAM.append("GAUS_SCR");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian scratch directory")
     PARAM.append("GAUS_REF");                       VARTYP.append("str");           DETAILS.append("Name of file containing single atom energies from Gaussian and target planewave method")
-    PARAM.append("LMP_FILES");                     VARTYP.append("int");           DETAILS.append("Path to input files if using it as a refernce (\"QM\") method")
-    PARAM.append("LMP_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for LAMMPS jobs")
-    PARAM.append("LMP_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Path to lmp2xyz.py")
-    PARAM.append("LMP_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for LAMMPS jobs")
-    PARAM.append("LMP_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for LAMMPS calculations, e.g. \"04:00:00\"")
-    PARAM.append("LMP_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit LAMMPS jobs to")
-    PARAM.append("LMP_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to LAMMPS executable")
+    PARAM.append("LMP_FILES");                      VARTYP.append("int");           DETAILS.append("Path to input files if using it as a refernce (\"QM\") method")
+    PARAM.append("LMP_NODES");                      VARTYP.append("int");           DETAILS.append("Number of nodes to use for LAMMPS jobs")
+    PARAM.append("LMP_POSTPRC");                    VARTYP.append("str");           DETAILS.append("Path to lmp_to_xyz.py")
+    PARAM.append("LMP_PPN");                        VARTYP.append("int");           DETAILS.append("Number of procs per node to use for LAMMPS jobs")
+    PARAM.append("LMP_TIME");                       VARTYP.append("str");           DETAILS.append("Walltime for LAMMPS calculations, e.g. \"04:00:00\"")
+    PARAM.append("LMP_QUEUE");                      VARTYP.append("str");           DETAILS.append("Queue to submit LAMMPS jobs to")
+    PARAM.append("LMP_EXE");                        VARTYP.append("str");           DETAILS.append("Absolute path to LAMMPS executable")
     PARAM.append("LMP_MODULES");                    VARTYP.append("str");           DETAILS.append("System-specific modules needed to run LAMMPS")
-    PARAM.append("LMP_DATADIR");                   VARTYP.append("str");           DETAILS.append("Absolute path to CP2K scratch (\"data\") directory")
-
+    PARAM.append("LMP_DATADIR");                    VARTYP.append("str");           DETAILS.append("Absolute path to CP2K scratch (\"data\") directory")
+    PARAM.append("LMP_EXE");                        VARTYP.append("str");           DETAILS.append("Absolute path to LAMMPS executable")
+    PARAM.append("LMP_MEM");                        VARTYP.append("str");           DETAILS.append("Memory requirements for running LAMMPS jobs")
+    PARAM.append("LMP_UNITS");                      VARTYP.append("str");           DETAILS.append("Units LAMMPS input/output is expected to be")
+   
 
     print("Help info: ")
     print("Run with, e.g.: unbuffer python /path/to/al_driver/main.py 0 1 2 | tee driver.log")
@@ -741,24 +758,6 @@ def verify(user_config):
         exit()    
     else:    
         user_config.NO_CASES = int(user_config.NO_CASES)
-        
-
-    if not hasattr(user_config,'MOLANAL_SPECIES'):
-
-        # Species to track/plot from molanal... only used for post-processing
-        # MOLANAL_SPECIES
-        #MOLANAL_SPECIES = ["C1 O1 1(O-C)",
-            #               "C1 O2 2(O-C)",
-            #               "N2 1(N-N)",
-            #               "N1 O1 1(O-N)",
-            #               "N2 O1 1(N-N) 1(O-N)",
-            #               "O2 1(O-O)"]#
-
-        print("WARNING: Option config.MOLANAL_SPECIES was not set")
-        print("         Will use:")
-        print("\t",user_config.MOLANAL_SPECIES)
-        
-        user_config.MOLANAL_SPECIES = user_config.MOLANAL_SPECIES
 
     if not hasattr(user_config,'USE_AL_STRS'):
 
@@ -892,10 +891,9 @@ def verify(user_config):
 
         # HPC Charge bank/account
 
-        print("WARNING: Option config.HPC_ACCOUNT was not set")
-        print("         Will use pbronze")    
-        
-        user_config.HPC_ACCOUNT = "pbronze"    
+        print("ERROR: Option config.HPC_ACCOUNT was not set!")
+        print("       Exiting")    
+        exit()   
         
     if not hasattr(user_config,'HPC_SYSTEM'):
 
@@ -1038,7 +1036,7 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_LSQ was not set")
         print("         Will use config.CHIMES_SRCDIR + \"chimes_lsq\"")
         
-        user_config.CHIMES_LSQ    = user_config.CHIMES_SRCDIR + "chimes_lsq"
+        user_config.CHIMES_LSQ    = user_config.CHIMES_SRCDIR + "../build/chimes_lsq"
         
     if not hasattr(user_config,'CHIMES_LSQ_MODULES'):
     
@@ -1056,9 +1054,9 @@ def verify(user_config):
         # Location of lsq2.py script
 
         print("WARNING: Option config.CHIMES_SOLVER was not set")
-        print("         Will use config.CHIMES_SRCDIR + \"lsq2.py\"")
+        print("         Will use config.CHIMES_SRCDIR + \"/build/chimes_lsq.py\"")
         
-        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "lsq2.py"
+        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "../build/chimes_lsq.py"
         
     if not hasattr(user_config,'CHIMES_POSTPRC'):
 
@@ -1266,9 +1264,9 @@ def verify(user_config):
 
         # Simulation method, i.e. ChIMES MD or DFTBplus+ChIMES
 
-        print("ERROR: Simulation mode not specified!")
-        print("         config.MD_STYLE must be set to \"CHIMES\", \"LMP\", or \"DFTB\"")
-        exit()
+        print("Warning: Simulation mode not specified")
+        print("         config.MD_STYLE was set to \"CHIMES\" options are: \"CHIMES\", \"LMP\", or \"DFTB\"")
+        user_config.MD_STYLE = "CHIMES"
     else:
         print("Will run simulations using method: ", user_config.MD_STYLE)
     
@@ -1287,7 +1285,7 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_MD_SER was not set")
         print("         Will use config.CHIMES_SRCDIR + \"chimes_md-serial\"")
         
-        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "chimes_md-serial"        
+        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "/../build/chimes_md-serial"        
     
     if user_config.MD_STYLE == "CHIMES":
         
@@ -1298,7 +1296,7 @@ def verify(user_config):
             print("WARNING: Option config.CHIMES_MD_MPI was not set")
             print("         Will use config.CHIMES_SRCDIR + \"chimes_md-mpi\"")
         
-            user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"
+            user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "/../build/chimes_md-mpi"
 
     else:
     	if not hasattr(user_config,'MD_MPI'):
@@ -1314,13 +1312,37 @@ def verify(user_config):
     	user_config.CHIMES_MD_MPI = None
     	user_config.CHIMES_MD_SER = None
         
+    if not hasattr(user_config,'RUN_MOLANAL'):
+
+        # If molanal post process script should be run
+        user_config.RUN_MOLANAL = True
+        print("WARNING: If MOLANAL path is defined, MOLANAL will be ran")
+        print("         RUN_MOLANAL set to True")
+        
     if not hasattr(user_config,'MOLANAL'):
 
         # Path to molanal executable
-
-        print("Error: Option config.MOLANAL was not set")
-        print("       Acceptable settings are of the form of an absolute path (Unix)")
+        user_config.RUN_MOLANAL = False
+        user_config.MOLANAL = ""
+        print("WARNING: MOLANAL will not be ran.")
+        print("         RUN_MOLANAL set to False")
+    
+    if not hasattr(user_config,'MOLANAL_SPECIES'):
         
+        # Species to track/plot from molanal... only used for post-processing
+        # MOLANAL_SPECIES
+        #MOLANAL_SPECIES = ["C1 O1 1(O-C)",
+            #               "C1 O2 2(O-C)",
+            #               "N2 1(N-N)",
+            #               "N1 O1 1(O-N)",
+            #               "N2 O1 1(N-N) 1(O-N)",
+            #               "O2 1(O-O)"]#
+            
+        if user_config.RUN_MOLANAL:
+            print("WARNING: Option config.MOLANAL_SPECIES was not set")
+            print("         Will set to no species.")
+        
+        user_config.MOLANAL_SPECIES = [""]
     
         
     if not hasattr(user_config,'MDFILES'):

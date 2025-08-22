@@ -36,17 +36,32 @@ def writeframe(frame, badness, badstream0, badstream1, badstream2):
     else:
         print("Something strange happened... ")
         print("In writeframe, badness is:",badness)
-        exit();
+        exit()
         
     xyz_text = []
     xyz_text.append(frame[3]) # Number of atoms
+
     
     boxl_x = frame[5]; boxl_x = boxl_x.split()
     boxl_y = frame[6]; boxl_y = boxl_y.split()
     boxl_z = frame[7]; boxl_z = boxl_z.split()
+    
+    if len(boxl_x) == 3: # Then its non-orthorhombic using restricted triclinic format
 
-    if len(boxl_x) == 3: # Then its non-orthorhombic
-        xyz_text.append("NON_ORTHO" + " " + ' '.join(boxl_x) + " " + ' '.join(boxl_y) + " " + ' '.join(boxl_z))
+
+        box_Ax = str(float(boxl_x[1])-float(boxl_x[0]))
+        box_Ay = "0.0"
+        box_Az = "0.0"
+
+        box_Bx = boxl_x[2]
+        box_By = str(float(boxl_y[1])-float(boxl_y[0]))
+        box_Bz = "0.0"
+
+        box_Cx = boxl_y[2]
+        box_Cy = boxl_z[2]
+        box_Cz = str(float(boxl_z[1])-float(boxl_z[0]))
+
+        xyz_text.append("NON_ORTHO " + box_Ax + " " + box_Ay + " " + box_Az + " " + box_Bx + " " + box_By + " " + box_Bz + " " + box_Cx + " " + box_Cy + " " + box_Cz + " " +'\n')
                         
     elif len(boxl_x) == 2: # Then orthorhombic
 
@@ -243,18 +258,19 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     # Convert the resulting trajectory file to .gen file named traj.gen
     
     lmp_to_xyz.lmp_to_xyzf("REAL", "traj.lammpstrj", "log.lammps") # Creates a file called traj.lammptrj.xyzf
-    helpers.xyz_to_dftbgen("traj.lammpstrj.xyzf") # Creates a file named traj.lammpstrj.gen
-    helpers.run_bash_cmnd("mv traj.lammpstrj.gen traj.gen")
+    if args["run_molanal"]:
+        helpers.xyz_to_dftbgen("traj.lammpstrj.xyzf") # Creates a file named traj.lammpstrj.gen
+        helpers.run_bash_cmnd("mv traj.lammpstrj.gen traj.gen")
 
-    if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
-    
-        helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
-    
-    
-    helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
-    helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
-    helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
-    
+        if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
+        
+            helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
+        
+        
+        helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
+        helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
+        helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
+        
     print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
     
     ################################

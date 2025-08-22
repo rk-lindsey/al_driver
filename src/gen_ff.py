@@ -192,7 +192,9 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
     
     E. w = n_atoms^a0
     
-    F. w = a0*exp(a1[ X/n_atoms-a2]/a3)
+    F. w = a0*exp(a1[X/n_atoms-a2]/a3)
+    
+    G. w = a0*exp(a1[|X|-a2]/a3)
     
     Example wXX value: ["C",[a0,a1,a2]]
     
@@ -261,8 +263,16 @@ def gen_weights_one(w_method, this_ALC, b_labeled_i, natoms_i):
             print(w_method)
             exit()
     
-        weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * (float(b_labeled_i)/float(natoms_i)-float(w_method[1][2])) / float(w_method[1][3]) )        
+        weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * (float(b_labeled_i)/float(natoms_i)-float(w_method[1][2])) / float(w_method[1][3]) )      
 
+    elif w_method[0] == "G":
+    
+        if len(w_method[1]) != 4:
+            print("ERROR: Found weight request with wrong number of parameters:")
+            print(w_method)
+            exit()
+    
+        weight =  float(w_method[1][0]) * m.exp( float(w_method[1][1]) * (abs(float(b_labeled_i))-float(w_method[1][2])) / float(w_method[1][3]) )
     else:
         print("ERROR: Unknown weight method!")
         exit()
@@ -434,50 +444,53 @@ def restart_solve_amat(my_ALC, **kwargs):
     # dim.txt
     
     
-    # Figure out what the restart job was:
-     
-    prev_restarts = sorted(glob.glob("restart*txt"))
-    tmp = prev_restarts[0:-1]
-
-
-    def numeric_keys(instr):
-        return int(instr.split('-')[-1].split('.')[0])
-   
-    tmp.sort(key=numeric_keys)
-    tmp.append(prev_restarts[-1])
+    # I think this method only works with the old dlars, which wrote a 
+    # single restart file per run rather than one per proc. Need to revise.
     
-    prev_restarts = copy.deepcopy(tmp)
+    # New logic: 
+    #
+    # 1. Check if there are restart files (E.g., restart.0000) - this indicates
+    #    at least one dlars job began
     
-    print("Found the following dlars/dlasso restart files:", prev_restarts)
-
-    if len(prev_restarts) == 0:
-        print("Bad logic in restart_solve_amat...")
-        print("prev_restarts list is empty")
-        exit()
+    has_restart_files = False
+    prev_restarts     = 0
     
-    if prev_restarts[-1] != "restart.txt":
-        print("Bad logic in restart_solve_amat...")
-        print("last item in prev_restarts should be restart.txt")
-        exit()
-        
-    # Copy restart.txt to a new (original) name
-    
-    this_restart = "restart-1.txt"
-    
-    if len(prev_restarts) == 1:
-        helpers.run_bash_cmnd("cp restart.txt " + this_restart)
+    prev_restarts = glob.glob("restart.0*")
+    if len(prev_restarts) > 0:
+        has_restart_files = True
     else:
-        this_restart  = "restart-"
-        this_restart += repr(int(prev_restarts[-2].split("-")[1].split(".")[0])+1)
-        this_restart += ".txt"
+        print("Bad logic in restart_solve_amat...")
+        print("prev_restarts list is empty - check that initial dlars job ran properly")
+        exit()   
     
-        helpers.run_bash_cmnd("cp restart.txt " + this_restart)
-        
-        
-    run_no = int(this_restart.split("-")[1].split(".")[0])
+    #
+    # 2. Determine if the jobs has been restarted before - in this case, we're 
+    #    going to see if folders named like restart-X exist, and what the last one was
+    #
+    
+    
+    prev_restart_folders = sorted(glob.glob("run-*")) #  Find all restart folders
+    
+    if len(prev_restart_folders) > 0:
+        def numeric_keys(instr):
+            return int(instr.split('-')[-1])
+            
+        prev_restart_folders.sort(key=numeric_keys)
+        prev_restart_folders = int(prev_restart_folders[-1]) # Grab the index of the last restart folder 
+    else:
+        prev_restart_folders = 0          
+    
+    print("DLARS has been restarted n times, with n = :", prev_restart_folders)
+      
+    #
+    # 3. Copy restart.0* files and other dlars files to a new (restart-*) folder
+    #
 
-    helpers.run_bash_cmnd("mkdir run-"+repr(run_no))
-    helpers.run_bash_cmnd("cp restart.txt dlars.log traj.txt run-"+repr(run_no))
+    prev_restart_folders = "run-" + str(prev_restart_folders)
+    
+    helpers.run_bash_cmnd("mkdir " + prev_restart_folders)
+    helpers.run_bash_cmnd("cp " + ' '.join(prev_restarts) + " " +  prev_restart_folders)
+    helpers.run_bash_cmnd("cp dlars.log traj.txt " + prev_restart_folders)
 
     # Determine whether this was a job with a split amat, and if so, ensure files are correct
     
@@ -542,7 +555,7 @@ def restart_solve_amat(my_ALC, **kwargs):
             job_task += "--split_files True    "
         
         
-    job_task += "--restart_dlasso_dlars "  + this_restart + " "             
+    job_task += "--restart_dlasso_dlars "  + prev_restart_folders + "/restart" #+ this_restart + " "             
     
 
     # Launch the job
@@ -563,7 +576,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 
     os.chdir("..")
     
-    return run_py_jobid.split()[0]
+    return [run_py_jobid]
     
 def parse_hyper_params(**kwargs):
 
@@ -677,30 +690,30 @@ def build_amat(my_ALC, **kwargs):
     default_keys[5 ] = "include_stress"    ; default_values[5 ] =     False                  # Should stress tensors be included in the A-matrix?
     default_keys[6 ] = "stress_style"      ; default_values[6 ] =     "DIAG"                 # Should the full stress tensor or only diagonal componets be considered? Only used if include_stress is true
     default_keys[7 ] = "do_hierarch"       ; default_values[7 ] =     False                  # Are we building parameters hierarchically?
-    default_keys[8 ] = "hierarch_method"   ; default_values[7 ] =     "CHIMES"  	     # Method for determining hierarch. contributions
-    default_keys[9 ] = "hierarch_files"    ; default_values[8 ] =     []		     # List of existing parameter files for hierarchical fitting
-    default_keys[10] = "hierarch_exe"	   ; default_values[9 ] =     None		     # Executable for subtracting parameter file contributions
-    default_keys[11] = "do_correction"     ; default_values[10] =     False		     # Are we fitting a correction to an underlying method?
-    default_keys[12] = "correction_exe"    ; default_values[11] =     None		     # Exectuable to evaluate interactions via method to be corrected
-    default_keys[13] = "correction_files"  ; default_values[12] =     None                   # Path to directory containng files needed for calculating interactions via method to be corrected
-    default_keys[14] = "correction_exe"    ; default_values[13] =     None                   # Executable for method being corrected
-    default_keys[15] = "correction_temps"  ; default_values[14] =     None                   # How to handle electron temperatures for 1st ALC
-    default_keys[16] = "n_hyper_sets"      ; default_values[15] =     1                      # Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data
+    default_keys[8 ] = "hierarch_method"   ; default_values[8 ] =     "CHIMES"  	     # Method for determining hierarch. contributions
+    default_keys[9 ] = "hierarch_files"    ; default_values[9 ] =     []		     # List of existing parameter files for hierarchical fitting
+    default_keys[10] = "hierarch_exe"	   ; default_values[10 ] =     None		     # Executable for subtracting parameter file contributions
+    default_keys[11] = "do_correction"     ; default_values[11] =     False		     # Are we fitting a correction to an underlying method?
+    default_keys[12] = "correction_exe"    ; default_values[12] =     None		     # Exectuable to evaluate interactions via method to be corrected
+    default_keys[13] = "correction_files"  ; default_values[13] =     None                   # Path to directory containng files needed for calculating interactions via method to be corrected
+    default_keys[14] = "correction_exe"    ; default_values[14] =     None                   # Executable for method being corrected
+    default_keys[15] = "correction_temps"  ; default_values[15] =     None                   # How to handle electron temperatures for 1st ALC
+    default_keys[16] = "n_hyper_sets"      ; default_values[16] =     1                      # Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data
     
     
         
     # Job controls
     
-    default_keys[17] = "job_name"	   ; default_values[16] =     "ALC-"+ repr(my_ALC)+"-lsq-1"   # Name for ChIMES lsq job
-    default_keys[18] = "job_nodes"	   ; default_values[17] =     "2"			      # Number of nodes for ChIMES lsq job
-    default_keys[19] = "job_ppn"	   ; default_values[18] =     "36"			      # Number of processors per node for ChIMES lsq job
-    default_keys[20] = "job_walltime"	   ; default_values[19] =     "1"			      # Walltime in hours for ChIMES lsq job
-    default_keys[21] = "job_queue"	   ; default_values[20] =     "pdebug"  		      # Queue for ChIMES lsq job
-    default_keys[22] = "job_account"	   ; default_values[21] =     "pbronze" 		      # Account for ChIMES lsq job
-    default_keys[23] = "job_executable"    ; default_values[22] =     ""			      # Full path to executable for ChIMES lsq job
-    default_keys[24] = "job_system"	   ; default_values[23] =     "slurm"			      # slurm or torque    
-    default_keys[25] = "job_email"	   ; default_values[24] =      True			      # Send slurm emails?
-    default_keys[26] = "job_modules"       ; default_values[25] =     ""                              # Modules for the job
+    default_keys[17] = "job_name"	   ; default_values[17] =     "ALC-"+ repr(my_ALC)+"-lsq-1"   # Name for ChIMES lsq job
+    default_keys[18] = "job_nodes"	   ; default_values[18] =     "2"			      # Number of nodes for ChIMES lsq job
+    default_keys[19] = "job_ppn"	   ; default_values[19] =     "36"			      # Number of processors per node for ChIMES lsq job
+    default_keys[20] = "job_walltime"	   ; default_values[20] =     "1"			      # Walltime in hours for ChIMES lsq job
+    default_keys[21] = "job_queue"	   ; default_values[21] =     "pdebug"  		      # Queue for ChIMES lsq job
+    default_keys[22] = "job_account"	   ; default_values[22] =     "pbronze" 		      # Account for ChIMES lsq job
+    default_keys[23] = "job_executable"    ; default_values[23] =     ""			      # Full path to executable for ChIMES lsq job
+    default_keys[24] = "job_system"	   ; default_values[24] =     "slurm"			      # slurm or torque    
+    default_keys[25] = "job_email"	   ; default_values[25] =      True			      # Send slurm emails?
+    default_keys[26] = "job_modules"       ; default_values[26] =     ""                              # Modules for the job
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)
@@ -1280,7 +1293,7 @@ def solve_amat(my_ALC, **kwargs):
 
     os.chdir("..")
     
-    return run_py_jobid.split()[0]
+    return [run_py_jobid]
 
 
 def split_weights():
