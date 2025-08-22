@@ -444,50 +444,53 @@ def restart_solve_amat(my_ALC, **kwargs):
     # dim.txt
     
     
-    # Figure out what the restart job was:
-     
-    prev_restarts = sorted(glob.glob("restart*txt"))
-    tmp = prev_restarts[0:-1]
-
-
-    def numeric_keys(instr):
-        return int(instr.split('-')[-1].split('.')[0])
-   
-    tmp.sort(key=numeric_keys)
-    tmp.append(prev_restarts[-1])
+    # I think this method only works with the old dlars, which wrote a 
+    # single restart file per run rather than one per proc. Need to revise.
     
-    prev_restarts = copy.deepcopy(tmp)
+    # New logic: 
+    #
+    # 1. Check if there are restart files (E.g., restart.0000) - this indicates
+    #    at least one dlars job began
     
-    print("Found the following dlars/dlasso restart files:", prev_restarts)
-
-    if len(prev_restarts) == 0:
-        print("Bad logic in restart_solve_amat...")
-        print("prev_restarts list is empty")
-        exit()
+    has_restart_files = False
+    prev_restarts     = 0
     
-    if prev_restarts[-1] != "restart.txt":
-        print("Bad logic in restart_solve_amat...")
-        print("last item in prev_restarts should be restart.txt")
-        exit()
-        
-    # Copy restart.txt to a new (original) name
-    
-    this_restart = "restart-1.txt"
-    
-    if len(prev_restarts) == 1:
-        helpers.run_bash_cmnd("cp restart.txt " + this_restart)
+    prev_restarts = glob.glob("restart.0*")
+    if len(prev_restarts) > 0:
+        has_restart_files = True
     else:
-        this_restart  = "restart-"
-        this_restart += repr(int(prev_restarts[-2].split("-")[1].split(".")[0])+1)
-        this_restart += ".txt"
+        print("Bad logic in restart_solve_amat...")
+        print("prev_restarts list is empty - check that initial dlars job ran properly")
+        exit()   
     
-        helpers.run_bash_cmnd("cp restart.txt " + this_restart)
-        
-        
-    run_no = int(this_restart.split("-")[1].split(".")[0])
+    #
+    # 2. Determine if the jobs has been restarted before - in this case, we're 
+    #    going to see if folders named like restart-X exist, and what the last one was
+    #
+    
+    
+    prev_restart_folders = sorted(glob.glob("run-*")) #  Find all restart folders
+    
+    if len(prev_restart_folders) > 0:
+        def numeric_keys(instr):
+            return int(instr.split('-')[-1])
+            
+        prev_restart_folders.sort(key=numeric_keys)
+        prev_restart_folders = int(prev_restart_folders[-1]) # Grab the index of the last restart folder 
+    else:
+        prev_restart_folders = 0          
+    
+    print("DLARS has been restarted n times, with n = :", prev_restart_folders)
+      
+    #
+    # 3. Copy restart.0* files and other dlars files to a new (restart-*) folder
+    #
 
-    helpers.run_bash_cmnd("mkdir run-"+repr(run_no))
-    helpers.run_bash_cmnd("cp restart.txt dlars.log traj.txt run-"+repr(run_no))
+    prev_restart_folders = "run-" + str(prev_restart_folders)
+    
+    helpers.run_bash_cmnd("mkdir " + prev_restart_folders)
+    helpers.run_bash_cmnd("cp " + ' '.join(prev_restarts) + " " +  prev_restart_folders)
+    helpers.run_bash_cmnd("cp dlars.log traj.txt " + prev_restart_folders)
 
     # Determine whether this was a job with a split amat, and if so, ensure files are correct
     
@@ -552,7 +555,7 @@ def restart_solve_amat(my_ALC, **kwargs):
             job_task += "--split_files True    "
         
         
-    job_task += "--restart_dlasso_dlars "  + this_restart + " "             
+    job_task += "--restart_dlasso_dlars "  + prev_restart_folders + "/restart" #+ this_restart + " "             
     
 
     # Launch the job
@@ -573,7 +576,7 @@ def restart_solve_amat(my_ALC, **kwargs):
 
     os.chdir("..")
     
-    return run_py_jobid.split()[0]
+    return [run_py_jobid]
     
 def parse_hyper_params(**kwargs):
 

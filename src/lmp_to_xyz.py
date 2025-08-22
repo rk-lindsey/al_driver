@@ -3,6 +3,31 @@ import helpers
 from math import floor
 
 
+def parse_thermo(logfile):
+    """
+    This file is used to extract only ther thermo lines from a LAMMPS log file
+    This is particularly useful when multiple run commands are issued inside a script.
+    Produces a file called thermo.lammps
+    """
+
+    thermofile = "thermo.lammps"
+    inside = False
+
+    with open(logfile, "r") as fin, open(thermofile, "w") as fout:
+        for line in fin:
+            linesplit = line.split()
+            if len(linesplit) >= 2:
+                if (linesplit[0] == "Step") and (linesplit[1] == "Time"):
+                    inside = True
+                    #fout.write(line)        # include the header line
+                    continue
+            if inside:
+                if line.startswith("Loop time") or line.startswith("ERROR:"):
+                    inside = False      # do not include "Loop time" line
+                else:
+                    fout.write(line)    # write chunk lines as-is
+
+
 def lmp_to_xyzf(units, trjfile, logfile):  # , argv):
     """
     Units are either: "REAL" or "METAL" -- Ancillary support for units metal
@@ -26,6 +51,8 @@ def lmp_to_xyzf(units, trjfile, logfile):  # , argv):
     natoms = int(helpers.head(trjfile, 4)[-1])
     outfile = trjfile + ".xyzf"
     ofstream = open(outfile, "w")
+    
+    
 
     skip = 1
 
@@ -58,18 +85,22 @@ def lmp_to_xyzf(units, trjfile, logfile):  # , argv):
 
     # Count the number of stats lines in the log file - this should match the number of frames in the traj file
 
-    stats_start = int(helpers.getlineno("Step", logfile)[-1]) + 1  # Index of first thermo output line
-    stats_end   = None
-    try:
-        stats_end = int(helpers.getlineno("Loop", logfile)[-1]) - 1  # Index of last thermo output line
-    except:
-        try:
-            stats_end = int(helpers.getlineno("ERROR", logfile)[-1]) - 1  # Index of last thermo output line
-        except:
-            stats_end = int(helpers.wc_l(logfile))  # Index of last thermo output line
-            stats_start += 1
-            
-    nstat_lines = stats_end - stats_start + 1
+#    stats_start = int(helpers.getlineno("Step", logfile)[-1]) + 1  # Index of first thermo output line
+#    stats_end   = None
+#    try:
+#        stats_end = int(helpers.getlineno("Loop", logfile)[-1]) - 1  # Index of last thermo output line
+#    except:
+#        try:
+#            stats_end = int(helpers.getlineno("ERROR", logfile)[-1]) - 1  # Index of last thermo output line
+#        except:
+#            stats_end = int(helpers.wc_l(logfile))  # Index of last thermo output line
+#            stats_start += 1
+#            
+#    nstat_lines = stats_end - stats_start + 1
+    
+    parse_thermo(logfile) # Creates file thermo.lammps that only contains thermo lines
+    logfile = "thermo.lammps"    
+    nstat_lines = int(helpers.wc_l(logfile))
 
     # Count the number of frames in the lammps file
 
@@ -92,7 +123,8 @@ def lmp_to_xyzf(units, trjfile, logfile):  # , argv):
 
     # Grab the energy and stress data from the logfile
 
-    stats = helpers.head(logfile, stats_end + 1)[-nstat_lines:]
+#    stats = helpers.head(logfile, stats_end + 1)[-nstat_lines:]
+    stats = helpers.cat_to_var(logfile)
 
     energy  = []
     stensor = []
