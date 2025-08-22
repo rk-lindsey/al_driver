@@ -10,21 +10,25 @@ def print_help():
     Prints a list of expected config options and thier purpose"
     
     """
+    PARAM=[]
+    VARTYP=[]
+    DETAILS=[]
 
     PARAM.append("EMAIL_ADD");                      VARTYP.append("str");           DETAILS.append("E-mail address for driver to sent status updates to")
     PARAM.append("SEED");                           VARTYP.append("int");           DETAILS.append("Seed for random number generator (used for MC cluster selection)")
     PARAM.append("ATOM_TYPES");                     VARTYP.append("str list");      DETAILS.append("List of atom types in system of interest , e.g. [\"C\", \"H\", \"O\", \"N\"]")
     PARAM.append("NO_CASES");                       VARTYP.append("int");           DETAILS.append("Number of different state points considered")
     PARAM.append("MOLANAL_SPECIES");                VARTYP.append("str list");      DETAILS.append("List of species to track in molanal output, e.g. [\"C1 O1 1(O-C)\", \"C1 O2 2(O-C)\"] ")
-    PARAM.append("STRS_STYLE");                     VARTYP.append("int");           DETAILS.append("ALC at which to start including stress tensors from ALC generated configrations ")
-    PARAM.append("USE_AL_STRS");                    VARTYP.append("str");           DETAILS.append("How stress tensors should be included in the fit, e.g. \"DIAG\" or \"ALL\"")
+    PARAM.append("USE_AL_STRS");                    VARTYP.append("int");           DETAILS.append("ALC at which to start including stress tensors from ALC generated configrations ")
+    PARAM.append("STRS_STYLE");                     VARTYP.append("str");           DETAILS.append("How stress tensors should be included in the fit, e.g. \"DIAG\" or \"ALL\"")
     PARAM.append("THIS_SMEAR");                     VARTYP.append("float");         DETAILS.append("Thermal smearing T in K; if \"None\", different values are used for each case, set in the ALL_BASE_FILES traj_list.dat")
     PARAM.append("DRIVER_DIR");                     VARTYP.append("str");           DETAILS.append("Path to the al_driver code")
     PARAM.append("WORKING_DIR");                    VARTYP.append("str");           DETAILS.append("Path to directory in which code is being run")
     PARAM.append("CHIMES_SRCDIR");                  VARTYP.append("str");           DETAILS.append("Path to directory containing the ChIMES_MD source code")
     PARAM.append("DO_HIERARCH");                    VARTYP.append("bool");          DETAILS.append("Is this a hierarchical fit (i.e., building on existing parameters?") 
     PARAM.append("HIERARCH_PARAM_FILES");           VARTYP.append("str list");      DETAILS.append("List of parameter files to build on, which chould be in ALL_BASE_FILES/HIERARCH_PARAMS")     
-    PARAM.append("HIERARCH_EXE");                   VARTYP.append("str");           DETAILS.append("Executable to use when subtracting existing parameter contributions")     
+    PARAM.append("HIERARCH_METHOD");                VARTYP.append("str");           DETAILS.append("MD method to use for subtracting existing parameter contributions - current options are CHIMES or LMP")     
+    PARAM.append("HIERARCH_EXE");                   VARTYP.append("str");           DETAILS.append("Executable to use when subtracting existing parameter contributions")         
     PARAM.append("FIT_CORRECTION");                 VARTYP.append("bool");          DETAILS.append("Is this ChIMES model being fit as a correction to another method?") 
     PARAM.append("CORRECTED_TYPE");                 VARTYP.append("str");           DETAILS.append("Method type being corrected. Currently only \"DFTB\" is supported")    
     PARAM.append("CORRECTED_TYPE_FILES");           VARTYP.append("str");           DETAILS.append("Files needed to run simulations/single points with the method to be corrected")    
@@ -32,13 +36,14 @@ def print_help():
     PARAM.append("CORRECTED_TEMPS_BY_FILE");        VARTYP.append("bool");          DETAILS.append("Should electron temperatures be set to values in traj_list.dat (false) or in specified file location, for correction calculation? Only needed if correction method is QM-based. ")
     PARAM.append("HPC_PPN");                        VARTYP.append("int");           DETAILS.append("The number of processors per node on the machine code is launched on")    
     PARAM.append("HPC_ACCOUNT");                    VARTYP.append("str");           DETAILS.append("Charge bank name on machine code is launched on (e.g. \"pbronze\")")
-    PARAM.append("HPC_SYSTEM");                     VARTYP.append("str");           DETAILS.append("Job scheduler on machine code is launched on (only \"slurm\" is supported currently)")
+    PARAM.append("HPC_SYSTEM");                     VARTYP.append("str");           DETAILS.append("Job scheduler on machine code is launched on (only \"slurm\" , \"TACC\" and \"UM-ARC\" are supported currently)")
     PARAM.append("HPC_PYTHON");                     VARTYP.append("str");           DETAILS.append("Path to python executable (2.X required for now)")
     PARAM.append("HPC_EMAIL");                      VARTYP.append("bool");          DETAILS.append("Controls whether driver status updates are e-mailed to user")
     PARAM.append("ALC0_FILES");                     VARTYP.append("str");           DETAILS.append("Path to base files required by the driver (e.g. ChIMES input files, VASP, input files, etc.)")
     PARAM.append("CHIMES_LSQ");                     VARTYP.append("str");           DETAILS.append("ChIMES_lsq executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_lsq\")")
-    PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"lsq2.py\")")
-    PARAM.append("CHIMES_POSTPRC");                 VARTYP.append("str");           DETAILS.append("post_proc_lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"post_proc_lsq2.py\")")
+    PARAM.append("CHIMES_SOLVER");                  VARTYP.append("str");           DETAILS.append("lsq2.py executable absolute path (e.g. CHIMES_SRCDIR + \"../build/chimes_lsq.py\")")
+    PARAM.append("CHIMES_POSTPRC");                 VARTYP.append("str");           DETAILS.append("post_proc_chimes_lsq.py executable absolute path (e.g. CHIMES_SRCDIR + \"../build/post_proc_chimes_lsq.py\")")
+    PARAM.append("N_HYPER_SETS");                   VARTYP.append("int");           DETAILS.append("Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data")
     PARAM.append("WEIGHTS_SET_ALC_0");              VARTYP.append("bool");          DETAILS.append("Should ALC-0 (or 1 if no clustering) weights be read directly from a user specified file? ")
     PARAM.append("WEIGHTS_ALC_0");                  VARTYP.append("str");           DETAILS.append("Set if WEIGHTS_SET_ALC_0 is true; path to user specified ALC-0 (or ALC-1) weights ")
     PARAM.append("WEIGHTS_FORCE");                  VARTYP.append("list");          DETAILS.append("Weight/method to apply to bulk forces during A-matrix solution ")
@@ -49,6 +54,7 @@ def print_help():
     PARAM.append("REGRESS_ALG");                    VARTYP.append("str");           DETAILS.append("Regression algorithm to use for fitting; only \"lassolars\" supported for now")
     PARAM.append("REGRESS_NRM");                    VARTYP.append("bool");          DETAILS.append("Controls whether A-matrix is normalized prior to solution")
     PARAM.append("REGRESS_VAR");                    VARTYP.append("bool");          DETAILS.append("Regression regularization variable")
+    PARAM.append("CHIMES_LSQ_MODULES");             VARTYP.append("str");           DETAILS.append("System-specific modules needed to run ChIMES-LSQ jobs")
     PARAM.append("CHIMES_BUILD_NODES");             VARTYP.append("int");           DETAILS.append("Number of nodes to use when running chimes_lsq")
     PARAM.append("CHIMES_BUILD_QUEUE");             VARTYP.append("int");           DETAILS.append("Queue to submit chimes_lsq job to")
     PARAM.append("CHIMES_BUILD_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for chimes_lsq job (e.g. \"04:00:00\")")
@@ -58,12 +64,17 @@ def print_help():
     PARAM.append("CHIMES_SOLVE_TIME");              VARTYP.append("str");           DETAILS.append("Walltime for lsq2.py/DLARS (lassolars) job (e.g. \"04:00:00\")")
     PARAM.append("MD_STYLE");                       VARTYP.append("str");           DETAILS.append("Should MD simulations be run as ChIMES-only (\"CHIMES\") or DFTB+ChIMES (\"DFTB\")?")    
     PARAM.append("MOLANAL");                        VARTYP.append("str");           DETAILS.append("Absolute path to the molanal src directory")
+    PARAM.append("RUN_MOLANAL");                    VARTYP.append("bool");          DETAILS.append("Determines if MOLANAL is ran")
     PARAM.append("MDFILES");                        VARTYP.append("str");           DETAILS.append("Absolute path to MD input files like case-0.indep-0.run_md.in (e.g. WORKING_DIR + \"ALL_BASE_FILES/CHIMESMD_FILES\")")
+    PARAM.append("MD_MODULES");                     VARTYP.append("str");           DETAILS.append("System-specific modules needed to run MD")
+    PARAM.append("MD_MPI");                         VARTYP.append("str");           DETAILS.append("MPI-compatible MD exectuable absolute path (either path to \"lmp_mpi_chimes\" or \"chimes_md-mpi\")  ) ")
     PARAM.append("MD_NODES");                       VARTYP.append("int");           DETAILS.append("Number of nodes to use when running md simulations")
     PARAM.append("MD_QUEUE");                       VARTYP.append("str");           DETAILS.append("Queue to submit md simulations to to")
+    PARAM.append("MD_SER");                         VARTYP.append("str");           DETAILS.append("Serial MD executable absolute path (either LAMMPS path or CHIMES_MD_SER)")
     PARAM.append("MD_TIME");                        VARTYP.append("str");           DETAILS.append("Walltime for md simulations (e.g. \"04:00:00\")")
     PARAM.append("DFTB_MD_SER");                    VARTYP.append("str");           DETAILS.append("DFTBplus executable absolute path")
     PARAM.append("CHIMES_MD_SER");                  VARTYP.append("str");           DETAILS.append("Serial ChIMES_md executable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-serial\")")
+    PARAM.append("CHIMES_MD_MODULES");              VARTYP.append("str");           DETAILS.append("System-specific modules needed to run ChIMES MD jobs")
     PARAM.append("CHIMES_MD_MPI");                  VARTYP.append("str");           DETAILS.append("MPI-compatible ChIMES_md exectuable absolute path (e.g. CHIMES_SRCDIR + \"chimes_md-mpi\")")    
     PARAM.append("CHIMES_PEN_PREFAC");              VARTYP.append("float");         DETAILS.append("ChIMES penalty function prefactor")
     PARAM.append("CHIMES_PEN_DIST");                VARTYP.append("float");         DETAILS.append("ChIMES pentalty function kick-in distance")
@@ -84,26 +95,52 @@ def print_help():
     PARAM.append("IGAS_QM_METHOD");                 VARTYP.append("str");           DETAILS.append("Specifies which nominal QM code to use for gas configurations; options are \"VASP\", \"DFTB+\", and \"Gaussian\"")
     PARAM.append("QM_FILES");                       VARTYP.append("str");           DETAILS.append("Absolute path to QM input files")
     PARAM.append("VASP_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to vasp2yzf.py ")
-    PARAM.append("VASP_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for VASP jobs")
+    PARAM.append("VASP_MEM");                       VARTYP.append("str");           DETAILS.append("Memory requirements for running VASP jobs")
+    PARAM.append("VASP_MODULES");                   VARTYP.append("str");           DETAILS.append("System-specific modules needed to run VASP jobs")
+    PARAM.append("VASP_NODES");                     VARTYP.append("int list");      DETAILS.append("Number of nodes to use for VASP jobs")
     PARAM.append("VASP_PPN");                       VARTYP.append("int");           DETAILS.append("Number of processors to use per node for VASP jobs")
     PARAM.append("VASP_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for VASP calculations, e.g. \"04:00:00\"")
     PARAM.append("VASP_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit VASP jobs to")
     PARAM.append("VASP_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to VASP executable")
     PARAM.append("DFTB_FILES");                     VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ input file ")
-    PARAM.append("DFTB_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to dftb+2yzf.py ")
+    PARAM.append("DFTB_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to dftgen_to_xyz.py ")
+    PARAM.append("DFTB_MEM");                       VARTYP.append("str");           DETAILS.append("Memory requirements for running DFTB+ jobs")
+    PARAM.append("DFTB_MODULES");                   VARTYP.append("str");           DETAILS.append("System-specific modules needed to run DFTB+ jobs")
     PARAM.append("DFTB_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for DFTB+ jobs")
     PARAM.append("DFTB_PPN");                       VARTYP.append("int");           DETAILS.append("Number of processors to use per node for DFTB+ jobs")
     PARAM.append("DFTB_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for DFTB+ calculations, e.g. \"04:00:00\"")
     PARAM.append("DFTB_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit DFTB+ jobs to")
     PARAM.append("DFTB_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to DFTB+ executable")
+    PARAM.append("CP2K_MEM");                       VARTYP.append("str");           DETAILS.append("Memory requirements for running CP2K jobs")
+    PARAM.append("CP2K_MODULES");                   VARTYP.append("str");           DETAILS.append("System-specific modules needed to run CP2K jobs")
+    PARAM.append("CP2K_NODES");                     VARTYP.append("int list");      DETAILS.append("Number of nodes to use for CP2K jobs")
+    PARAM.append("CP2K_POSTPRC");                   VARTYP.append("str");           DETAILS.append("Absolute path to cp2k_to_xyz.py ")
+    PARAM.append("CP2K_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for CP2K jobs")
+    PARAM.append("CP2K_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for CP2K calculations, e.g. \"04:00:00\"")
+    PARAM.append("CP2K_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit CP2K jobs to")
+    PARAM.append("CP2K_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to CP2K executable")
+    PARAM.append("CP2K_DATADIR");                   VARTYP.append("str");           DETAILS.append("Absolute path to CP2K scratch (\"data\") directory")
     PARAM.append("GAUS_NODES");                     VARTYP.append("int");           DETAILS.append("Number of nodes to use for Gaussian jobs")
     PARAM.append("GAUS_PPN");                       VARTYP.append("int");           DETAILS.append("Number of procs per node to use for Gaussian jobs")
     PARAM.append("GAUS_TIME");                      VARTYP.append("str");           DETAILS.append("Walltime for Gaussian calculations, e.g. \"04:00:00\"")
     PARAM.append("GAUS_QUEUE");                     VARTYP.append("str");           DETAILS.append("Queue to submit Gaussian jobs to")
     PARAM.append("GAUS_EXE");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian executable")
+    PARAM.append("GAUS_MEM");                       VARTYP.append("str");           DETAILS.append("Memory requirements for running Gaussian jobs")
     PARAM.append("GAUS_SCR");                       VARTYP.append("str");           DETAILS.append("Absolute path to Gaussian scratch directory")
     PARAM.append("GAUS_REF");                       VARTYP.append("str");           DETAILS.append("Name of file containing single atom energies from Gaussian and target planewave method")
-
+    PARAM.append("LMP_FILES");                      VARTYP.append("int");           DETAILS.append("Path to input files if using it as a refernce (\"QM\") method")
+    PARAM.append("LMP_NODES");                      VARTYP.append("int");           DETAILS.append("Number of nodes to use for LAMMPS jobs")
+    PARAM.append("LMP_POSTPRC");                    VARTYP.append("str");           DETAILS.append("Path to lmp_to_xyz.py")
+    PARAM.append("LMP_PPN");                        VARTYP.append("int");           DETAILS.append("Number of procs per node to use for LAMMPS jobs")
+    PARAM.append("LMP_TIME");                       VARTYP.append("str");           DETAILS.append("Walltime for LAMMPS calculations, e.g. \"04:00:00\"")
+    PARAM.append("LMP_QUEUE");                      VARTYP.append("str");           DETAILS.append("Queue to submit LAMMPS jobs to")
+    PARAM.append("LMP_EXE");                        VARTYP.append("str");           DETAILS.append("Absolute path to LAMMPS executable")
+    PARAM.append("LMP_MODULES");                    VARTYP.append("str");           DETAILS.append("System-specific modules needed to run LAMMPS")
+    PARAM.append("LMP_DATADIR");                    VARTYP.append("str");           DETAILS.append("Absolute path to CP2K scratch (\"data\") directory")
+    PARAM.append("LMP_EXE");                        VARTYP.append("str");           DETAILS.append("Absolute path to LAMMPS executable")
+    PARAM.append("LMP_MEM");                        VARTYP.append("str");           DETAILS.append("Memory requirements for running LAMMPS jobs")
+    PARAM.append("LMP_UNITS");                      VARTYP.append("str");           DETAILS.append("Units LAMMPS input/output is expected to be")
+   
 
     print("Help info: ")
     print("Run with, e.g.: unbuffer python /path/to/al_driver/main.py 0 1 2 | tee driver.log")
@@ -135,20 +172,37 @@ def check_VASP(user_config):
 
         if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
             print("WARNING: Option config.VASP_POSTPRC was not set")
-            print("         Will use config.CHIMES_SRCDIR + \"../contrib/vasp2xyzf.py\"")
+            print("         Will use config.DRIVER_DIR + \"/src/vasp2xyzf.py\"")
 
-        user_config.VASP_POSTPRC = user_config.CHIMES_SRCDIR + "../contrib/vasp2xyzf.py"            
-        
-    if not hasattr(user_config,'VASP_NODES'):
+        user_config.VASP_POSTPRC = user_config.DRIVER_DIR + "/src/vasp2xyzf.py"
 
-        # Number of nodes to use for a VASP calculation
+    if not hasattr(user_config, 'VASP_NODES'):
+
+        # Number of processors per node to use for a VASP calculation
 
         if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
             print("WARNING: Option config.VASP_NODES was not set")
             print("         Will use a value of 6")
 
-        user_config.VASP_NODES = 6
-        
+        user_config.VASP_NODES = [6] * user_config.NO_CASES
+    else:
+        if isinstance(user_config.VASP_NODES, int):
+            user_config.VASP_NODES = [user_config.VASP_NODES] * user_config.NO_CASES
+        elif isinstance(user_config.VASP_NODES, list):
+            if len(user_config.VASP_NODES) > user_config.NO_CASES:
+                print("WARNING: Option config.VASP_NODES was set to a list longer than the number of cases")
+                print("         Will use the first " + str(user_config.NO_CASES) + " values")
+                user_config.VASP_NODES = user_config.VASP_NODES[:user_config.NO_CASES]
+            elif len(user_config.VASP_NODES) < user_config.NO_CASES:
+                print("WARNING: Option config.VASP_NODES was set to a list shorter than the number of cases")
+                print("         Will repeat the last value to fill the list")
+                user_config.VASP_NODES = user_config.VASP_NODES + [user_config.VASP_NODES[-1]] * (user_config.NO_CASES - len(user_config.VASP_NODES))
+        else:
+            print("ERROR: Option config.VASP_NODES was set to an invalid type")
+            print("         Acceptable settings are of the form: [int] or int")
+            exit()
+
+
     if not hasattr(user_config,'VASP_PPN'):
 
         # Number of nodes to use for a VASP calculation
@@ -157,7 +211,17 @@ def check_VASP(user_config):
             print("WARNING: Option config.VASP_PPN was not set")
             print("         Will use a value of config.HPC_PPN")
 
-        user_config.VASP_PPN = user_config.HPC_PPN                            
+        user_config.VASP_PPN = user_config.HPC_PPN    
+        
+    if not hasattr(user_config,'VASP_MEM'):
+
+        # Memory per node to use for a VASP calculation
+
+        if ((user_config.BULK_QM_METHOD == "VASP") or (user_config.IGAS_QM_METHOD == "VASP")):
+            print("WARNING: Option config.VASP_MEM was not set")
+            #print("         Will use a value of 128 (GB)")
+
+        user_config.VASP_MEM = ""                                   
 
     if not hasattr(user_config,'VASP_TIME'):
 
@@ -250,7 +314,17 @@ def check_DFTB(user_config):
             print("WARNING: Option config.DFTB_PPN was not set")
             print("         Will use a value of 1")
 
-        user_config.DFTB_PPN = 1                            
+        user_config.DFTB_PPN = 1 
+        
+    if not hasattr(user_config,'DFTB_MEM'):
+
+        # Memory per node to to use for a DFTB calculation
+
+        if ((user_config.BULK_QM_METHOD == "DFTB") or (user_config.IGAS_QM_METHOD == "DFTB")):
+            print("WARNING: Option config.DFTB_MEM was not set")
+            #print("         Will use a value of 128 (GB)")
+
+        user_config.DFTB_MEM = ""                                       
 
     if not hasattr(user_config,'DFTB_TIME'):
 
@@ -289,9 +363,127 @@ def check_DFTB(user_config):
         if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
             print("ERROR: Option config.DFTB_EXE was not set")
             print("         Acceptable settings are of the form: \"/path/to/dftbplus.exe\"")
-            exit()
+        
         else:
             user_config.DFTB_EXE = None
+
+
+def check_CP2K(user_config):
+    
+    """
+    
+    Checks whether settings for CP2K compatibility.
+    Produces warnings for un-initialized values if CP2K is requested
+        
+    Usage: check_CP2K(user_config)
+    
+    """    
+    
+    if not hasattr(user_config,'CP2K_FILES'):
+
+        # Location of basic CP2K input files (inp and potentials)
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_FILES was not set")
+            print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\"")
+
+        user_config.CP2K_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
+    
+    if not hasattr(user_config,'CP2K_POSTPRC'):
+
+        # Location of a CP2K post-processing file
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_POSTPRC was not set")
+            print("         Will use config.DRIVER_DIR + \"/src/cp2k_to_xyz.py\"")
+
+        user_config.CP2K_POSTPRC = user_config.DRIVER_DIR + "/src/cp2k_to_xyz.py"            
+    
+    if not hasattr(user_config, 'CP2K_NODES'):
+        # Number of nodes to use for a CP2K calculation
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_NODES was not set")
+            print("         Will use a value of 3")
+        user_config.CP2K_NODES = [3] * user_config.NO_CASES
+    else:
+        if isinstance(user_config.CP2K_NODES, int):
+            user_config.CP2K_NODES = [user_config.CP2K_NODES] * user_config.NO_CASES
+        elif isinstance(user_config.CP2K_NODES, list):
+            if len(user_config.CP2K_NODES) > user_config.NO_CASES:
+                print("WARNING: Option config.CP2K_NODES was set to a list longer than the number of cases")
+                print("         Will use the first " + str(user_config.NO_CASES) + " values")
+                user_config.CP2K_NODES = user_config.CP2K_NODES[:user_config.NO_CASES]
+            elif len(user_config.CP2K_NODES) < user_config.NO_CASES:
+                print("WARNING: Option config.CP2K_NODES was set to a list shorter than the number of cases")
+                print("         Will repeat the last value to fill the list")
+                user_config.CP2K_NODES = user_config.CP2K_NODES + [user_config.CP2K_NODES[-1]] * (user_config.NO_CASES - len(user_config.CP2K_NODES))
+        else:
+            print("ERROR: Option config.CP2K_NODES was set to an invalid type")
+            print("         Acceptable settings are of the form: [int] or int")
+            exit()
+    
+    if not hasattr(user_config,'CP2K_PPN'):
+
+        # Number of processors per node to use for a CP2K calculation
+        
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_PPN was not set")
+            print("         Will use a value of 1")
+
+        user_config.CP2K_PPN = 1      
+        
+    if not hasattr(user_config,'CP2K_MEM'):
+
+        # Memory per node to use for a CP2K calculation
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_MEM was not set")
+            #print("         Will use a value of 128 (GB)")
+
+        user_config.CP2K_MEM = ""                                  
+
+    if not hasattr(user_config,'CP2K_TIME'):
+
+        # Time for a CP2K calculation (hrs)
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_TIME was not set")
+            print("         Will use a value of \"04:00:00\"")
+
+        user_config.CP2K_TIME = "04:00:00"
+    
+    if not hasattr(user_config,'CP2K_QUEUE'):
+
+        # Queue for a CP2K calculation
+        
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_QUEUE was not set")
+            print("         Will use pbatch")
+
+        user_config.CP2K_QUEUE = "pbatch"
+    
+    if not hasattr(user_config,'CP2K_MODULES'):
+
+        # Queue for a CP2K calculation
+
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("WARNING: Option config.CP2K_MODULES was not set")
+            print("         Will use mkl")
+
+        user_config.CP2K_MODULES = "mkl"        
+    
+    if not hasattr(user_config,'CP2K_EXE'):
+
+        # CP2K executable
+        
+        if ((user_config.BULK_QM_METHOD == "CP2K") or (user_config.IGAS_QM_METHOD == "CP2K")):
+            print("ERROR: Option config.CP2K_EXE was not set")
+            print("         Acceptable settings are of the form: \"/path/to/cp2k.popt\"")
+            
+        else:
+            user_config.CP2K_EXE = None    
+    
+    
 
 def check_GAUS(user_config):
     
@@ -322,7 +514,17 @@ def check_GAUS(user_config):
             print("WARNING: Option config.GAUS_PPN was not set")
             print("         Will use a value of config.HPC_PPN")
 
-        user_config.GAUS_PPN = user_config.HPC_PPN                        
+        user_config.GAUS_PPN = user_config.HPC_PPN  
+        
+    if not hasattr(user_config,'GAUS_MEM'):
+
+        ## Memory per node to use for a GAUS calculation
+
+        if ((user_config.BULK_QM_METHOD == "GAUS") or (user_config.IGAS_QM_METHOD == "GAUS")):
+            print("WARNING: Option config.GAUS_MEM was not set")
+            #print("         Will use a value of 128 (GB)")
+
+        user_config.GAUS_MEM = ""                                
 
     if not hasattr(user_config,'GAUS_TIME'):
 
@@ -382,6 +584,124 @@ def check_GAUS(user_config):
         else:
             user_config.GAUS_REF = None
 
+def check_LMP(user_config):
+    
+    """
+    
+    Checks whether settings for LAMMPS compatibility.
+    Produces warnings for un-initialized values if LMP is requested
+        
+    Usage: check_LMP(user_config)
+    
+    """    
+    
+    if not hasattr(user_config,'LMP_FILES'):
+
+        # Location of basic LAMMPS+ input files (data.header.in, data.footer.in, in.lammps)
+
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+        
+            if hasattr(user_config,'QM_FILES'):
+            
+                user_config.LMP_FILES = user_config.QM_FILES
+            else:
+        
+                print("WARNING: Option config.LMP_FILES was not set")
+                print("         Will use config.WORKING_DIR + \"ALL_BASE_FILES/QM_BASEFILES\"")
+
+                user_config.LMP_FILES = user_config.WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
+
+    if not hasattr(user_config,'LMP_UNITS'):
+
+        # Units LAMMPS will run with - REAL or METAL)
+
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("WARNING: Option config.LMP_UNITS was not set")
+            print("         Will use \"REAL\"")
+
+        user_config.LMP_UNITS = "REAL"
+    
+    if not hasattr(user_config,'LMP_POSTPRC'):
+
+        # Location of a LMP post-processing file
+
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("WARNING: Option config.LMP_POSTPRC was not set")
+            print("         Will use config.DRIVER_DIR + \"/src/lmp_to_xyz.py\"")
+
+        user_config.LMP_POSTPRC = user_config.DRIVER_DIR + "/src/lmp_to_xyz.py"            
+    
+    if not hasattr(user_config,'LMP_NODES'):
+
+        # Number of nodes to use for a LMP calculation
+
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("WARNING: Option config.LMP_NODES was not set")
+            print("         Will use a value of 1")
+
+        user_config.LMP_NODES = 1
+    
+    if not hasattr(user_config,'LMP_PPN'):
+
+        # Number of nodes to use for a LMP calculation
+        
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("WARNING: Option config.LMP_PPN was not set")
+            print("         Will use a value of 1")
+
+        user_config.LMP_PPN = 1      
+        
+    if not hasattr(user_config,'LMP_MEM'):
+
+        # Memory per node to use for a LMP calculation
+
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("WARNING: Option config.LMP_MEM was not set")
+            #print("         Will use a value of 128 (GB)")
+
+        user_config.LMP_MEM = ""                                  
+
+    if not hasattr(user_config,'LMP_TIME'):
+
+        # Time for a LMP calculation (hrs)
+
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("WARNING: Option config.LMP_TIME was not set")
+            print("         Will use a value of \"00:30:00\"")
+
+        user_config.LMP_TIME = "00:30:00"
+    
+    if not hasattr(user_config,'LMP_QUEUE'):
+
+        # Queue for a LMP calculation
+        
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("WARNING: Option config.LMP_QUEUE was not set")
+            print("         Will use pdebug")
+
+        user_config.LMP_QUEUE = "pdebug"
+    
+    if not hasattr(user_config,'LMP_MODULES'):
+
+        # Queue for a LMP calculation
+
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("WARNING: Option config.LMP_MODULES was not set")
+            print("         Will not load any default modules")
+
+        user_config.LMP_MODULES = None        
+    
+    if not hasattr(user_config,'LMP_EXE'):
+
+        # LMP executable
+        
+        if ((user_config.BULK_QM_METHOD == "LMP") or (user_config.IGAS_QM_METHOD == "LMP")):
+            print("ERROR: Option config.LMP_EXE was not set")
+            print("         Acceptable settings are of the form: \"/path/to/lmp\"")
+            
+        else:
+            user_config.LMP_EXE = None    
+    
 def verify(user_config):
 
     """
@@ -438,24 +758,6 @@ def verify(user_config):
         exit()    
     else:    
         user_config.NO_CASES = int(user_config.NO_CASES)
-        
-
-    if not hasattr(user_config,'MOLANAL_SPECIES'):
-
-        # Species to track/plot from molanal... only used for post-processing
-        # MOLANAL_SPECIES
-        #MOLANAL_SPECIES = ["C1 O1 1(O-C)",
-            #               "C1 O2 2(O-C)",
-            #               "N2 1(N-N)",
-            #               "N1 O1 1(O-N)",
-            #               "N2 O1 1(N-N) 1(O-N)",
-            #               "O2 1(O-O)"]#
-
-        print("WARNING: Option config.MOLANAL_SPECIES was not set")
-        print("         Will use:")
-        print("\t",MOLANAL_SPECIES)
-        
-        user_config.MOLANAL_SPECIES = MOLANAL_SPECIES
 
     if not hasattr(user_config,'USE_AL_STRS'):
 
@@ -530,6 +832,8 @@ def verify(user_config):
         
         user_config.DO_HIERARCH = False
         user_config.HIERARCH_PARAM_FILES = []
+        user_config.HIERARCH_EXE = None
+        user_config.HIERARCH_METHOD = None
     
     if user_config.DO_HIERARCH:
         
@@ -537,17 +841,11 @@ def verify(user_config):
 
             # Determines whether to build on existing parameter files
             
-            if user_config.DO_HIERARCH:
+            print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
+            print("config.HIERARCH_PARAM_FILES not specified")
             
-                print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
-                print("config.HIERARCH_PARAM_FILES not specified")
-            
-                exit()
-                
-            print("Warning: Option config.HIERARCH_PARAM_FILES was not set")
-            print("         Will use []")            
-                
-            user_config.HIERARCH_PARAM_FILES = []
+            exit()
+
         else:
             for i in range(len(user_config.HIERARCH_PARAM_FILES)):
                 user_config.HIERARCH_PARAM_FILES[i] = user_config.WORKING_DIR + "ALL_BASE_FILES/HIERARCH_PARAMS/" + user_config.HIERARCH_PARAM_FILES[i]
@@ -555,17 +853,24 @@ def verify(user_config):
             print("WARNING: config.HIERARCH_PARAM_FILES special cutoffs must") 
             print("         be specified with \"SPECIFIC\" and not \"ALL\"")
             
+        if not hasattr(user_config,'HIERARCH_METHOD'):
+
+            # Determines which MD method is used for HIERARCH interaction remoal
+            
+            print("WARNING: config.HIERARCH_METHOD was not set") 
+            print("         Will use config.MD_STYLE")            
+            
+            user_config.HIERARCH_METHOD = None 
+
         if not hasattr(user_config,'HIERARCH_EXE'):
 
             # Determines whether to build on existing parameter files
             
             if user_config.DO_HIERARCH:
             
-                print("ERROR: Option config.DO_HIERARCH was set to \"True\", but")
-                print("config.HIERARCH_EXE not specified")
+                print("Warning: Option config.DO_HIERARCH was set to \"True\", but")
+                print("         config.HIERARCH_EXE not specified. Will attempt to use MD_MPI or MD_SER")
             
-                exit()
-            else:
                 user_config.HIERARCH_EXE = None                
 
 
@@ -586,10 +891,9 @@ def verify(user_config):
 
         # HPC Charge bank/account
 
-        print("WARNING: Option config.HPC_ACCOUNT was not set")
-        print("         Will use pbronze")    
-        
-        user_config.HPC_ACCOUNT = "pbronze"    
+        print("ERROR: Option config.HPC_ACCOUNT was not set!")
+        print("       Exiting")    
+        exit()   
         
     if not hasattr(user_config,'HPC_SYSTEM'):
 
@@ -597,7 +901,7 @@ def verify(user_config):
 
         print("WARNING: Option config.HPC_SYSTEM was not set")
         print("         Will use slurm")
-        print("        Note: No other options are currently supported.")    
+        #print("         Note: No other options are currently supported.")    
         
         user_config.HPC_SYSTEM = "slurm"    
 
@@ -732,16 +1036,27 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_LSQ was not set")
         print("         Will use config.CHIMES_SRCDIR + \"chimes_lsq\"")
         
-        user_config.CHIMES_LSQ    = user_config.CHIMES_SRCDIR + "chimes_lsq"
+        user_config.CHIMES_LSQ    = user_config.CHIMES_SRCDIR + "../build/chimes_lsq"
+        
+    if not hasattr(user_config,'CHIMES_LSQ_MODULES'):
+    
+        print("WARNING: Option config.CHIMES_LSQ_MODULES was not set")
+        user_config.CHIMES_LSQ_MODULES = ""
+
+    if not hasattr(user_config,'CHIMES_MD_MODULES'):
+    
+        print("WARNING: Option config.CHIMES_MD_MODULES was not set")
+        user_config.CHIMES_MD_MODULES = ""
+  
 
     if not hasattr(user_config,'CHIMES_SOLVER'):
 
         # Location of lsq2.py script
 
         print("WARNING: Option config.CHIMES_SOLVER was not set")
-        print("         Will use config.CHIMES_SRCDIR + \"lsq2.py\"")
+        print("         Will use config.CHIMES_SRCDIR + \"/build/chimes_lsq.py\"")
         
-        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "lsq2.py"
+        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "../build/chimes_lsq.py"
         
     if not hasattr(user_config,'CHIMES_POSTPRC'):
 
@@ -750,8 +1065,17 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_POSTPRC was not set")
         print("         Will use config.CHIMES_SRCDIR + \"/../build/post_proc_chimes_lsq.py\"")
         
-        user_config.CHIMES_SOLVER = user_config.CHIMES_SRCDIR + "/../build/post_proc_chimes_lsq.py"
+        user_config.CHIMES_POSTPRC = user_config.CHIMES_SRCDIR + "/../build/post_proc_chimes_lsq.py"
 
+
+    if not hasattr(user_config,'N_HYPER_SETS'):
+
+        # Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data 
+
+        print("WARNING: Option config.N_HYPER_SETS was not set")
+        print("         Will set to a value of 1 (old mode)")
+
+        user_config.N_HYPER_SETS = 1
 
     if not hasattr(user_config,'WEIGHTS_SET_ALC_0'):
 
@@ -940,9 +1264,9 @@ def verify(user_config):
 
         # Simulation method, i.e. ChIMES MD or DFTBplus+ChIMES
 
-        print("ERROR: Simulation mode not specified!")
-        print("         config.MD_STYLE must be set to \"CHIMES\" or \"DFTB\"")
-        exit()
+        print("Warning: Simulation mode not specified")
+        print("         config.MD_STYLE was set to \"CHIMES\" options are: \"CHIMES\", \"LMP\", or \"DFTB\"")
+        user_config.MD_STYLE = "CHIMES"
     else:
         print("Will run simulations using method: ", user_config.MD_STYLE)
     
@@ -961,7 +1285,7 @@ def verify(user_config):
         print("WARNING: Option config.CHIMES_MD_SER was not set")
         print("         Will use config.CHIMES_SRCDIR + \"chimes_md-serial\"")
         
-        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "chimes_md-serial"        
+        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "/../build/chimes_md-serial"        
     
     if user_config.MD_STYLE == "CHIMES":
         
@@ -972,30 +1296,54 @@ def verify(user_config):
             print("WARNING: Option config.CHIMES_MD_MPI was not set")
             print("         Will use config.CHIMES_SRCDIR + \"chimes_md-mpi\"")
         
-            user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "chimes_md-mpi"
+            user_config.CHIMES_MD_MPI = user_config.CHIMES_SRCDIR + "/../build/chimes_md-mpi"
 
-    elif user_config.MD_STYLE == "DFTB":
-    
-        if not hasattr(user_config,'DFTB_MD_SER'):
-
-            # Path to chimes_md executable
-
-            print("ERROR: Option config.DFTB_MD_SER was not set")
-            print("       Must be set as path to serial DFTBplus executable")
+    else:
+    	if not hasattr(user_config,'MD_MPI'):
+            print("ERROR: Option config.MD_MPI was not set")
+            exit(0)
             
-            exit()
-        else:
+    	if not hasattr(user_config,'MD_SER'): 
+            print("WARNING: Option config.MD_SER was not set")
+            print("         Attempting to set equal to config.MD_MPI")
+            
+            user_config.MD_SER = user_config.MD_MPI
+            
+    	user_config.CHIMES_MD_MPI = None
+    	user_config.CHIMES_MD_SER = None
         
-            user_config.CHIMES_MD_MPI = user_config.DFTB_MD_SER    
+    if not hasattr(user_config,'RUN_MOLANAL'):
+
+        # If molanal post process script should be run
+        user_config.RUN_MOLANAL = True
+        print("WARNING: If MOLANAL path is defined, MOLANAL will be ran")
+        print("         RUN_MOLANAL set to True")
         
     if not hasattr(user_config,'MOLANAL'):
 
         # Path to molanal executable
-
-        print("Error: Option config.MOLANAL was not set")
-        print("       Acceptable settings are of the form of an absolute path (Unix)")
+        user_config.RUN_MOLANAL = False
+        user_config.MOLANAL = ""
+        print("WARNING: MOLANAL will not be ran.")
+        print("         RUN_MOLANAL set to False")
+    
+    if not hasattr(user_config,'MOLANAL_SPECIES'):
         
-        exit()
+        # Species to track/plot from molanal... only used for post-processing
+        # MOLANAL_SPECIES
+        #MOLANAL_SPECIES = ["C1 O1 1(O-C)",
+            #               "C1 O2 2(O-C)",
+            #               "N2 1(N-N)",
+            #               "N1 O1 1(O-N)",
+            #               "N2 O1 1(N-N) 1(O-N)",
+            #               "O2 1(O-O)"]#
+            
+        if user_config.RUN_MOLANAL:
+            print("WARNING: Option config.MOLANAL_SPECIES was not set")
+            print("         Will set to no species.")
+        
+        user_config.MOLANAL_SPECIES = [""]
+    
         
     if not hasattr(user_config,'MDFILES'):
 
@@ -1246,8 +1594,9 @@ def verify(user_config):
         check_VASP(user_config)
     else:
         user_config.VASP_POSTPRC = None
-        user_config.VASP_NODES   = None
+        user_config.VASP_NODES   = [None] * user_config.NO_CASES  #This needs to be a list since in main.py we enumarate it
         user_config.VASP_PPN     = None 
+        user_config.VASP_MEM     = None 
         user_config.VASP_TIME    = None
         user_config.VASP_QUEUE   = None
         user_config.VASP_MODULES = None
@@ -1260,20 +1609,47 @@ def verify(user_config):
         user_config.DFTB_POSTPRC = None
         user_config.DFTB_NODES   = None 
         user_config.DFTB_PPN     = None 
+        user_config.DFTB_MEM     = None 
         user_config.DFTB_TIME    = None
         user_config.DFTB_QUEUE   = None
         user_config.DFTB_MODULES = None 
         user_config.DFTB_EXE     = None
+        
+    if (user_config.IGAS_QM_METHOD == "CP2K") or (user_config.BULK_QM_METHOD == "CP2K"):    
+        check_CP2K(user_config)
+    else:
+        user_config.CP2K_FILES   = None
+        user_config.CP2K_POSTPRC = None
+        user_config.CP2K_NODES   = [None] * user_config.NO_CASES #This needs to be a list since in main.py we enumarate it 
+        user_config.CP2K_PPN     = None 
+        user_config.CP2K_MEM     = None 
+        user_config.CP2K_TIME    = None
+        user_config.CP2K_QUEUE   = None
+        user_config.CP2K_MODULES = None 
+        user_config.CP2K_EXE     = None  
+        user_config.CP2K_DATADIR = None      
         
     if (user_config.IGAS_QM_METHOD == "GAUS") or (user_config.BULK_QM_METHOD == "GAUS"):
         check_GAUS(user_config)
     else:
         user_config.GAUS_NODES   = None
         user_config.GAUS_PPN     = None
+        user_config.GAUS_MEM     = None
         user_config.GAUS_TIME    = None 
         user_config.GAUS_QUEUE   = None
         user_config.GAUS_EXE     = None
         user_config.GAUS_SCR     = None
         user_config.GAUS_REF     = None
 
-
+    if (user_config.IGAS_QM_METHOD == "LMP") or (user_config.BULK_QM_METHOD == "LMP"):
+        check_LMP(user_config)
+    else:
+        user_config.LMP_POSTPRC = None
+        user_config.LMP_NODES   = None
+        user_config.LMP_PPN     = None 
+        user_config.LMP_MEM     = None 
+        user_config.LMP_TIME    = None
+        user_config.LMP_QUEUE   = None
+        user_config.LMP_MODULES = None
+        user_config.LMP_EXE     = None
+        user_config.LMP_UNITS   = None

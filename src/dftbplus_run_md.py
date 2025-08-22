@@ -76,54 +76,56 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     ################################
     # 1. Run molanal
     ################################
-    
-    if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
-    
-        helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
-    
-    
-    # Copy/convert geo_end.xyz traj.gen
-    
-    box = []
-    tmp = helpers.tail(args["basefile_dir"] + "case-" + str(my_case) + ".indep-" + str(my_indep) + ".gen",3)
-    
-    box.append(tmp[0].split()[0])
-    box.append(tmp[1].split()[1])
-    box.append(tmp[2].split()[2])
-    box = ' '.join(box)
-    
-    frames = helpers.count_xyzframes_general("geo_end.xyz")
+    if user_config.RUN_MOLANAL:
+        if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
+        
+            helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
+        
+        
+        # Copy/convert geo_end.xyz traj.gen
+        
+        box = []
+        tmp = helpers.tail(args["basefile_dir"] + "case-" + str(my_case) + ".indep-" + str(my_indep) + ".gen",3)
+        
+        box.append(tmp[0].split()[0])
+        box.append(tmp[1].split()[1])
+        box.append(tmp[2].split()[2])
+        box = ' '.join(box)
+        
+        frames = helpers.count_xyzframes_general("geo_end.xyz")
 
-    ifstream = open("geo_end.xyz",'r')
-    ofstream = open("traj.xyz",'w')
+        ifstream = open("geo_end.xyz",'r')
+        ofstream = open("traj.xyz",'w')
 
-    for i in range(frames):
-    
-        # Natoms line
-    
-        line = ifstream.readline()
-        ofstream.write(line)
-        natoms = int(line)
+        for i in range(frames):
         
-        # boxlens line
+            # Natoms line
         
-        line = ifstream.readline()
-        ofstream.write(box + '\n')
-        
-        # Coordinates
-        
-        for j in range(natoms):
-            
             line = ifstream.readline()
             ofstream.write(line)
-    
-    helpers.xyz_to_dftbgen("traj.xyz")
+            natoms = int(line)
+            
+            # boxlens line
+            
+            line = ifstream.readline()
+            ofstream.write(box + '\n')
+            
+            # Coordinates
+            
+            for j in range(natoms):
+                
+                line = ifstream.readline()
+                ofstream.write(line)
         
-    helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
-    helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
-    helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
+        helpers.xyz_to_dftbgen("traj.xyz")
+            
+        helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
+        helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
+        helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
 
-    print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
+        print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
+    else:
+        print("Skipping MOLANAL")
     
     ################################
     # 2. Cluster
@@ -174,8 +176,8 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*15
-    default_values = [""]*15
+    default_keys   = [""]*16
+    default_values = [""]*16
 
     # MD specific controls
 
@@ -186,7 +188,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     default_keys[4 ] = "chimes_exe"    ; default_values[4 ] = None                       # Path to the ChIMES executable to be used - serial version preferred
     # Overall job controls
 
-    default_keys[5 ] = "job_name"       ; default_values[5 ] = "ALC-"+ repr(my_ALC)+"-md"    # Name for ChIMES md job
+    default_keys[5 ] = "job_name"      ; default_values[5 ] = "ALC-"+ repr(my_ALC)+"-md"    # Name for ChIMES md job
     default_keys[6 ] = "job_nodes"     ; default_values[6 ] = "1"                            # Number of nodes for ChIMES md job
     default_keys[7 ] = "job_ppn"       ; default_values[7 ] = "1"                            # Number of processors per node for ChIMES md job
     default_keys[8 ] = "job_walltime"  ; default_values[8 ] = "1"                            # Walltime in hours for ChIMES md job
@@ -194,8 +196,9 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     default_keys[10] = "job_account"   ; default_values[10] = "pbronze"                      # Account for ChIMES md job
     default_keys[11] = "job_executable"; default_values[11] = ""                             # Full path to executable for ChIMES md job
     default_keys[12] = "job_system"    ; default_values[12] = "slurm"                        # slurm or torque    
-    default_keys[13] = "job_file"       ; default_values[13] = "run.cmd"                     # Name of the resulting submit script
+    default_keys[13] = "job_file"      ; default_values[13] = "run.cmd"                     # Name of the resulting submit script
     default_keys[14] = "job_email"     ; default_values[14] = True                           # Send slurm emails?
+    default_keys[15] = "job_modules"   ; default_values[15] = ""                             # Send slurm emails?
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
@@ -291,8 +294,10 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     job_task  = "-n 1 " + args["job_executable"] + " > dftb.out"    
 
-    if args["job_system"] == "slurm":
+    if (args["job_system"] == "slurm" or args["job_system"] == "UM-ARC"):
         job_task = "srun "   + job_task
+    elif args["job_system"] == "TACC":
+        job_task = "ibrun "  + job_task
     else:
         job_task = "mpirun " + job_task    
     
@@ -302,10 +307,11 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
         job_nodes      = "1",
         job_ppn        = "1",
         job_walltime   = str(args["job_walltime"]),
-        job_queue      =     args["job_queue"    ] ,
+        job_queue      =     args["job_queue"   ] ,
         job_account    =     args["job_account" ] ,
         job_executable =     job_task,
         job_system     =     args["job_system"  ] ,
+        job_modules    =     args["job_modules" ] ,
         job_file       =     "run_dftb.cmd")
         
     

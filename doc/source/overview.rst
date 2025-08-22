@@ -7,7 +7,7 @@ Overview: ChIMES Active Learning Driver
 .. The Essential ChIMES Fitting Workflow
 .. ***************************************
 
-.. figure:: ALD_workflow.pdf
+.. figure:: ALD_workflow.png
   :width: 600
   :align: center
   
@@ -29,8 +29,10 @@ Additional information on different execution modes as well as example scripts c
    
    basicmode
    hierarchmode
+   clusterALmode   
+
    
-   
+..    turboChimesMode   
 ..    correctionmode
 ..    clusterALmode
 ..    committeeALmode

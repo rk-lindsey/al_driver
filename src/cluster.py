@@ -101,10 +101,8 @@ def get_repo_energies(*argv, **kwargs):
     # Submit and monitor the jobs
 
     active_jobs = []
-    
-    #print "job: ", run_cmnd
-    
-    active_jobs.append(int(helpers.run_bash_cmnd(run_cmnd).split()[0]))
+      
+    active_jobs.append(int(helpers.run_bash_cmnd(run_cmnd).split()[-1]))
 
     
     ################################
@@ -119,8 +117,8 @@ def get_repo_energies(*argv, **kwargs):
 
         currdir = helpers.run_bash_cmnd("pwd").rstrip()
         
-        helpers.run_bash_cmnd("cp " + args["driver_dir"]   + "/../utilities/new-get_dumb_ener.sh          ../CENTRAL_REPO")
-        helpers.run_bash_cmnd("cp " + args["driver_dir"]   + "/../utilities/new-get_dumb_ener_subjob.sh   ../CENTRAL_REPO")
+        helpers.run_bash_cmnd("cp " + args["driver_dir"]   + "/utilities/new-get_dumb_ener.sh          ../CENTRAL_REPO")
+        helpers.run_bash_cmnd("cp " + args["driver_dir"]   + "/utilities/new-get_dumb_ener_subjob.sh   ../CENTRAL_REPO")
         helpers.run_bash_cmnd("cp " + currdir + "/GEN_FF/params.txt.reduced                            ../CENTRAL_REPO")
         helpers.run_bash_cmnd("cp " + args["base_runfile"] + "                                         ../CENTRAL_REPO")   
         
@@ -158,14 +156,14 @@ def get_repo_energies(*argv, **kwargs):
         run_cmnd  = "sbatch  -N " + args["job_nodes"] + " -n " + args["job_ppn"] + " -t " + args["job_cent_walltime"] + " -J " + "dmb_enr" + " -p " + args["job_cent_queue"] + " -A " + args["job_account"] + " "
         run_cmnd += " new-get_dumb_ener.sh params.txt.reduced "  + args["job_executable"] + " " + args["base_runfile"] + " " + args["driver_dir"]
         run_cmnd += " REPO"
-    
-        active_jobs.append(int(helpers.run_bash_cmnd(run_cmnd).split()[0]))
+	
+        active_jobs.append(int(helpers.run_bash_cmnd(run_cmnd).split()[-1]))
 
         ################################
         # 4. Wait for repo job to end, post-process
         ################################
     
-        helpers.wait_for_job(active_jobs[1], job_system = args["job_system"], verbose = True, job_name = "get_repo_energies-central")    
+        helpers.wait_for_jobs(active_jobs, job_system = args["job_system"], verbose = True, job_name = "get_repo_energies-central")    
     
         helpers.run_bash_cmnd("mv all.xyzlist.dat     full_repo.xyzlist.dat")
         helpers.run_bash_cmnd("mv all.energies        full_repo.energies")
@@ -215,9 +213,6 @@ def list_clusters(CFG_REPO, *argv): # This is where we need to start caring abou
         if  helpers.wc_l(repo_files[i]) < 1:
             continue
     
-        #print "WORKING ON REPO FILES: ", repo_files[i]
-        #print "...file has", helpers.wc_l(repo_files[i]), "lines."
-
         no_atoms = int(helpers.head(repo_files[i],1)[0].rstrip())
         no_types = [0]*len(atm_types)
 
@@ -238,7 +233,7 @@ def list_clusters(CFG_REPO, *argv): # This is where we need to start caring abou
         ofstream.write(str(no_atoms) + " " + ' '.join(map(str,no_types)) + " " + repo_files[i] + '\n')
 
     ofstream.close()
-    
+
     helpers.run_bash_cmnd_to_file("xyzlist.dat", "sort tmp")
     helpers.run_bash_cmnd("rm -f tmp")
     
@@ -352,18 +347,19 @@ def generate_clusters(**kwargs):
     
     helpers.run_bash_cmnd("rm -rf CFG_REPO")
     helpers.run_bash_cmnd("mkdir CFG_REPO")
+
     
     # Save
     
-    items = ' '.join(glob.glob("*.wrapped.*xyz"))
+    items = ' '.join(glob.glob("*.wrapped.*xyz")).split()
     
-    helpers.run_bash_cmnd("mv " + items + " CFG_REPO")
+    helpers.run_bash_mvbig(items,"CFG_REPO")
     
     # Cleanup
     
     items =  ' '.join(glob.glob("*wrap*xyz")) + " " + ' '.join(glob.glob("*wrap*lammpstrj")) + " " + ' '.join(glob.glob("*cluster*stats"))
-
-    helpers.run_bash_cmnd("rm -f " + items)
+  
+    helpers.run_bash_rmbig(items.split())
     
 
     if args["my_dir"]:

@@ -479,10 +479,10 @@ def post_process(*argv, **kwargs):
                     if os.path.isfile("OUTCAR.xyzf"):
             
                         helpers.cat_specific("tmp.dat", ["OUTCAR.xyzf", xyzfname])
-                        helpers.appendlines("OUTCAR.temps" ["0.0"])
+                        helpers.appendlines("OUTCAR.temps", ["0.0"])
                     else:
                         helpers.cat_specific("tmp.dat", [xyzfname])
-                        helpers.writelines("OUTCAR.temps" ["0.0"])
+                        helpers.writelines("OUTCAR.temps", ["0.0"])
                         
                     helpers.run_bash_cmnd("mv tmp.dat OUTCAR.xyzf")    
 
@@ -528,8 +528,8 @@ def setup_gaus(my_ALC, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*16
-    default_values = [""]*16
+    default_keys   = [""]*17
+    default_values = [""]*17
 
     # Gaussian specific controls
     
@@ -552,6 +552,7 @@ def setup_gaus(my_ALC, *argv, **kwargs):
     default_keys[13] = "job_system"    ; default_values[13] = "slurm"       # slurm or torque       
     default_keys[14] = "job_file"      ; default_values[14] = "run.cmd"    # Name of the resulting submit script   
     default_keys[15] = "job_email"     ; default_values[15] = True          # Send slurm emails?
+    default_keys[16] = "job_mem  "     ; default_values[16] = 128                   # GB
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -665,6 +666,7 @@ def setup_gaus(my_ALC, *argv, **kwargs):
             job_queue      =     args["job_queue"    ] ,
             job_account    =     args["job_account" ] ,
             job_system     =     args["job_system"  ] ,
+            job_mem        =     args["job_mem"     ],
             job_file       =     "run_gaus.cmd")
             
         run_gaus_jobid.append(this_jobid.split()[0])    

@@ -92,7 +92,7 @@ def continue_job(*argv, **kwargs):
     
     Usage: continue_job(<arguments>)
     
-    Notes: See function definition in gaus_driver.py for a full list of options. 
+    Notes: See function definition in dftbplus_driver.py for a full list of options. 
            Returns a SLURM jobid list??
                
     """
@@ -164,7 +164,7 @@ def continue_job(*argv, **kwargs):
             
                 print("            Resubmitting.")
 
-                if args["job_system"] == "slurm":
+                if args["job_system"] == "slurm" or args["job_system"] == "TACC" or args["job_system"] == "UM-ARC":
                     job_list.append(helpers.run_bash_cmnd("sbatch run_dftb.cmd").split()[-1])
                 else:    
                     job_list.append(helpers.run_bash_cmnd("qsub run_dftb.cmd").replace('\n', ''))
@@ -393,7 +393,6 @@ def generate_gen(inxyz, *argv):
             
     ofstream.close()
 
-
 def post_process(*argv, **kwargs):
 
     """ 
@@ -520,9 +519,7 @@ def post_process(*argv, **kwargs):
                 helpers.run_bash_cmnd("mv tmp.tmp OUTCAR.temps")
         
         os.chdir("..")
-        
-                  
-          
+         
 def setup_dftb(my_ALC, *argv, **kwargs):
 
     """ 
@@ -571,30 +568,31 @@ def setup_dftb(my_ALC, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*14
-    default_values = [""]*14
+    default_keys   = [""]*15
+    default_values = [""]*15
 
 
     # DFTB specific controls
     
-    default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../QM_BASEFILES/"        # dftb_in.hsd files, optionall .sfk files
-    default_keys[1 ] = "traj_list"        ; default_values[1 ] = "traj_list.dat"        # Traj_list used in fm_setup.in... last column is target temperatura
-    default_keys[2 ] = "modules"        ; default_values[2 ] = "mkl"             # Post_proc_lsq*py file... should also include the python command
-    default_keys[3 ] = "build_dir"        ; default_values[3 ] = "."                 # Post_proc_lsq*py file... should also include the python command
-    default_keys[4 ] = "first_run"     ; default_values[4 ] = False                # Optional... is this the first run? if so, dont search for "CASE" in the name
+    default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../QM_BASEFILES/"  # dftb_in.hsd files, optionall .sfk files
+    default_keys[1 ] = "traj_list"     ; default_values[1 ] = "traj_list.dat"     # Traj_list used in fm_setup.in... last column is target temperatura
+    default_keys[2 ] = "modules"       ; default_values[2 ] = "mkl"               # Post_proc_lsq*py file... should also include the python command
+    default_keys[3 ] = "build_dir"     ; default_values[3 ] = "."                 # Post_proc_lsq*py file... should also include the python command
+    default_keys[4 ] = "first_run"     ; default_values[4 ] = False               # Optional... is this the first run? if so, dont search for "CASE" in the name
 
 
     # Overall job controls    
     
-    default_keys[5 ] = "job_nodes"     ; default_values[5 ] = "2"                  # Number of nodes for ChIMES md job
-    default_keys[6 ] = "job_ppn"       ; default_values[6 ] = "36"                # Number of processors per node for ChIMES md job
-    default_keys[7 ] = "job_walltime"  ; default_values[7 ] = "1"                  # Walltime in hours for ChIMES md job
+    default_keys[5 ] = "job_nodes"     ; default_values[5 ] = "2"                   # Number of nodes for ChIMES md job
+    default_keys[6 ] = "job_ppn"       ; default_values[6 ] = "36"                  # Number of processors per node for ChIMES md job
+    default_keys[7 ] = "job_walltime"  ; default_values[7 ] = "1"                   # Walltime in hours for ChIMES md job
     default_keys[8 ] = "job_queue"     ; default_values[8 ] = "pdebug"              # Queue for ChIMES md job
-    default_keys[9 ] = "job_account"   ; default_values[9 ] = "pbronze"              # Account for ChIMES md job
-    default_keys[10] = "job_executable"; default_values[10] = ""                  # Full path to executable for ChIMES md job
-    default_keys[11] = "job_system"    ; default_values[11] = "slurm"              # slurm or torque       
-    default_keys[12] = "job_file"       ; default_values[12] = "run.cmd"              # Name of the resulting submit script   
+    default_keys[9 ] = "job_account"   ; default_values[9 ] = "pbronze"             # Account for ChIMES md job
+    default_keys[10] = "job_executable"; default_values[10] = ""                    # Full path to executable for ChIMES md job
+    default_keys[11] = "job_system"    ; default_values[11] = "slurm"               # slurm or torque       
+    default_keys[12] = "job_file"      ; default_values[12] = "run.cmd"             # Name of the resulting submit script   
     default_keys[13] = "job_email"     ; default_values[13] = True                  # Send slurm emails?
+    default_keys[14] = "job_mem  "     ; default_values[14] = 128                   # GB
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -759,7 +757,10 @@ def setup_dftb(my_ALC, *argv, **kwargs):
         job_task.append("    fi            ")
         job_task.append("    TEMP=`awk '{if(NR==2){print int($(NF-1)); exit}}' dftbjob.gen`")
         job_task.append("    cp " + args["basefile_dir" ] + "/${TEMP}.dftb_in.hsd dftb_in.hsd        ")    
-        job_task.append("    srun -N " + str(args["job_nodes" ]) + " -n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
+        if args["job_system"] == "TACC":
+            job_task.append("    ibrun " + "-n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
+        else:
+            job_task.append("    srun -N " + str(args["job_nodes" ]) + " -n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
         job_task.append("    mv results.tag ${TAG}.results.tag")
         job_task.append("    mv md.out      ${TAG}.md.out     ")
         job_task.append("done    ")
@@ -775,7 +776,8 @@ def setup_dftb(my_ALC, *argv, **kwargs):
             job_queue      =     args["job_queue"    ] ,
             job_account    =     args["job_account" ] ,
             job_system     =     args["job_system"  ] ,
-            job_file       =     "run_dftb.cmd")
+            job_file       =     "run_dftb.cmd",
+            job_mem        =     args["job_mem"] if args["job_system"] == "UM-ARC" else None)
             
         run_dftb_jobid.append(this_jobid.split()[0])    
     

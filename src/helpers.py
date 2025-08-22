@@ -8,8 +8,35 @@ import sys
 import math
 import sys
 import os
+import subprocess
+
 
 """ Small helper functions and utilities general to the ALC process. """
+
+def findinfile(search_str,search_file):
+    
+    matches = []
+    
+    
+    with open(search_file) as ifstream:
+        for line in ifstream:
+            
+            if search_str in line:
+                matches.append(line.strip())
+    
+    return matches
+    
+def getlineno(search_str,search_file):
+    matches = []
+    index   = 0
+    with open(search_file) as ifstream:
+        for line in ifstream:
+            if search_str in line:
+                matches.append(index)
+            index += 1
+                                                                    
+    return matches  
+
 
 def readlines(infile,start_line=0, nlines=-1):
 
@@ -86,7 +113,33 @@ def writelines(outfile, contents, nlines=-1):
             break
         
     ofstream.close()
+    
+def run_bash_rmbig(files, batch_size=1000):
+    """
+    Removes files in chunks to avoid 'Argument list too long' errors.
+    """
+    for i in range(0, len(files), batch_size):
+        chunk = files[i:i+batch_size]
+        subprocess.run(["rm", "-f"] + chunk, check=False)  
+	
+def run_bash_mvbig(files, target_dir, batch_size=1000):
+    """
+    Moves files to the given target directory in safe-size batches to avoid 'Argument list too long' errors.
 
+    Parameters:
+    - files: list of file paths (strings)
+    - target_dir: path to the destination directory
+    - batch_size: number of files to move per mv invocation
+    """
+    
+    os.makedirs(target_dir, exist_ok=True)
+
+    for i in range(0, len(files), batch_size):
+        chunk = files[i:i + batch_size]
+        try:
+            subprocess.run(["mv"] + chunk + [target_dir], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error moving files in batch {i // batch_size + 1}: {e}")	  
 
 def run_bash_cmnd(cmnd_str):
 
@@ -146,8 +199,6 @@ def run_bash_cmnd_to_file(outfile, cmnd_str):
     ofstream .write(run_bash_cmnd(cmnd_str))
     ofstream .close()
     
-
-    
 def cat_to_var(*argv):
 
     """ 
@@ -172,40 +223,76 @@ def cat_to_var(*argv):
             
         ifstream.close()
         
-    return contents
+    return contents  
     
-    
-def cat_specific(outfilename, *argv):
+# def cat_specific(outfilename, *argv):
 
-    """ 
+#     """ 
     
-    Concatenates a list of files and returns result. 
+#     Concatenates a list of files and returns result. 
     
-    Usage: cat_specific("my_outfile.dat", "file1.dat", "file2.dat", "file3.dat")    
+#     Usage: cat_specific("my_outfile.dat", "file1.dat", "file2.dat", "file3.dat")    
     
-    Notes: Linux wildcards will not work as expected. Use the glob if needed.
+#     Notes: Linux wildcards will not work as expected. Use the glob if needed.
     
+#     """
+    
+#     # Assumes first file is large, so avoids reading contents
+
+#     files_to_cat = argv[0][0]
+
+#     run_bash_cmnd("cp " + files_to_cat + " " + outfilename)
+    
+#     files_to_cat = argv[0][1:]
+
+#     with open(outfilename, "a") as ofstream:
+#         for f in files_to_cat:
+        
+#             with open(f, "r") as ifstream:
+        
+#                 if os.path.getsize(f)/1E9 > 15:
+
+#                     for line in ifstream:
+#                         ofstream.write(line)
+#                 else:
+#                     ofstream.write(ifstream.read()) # Memory issues with large files
+
+def cat_specific(outfilename, *argv):
+    """
+    Concatenates a list of files using chunked reading and writing with 1GB chunks,
+    interpreted as 1 billion bytes (10^9 bytes).
+    This method is designed to prevent MemoryError while efficiently handling large files.
+    
+    Usage: 
+        cat_specific("my_outfile.dat", ["file1.dat", "file2.dat", "file3.dat"])
+    
+    Notes:
+        - The function operates in binary mode ('b'), ensuring that no data is lost or altered during the process.
+        - It assumes that up to 1GB of memory in decimal notation (10^9 bytes) is acceptable per chunk.
     """
     
-    # Assumes first file is large, so avoids reading contents
+    # Set the chunk_size to 1GB, interpreted as 1 billion bytes (10^9).
+    chunk_size = 10**9  # 1GB in bytes using decimal notation
 
-    files_to_cat = argv[0][0]
-
-    run_bash_cmnd("cp " + files_to_cat + " " + outfilename)
-    
-    files_to_cat = argv[0][1:]
-
-    with open(outfilename, "a") as ofstream:
-        for f in files_to_cat:
-        
-            with open(f, "r") as ifstream:
-        
-                if os.path.getsize(f)/1E9 > 50:
-
-                    for line in ifstream:
-                        ofstream.write(line)
-                else:
-                    ofstream.write(ifstream.read()) # Memory issues with large files
+    # Open the output file in binary write mode.
+    with open(outfilename, "wb") as ofstream:
+        # Iterate over each input filename provided in the argument list.
+        for f in argv[0]:
+            # Open each input file in binary read mode.
+            with open(f, "rb") as ifstream:
+                # Read the file in chunks until the end of file is reached.
+                while True:
+                    # Read a segment of the file into memory.
+                    # The read operation is based on the number of bytes, and we're
+                    # reading 1 billion bytes (or 1GB in decimal notation) at a time.
+                    chunk = ifstream.read(chunk_size)
+                    if not chunk:
+                        # If the chunk is empty, we've reached the end of this file.
+                        # Break out of the while loop and proceed to the next file.
+                        break
+                    # Write the chunk of data to the output file.
+                    # The data is written as-is with no transformations or processing.
+                    ofstream.write(chunk)
 
 def cat_pattern(outfilename, pattern):
 
@@ -228,6 +315,8 @@ def cat_pattern(outfilename, pattern):
             with open(f, "rb") as ifstream:
                 ofstream.write(ifstream.read())
                 
+
+
 def head(*argv):
     
     """ 
@@ -418,8 +507,7 @@ def list_natoms(infile):
             if len(line.split()) == 1:
                 natoms.append(int(line.split()[0]))
     return natoms        
-    
-    
+        
 def email_user(base, address, status):
 
     """ 
@@ -438,8 +526,7 @@ def email_user(base, address, status):
         cmnd = base + "/utilities/send_email.sh " + address + " " + status + " "
 
         return run_bash_cmnd(cmnd)
-        
-    
+           
 def create_and_launch_job(*argv, **kwargs):
 
     """ 
@@ -458,12 +545,12 @@ def create_and_launch_job(*argv, **kwargs):
     # 0. Set up an argument parser
     ################################
     
-    default_keys   = [""]*10
-    default_values = [""]*10
+    default_keys   = [""]*12
+    default_values = [""]*12
 
     # Overall job controls
     
-    default_keys[0 ] = "job_name"           ; default_values[0 ] =     "ALC-x-lsq-1" # Name for ChIMES lsq job
+    default_keys[0 ] = "job_name"          ; default_values[0 ] =     "ALC-x-lsq-1" # Name for ChIMES lsq job
     default_keys[1 ] = "job_nodes"         ; default_values[1 ] =     "2"            # Number of nodes for ChIMES lsq job
     default_keys[2 ] = "job_ppn"           ; default_values[2 ] =     "36"           # Number of processors per node for ChIMES lsq job
     default_keys[3 ] = "job_walltime"      ; default_values[3 ] =     "1"            # Walltime in hours for ChIMES lsq job
@@ -472,7 +559,9 @@ def create_and_launch_job(*argv, **kwargs):
     default_keys[6 ] = "job_executable"    ; default_values[6 ] =     ""             # Full path to executable for ChIMES lsq job
     default_keys[7 ] = "job_system"        ; default_values[7 ] =     "slurm"        # slurm or torque    
     default_keys[8 ] = "job_file"          ; default_values[8 ] =     "run.cmd"      # Name of the resulting submit script    
-    default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Name of the resulting submit script    
+    default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Should emails be sent?
+    default_keys[10] = "job_modules"       ; default_values[10] =     ""             # Name of the resulting submit script    
+    default_keys[11] = "job_mem"           ; default_values[11] =     "128"             # GB
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -488,7 +577,9 @@ def create_and_launch_job(*argv, **kwargs):
     JOB = []
     JOB.append(" -J " + args["job_name"])
     JOB.append(" -N " + args["job_nodes"])
-    JOB.append(" -n " + args["job_ppn"])
+    JOB.append(" --ntasks-per-node " + args["job_ppn"])
+    if args["job_mem"] and args["job_system"] == "UM-ARC":
+        JOB.append("--mem-per-cpu="+str(int(int(args["job_mem"])/int(args["job_ppn"])))+"G")
     JOB.append(" -t " + args["job_walltime"])             
     JOB.append(" -p " + args["job_queue"])
     if args["job_email"]:
@@ -502,7 +593,7 @@ def create_and_launch_job(*argv, **kwargs):
     
     for i in range(len(JOB)):
     
-        if args["job_system"] == "slurm":
+        if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
             JOB[i] = "#SBATCH" + JOB[i]
         elif args["job_system"] == "torque":
             JOB[i] = "#PBS"  + JOB[i]
@@ -511,6 +602,9 @@ def create_and_launch_job(*argv, **kwargs):
             exit()
             
         ofstream.write(JOB[i] + '\n')
+        
+    if args["job_modules"]:
+        ofstream.write("module load " + args["job_modules"] + '\n')
     
     if args["job_executable"]:
     
@@ -530,21 +624,20 @@ def create_and_launch_job(*argv, **kwargs):
 
     jobid = None
     
-    if args["job_system"] == "slurm":
+    if args["job_system"] == "slurm" or args["job_system"] == "TACC" or args["job_system"] == "UM-ARC":
         jobid = run_bash_cmnd("sbatch " + args["job_file"]).split()[-1]
     else:    
         jobid = run_bash_cmnd("qsub " + args["job_file"])
 
     return jobid    
     
-
 def wait_for_job(active_job, **kwargs):
 
     """ 
     
     Pauses the code until a single SLURM job completes.
     
-    Usage: wait_for_job(2116091,<arguments>)
+    Usage: wait_for_job([2116091],<arguments>)
     
     Notes: Accepts a jobid and queries the queueing system to determine
            whether the job is active. Doesn't return until job completes.
@@ -566,7 +659,7 @@ def wait_for_job(active_job, **kwargs):
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)
     
-    active_job = str(active_job).split()[0]
+    active_job = active_job[0]
     
     
     ################################
@@ -577,7 +670,7 @@ def wait_for_job(active_job, **kwargs):
         
         check_job = ""
         
-        if args["job_system"] == "slurm":
+        if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
             check_job = "squeue -j " + active_job
             
         elif args["job_system"] == "torque":
@@ -598,7 +691,6 @@ def wait_for_job(active_job, **kwargs):
             
     return
     
-
 def wait_for_jobs(*argv, **kwargs):
 
     """ 
@@ -646,7 +738,7 @@ def wait_for_jobs(*argv, **kwargs):
             if type(active_jobs[i]) == type(1):
                 active_jobs[i] = str(active_jobs[i])
         
-            if args["job_system"] == "slurm":
+            if args["job_system"] == "slurm" or "TACC":
 
                 check_job = "squeue -j " + active_jobs[i]
             
@@ -671,8 +763,7 @@ def wait_for_jobs(*argv, **kwargs):
         else:        
             print("Breaking ... ")
             break                    
-    return
-    
+    return  
 
 def str2bool(v):
 
@@ -897,8 +988,52 @@ def xyz_to_dftbgen(xyzfile):
     ifstream.close()
     ofstream.close()
 
-    return genfile
+    return genfile 
     
+def get_xyz_boxdims(xyzfile, magnitudes=True):
+
+    """ 
+    
+    Reads a .xyz file and returns two things:
+    1. Is the box orthorhombic or triclinic
+    2. boxdims, as strings
+    
+    The user specifies if they want magnitudes or latvectors (a 9-element list). 
+    by default, returns magnitudes
+    
+    """
+
+    boxdims = head(xyzfile,2)[-1].split()
+    
+    offdiag_elements = [1,2,3,5,6,7]
+
+    
+    is_ortho = True
+    
+    if boxdims[0] != "NON_ORTHO":
+        if magnitudes: 
+            return is_ortho, boxdims
+        else:
+           return is_ortho, [boxdims[0], "0.0", "0.0", "0.0", boxdims[1], "0.0", "0.0", "0.0", boxdims[2]]
+    
+    else:
+       boxdims = boxdims[1:]
+       
+       for i in offdiag_elements:
+           if abs(float(boxdims[i])) > 0.0001:
+               is_ortho = False
+       
+       if not magnitudes:
+           return is_ortho, boxdims
+       elif magnitudes and not is_ortho:
+           print("ERROR in helpers.get_xyz_boxdims: requested boxdims for an orthorhomic cell, but input cell is triclinic")
+           print(xyzfile)
+           print(boxdims)
+           exit()
+       else:
+           return is_ortho, [boxdims[0], boxdims[4], boxdims[8]]
+
+       
     
 def dftbgen_to_xyz(*argv):
 

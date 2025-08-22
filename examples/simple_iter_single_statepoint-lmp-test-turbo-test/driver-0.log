@@ -1,0 +1,1099 @@
+
+01000011011010000100100101001101010001010101001100100000010001000111001001101001011101100110010101110010
+                                                                                                        
+          _____ _     _____ __  __ ______  _____            _        _____       _                      
+         / ____| |   |_   _|  \/  |  ____|/ ____|     /\   | |      |  __ \     (_)                     
+        | |    | |__   | | | \  / | |__  | (___      /  \  | |      | |  | |_ __ ___   _____ _ __       
+        | |    | '_ \  | | | |\/| |  __|  \___ \    / /\ \ | |      | |  | | '__| \ \ / / _ \ '__|      
+        | |____| | | |_| |_| |  | | |____ ____) |  / ____ \| |____  | |__| | |  | |\ V /  __/ |         
+         \_____|_| |_|_____|_|  |_|______|_____/  /_/    \_\______| |_____/|_|  |_| \_/ \___|_|         
+                                                                                                        
+                              ____                                                                      
+                         ____//_]|________                                                              
+                        (o _ |  -|   _  o|                                                              
+                         `(_)-------(_)--'~~~~~ Copyright (C) 2022 R.K. Lindsey                         
+                                                                                                        
+                                                                                                        
+01000011011010000100100101001101010001010101001100100000010001000111001001101001011101100110010101110010
+
+WARNING: Option config.EMAIL_ADD was not set
+         Will not send e-mail updates. 
+WARNING: Option config.SEED was not set
+         Will use a value of 1
+WARNING: Option config.STRS_STYLE was not set
+         Will use "ALL" (i.e. rather than "DIAG")
+WARNING: Option config.THIS_SMEAR was not set
+         Will assume values are provided in the traj_list file, in K
+Warning: Option config.DO_HIERARCH was not set
+         Will use "False"
+WARNING: Option config.HPC_EMAIL was not set
+         Will use False
+Warning: Option config.FIT_CORRECTION was not set
+         Will use "False"
+WARNING: Option config.CHIMES_LSQ_MODULES was not set
+WARNING: Option config.CHIMES_MD_MODULES was not set
+WARNING: Option config.WEIGHTS_SET_ALC_0 was not set
+         Will set to False
+WARNING: Option config.WEIGHTS_ALC_0 was not set
+         Will set to None
+WARNING: Option config.WEIGHTS_FGAS was not set
+         Will use a value of 5.0
+WARNING: Option config.WEIGHTS_ENER was not set
+         Will use a value of 0.1
+WARNING: Option config.WEIGHTS_EGAS was not set
+         Will use a value of 0.1
+WARNING: Option config.WEIGHTS_STRES was not set
+         Will use a value of 250.0
+WARNING: Option config.CHIMES_SOLVE_PPN was not set
+         Will use a value of config.HPC_PPN
+Will run simulations using method:  LMP
+WARNING: Option config.CHIMES_MD_SER was not set
+         Will use config.CHIMES_SRCDIR + "chimes_md-serial"
+ERROR: Option config.DFTB_MD_SER was not set
+       Must be set as path to serial DFTBplus executable
+WARNING: Option config.CHIMES_PEN_PREFAC was not set
+         Will use a value of 1.0E6
+WARNING: Option config.CHIMES_PEN_DIST was not set
+         Will use a value of 0.02
+WARNING: Option config.DO_CLUSTER was not set
+         Will use a value of False
+WARNING: Option config.LMP_POSTPRC was not set
+         Will use config.DRIVER_DIR + "/src/lmp_to_xyz.py"
+The following has been set as the working directory:
+	 /work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/examples/simple_iter_single_statepoint-lmp-test-turbo-test/
+The ALC-X contents of this directory will be overwritten.
+Will read smearing temperatures from traj_list.dat file
+Will run for the following active learning cycles:
+0
+1
+2
+3
+After processing restart file, will run for the following active learning cycles:
+0
+1
+2
+3
+Will include stress tensors for self-consistently obtained full-frames, for ALC >= 1000
+config.DO_CLUSTER was set false - skipping ALC-0
+Working on ALC: 1
+['GEN_FF-0/test_data.temps']
+Starting job: GEN_FF-0
+['GEN_FF-1/test_data.temps']
+Starting job: GEN_FF-1
+Sleeping for 60 more seconds while waiting for jobs  ['713705', '713706'] ... build_amat
+Breaking ... 
+Starting solve_amat from scratch
+Pasting from: 1
+paste GEN_FF/A.txt GEN_FF-1/A.txt > tmp
+A-mat entries:   69336
+b-mat entries:   69336
+natoms entries:  69336
+weight entries:  69336
+Dim file contents: 26 69336
+
+Splitting A-matrix for faster solve
+Will write 48 files with 1445 lines per file
+Counted 26 columns
+Working on a new file no. 0
+Working on a new file no. 1
+Working on a new file no. 2
+Working on a new file no. 3
+Working on a new file no. 4
+Working on a new file no. 5
+Working on a new file no. 6
+Working on a new file no. 7
+Working on a new file no. 8
+Working on a new file no. 9
+Working on a new file no. 10
+Working on a new file no. 11
+Working on a new file no. 12
+Working on a new file no. 13
+Working on a new file no. 14
+Working on a new file no. 15
+Working on a new file no. 16
+Working on a new file no. 17
+Working on a new file no. 18
+Working on a new file no. 19
+Working on a new file no. 20
+Working on a new file no. 21
+Working on a new file no. 22
+Working on a new file no. 23
+Working on a new file no. 24
+Working on a new file no. 25
+Working on a new file no. 26
+Working on a new file no. 27
+Working on a new file no. 28
+Working on a new file no. 29
+Working on a new file no. 30
+Working on a new file no. 31
+Working on a new file no. 32
+Working on a new file no. 33
+Working on a new file no. 34
+Working on a new file no. 35
+Working on a new file no. 36
+Working on a new file no. 37
+Working on a new file no. 38
+Working on a new file no. 39
+Working on a new file no. 40
+Working on a new file no. 41
+Working on a new file no. 42
+Working on a new file no. 43
+Working on a new file no. 44
+Working on a new file no. 45
+Working on a new file no. 46
+    ...split complete
+Sleeping for 60 more seconds while waiting for job  713709 ... solve_amat
+Breaking ... 
+Prior to solve_amat_completed
+Parsing files ...
+...Generating param.txt file for GEN_FF-0
+Command executed successfully
+...Generating param.txt file for GEN_FF-1
+Command executed successfully
+srun -N 1 -n 48 /work2/09982/aoladipupo/stampede3/codes/chimes_calculator-LLfork/etc/lmp/exe/lmp_mpi_chimes -i case-0.indep-0.in.lammps  > out.lammps
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713710'] ... run_md
+Breaking ... 
+	Processing files:         
+	    trjfile:              traj.lammpstrj
+	    logfile:              log.lammps
+	Writing output to:        traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           3001
+	Printing every nth frame: 1
+Printed frames:            3001
+
+Generating 20 evenly spaced frames
+Adding up to 20 traj_bad_r.lt.rin+dp.xyz frames
+Breaking apart file:  traj_bad_r.lt.rin+dp.xyz
+WARNING: Converting forces from Hartree/bohr to simulation units (kca/mol/Ang)
+WARNING: LMP as a gas phase method is untested!
+WARNING: LMP as a gas phase method is untested!
+WARNING: LMP as a gas phase method is untested!
+Breaking apart file:  case_0.indep_0.traj_20F.xyz
+WARNING: Converting forces from Hartree/bohr to simulation units (kca/mol/Ang)
+	On case 0 configuration case_0.indep_0.traj_20F_#000.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#001.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#002.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#003.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#004.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#005.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#006.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#007.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#008.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#009.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#010.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#011.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#012.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#013.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#014.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#015.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#016.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#017.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#018.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#019.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#020.xyz generating LMP .data.in file with template data file index: 1
+Sleeping for 60 more seconds while waiting for jobs  ['713938'] ... setup_qm
+Breaking ... 
+active jobs:  []
+All jobs are complete
+Working on: LMP-20
+Detected 0 unconverged QM jobs
+post-processing...
+Working on: LMP-20
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#000.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#000.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#000.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#001.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#001.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#001.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#002.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#002.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#002.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#003.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#003.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#003.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#004.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#004.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#004.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#005.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#005.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#005.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#006.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#006.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#006.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#007.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#007.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#007.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#008.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#008.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#008.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#009.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#009.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#009.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#010.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#010.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#010.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#011.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#011.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#011.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#012.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#012.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#012.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#013.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#013.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#013.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#014.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#014.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#014.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#015.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#015.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#015.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#016.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#016.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#016.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#017.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#017.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#017.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#018.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#018.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#018.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#019.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#019.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#019.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#020.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#020.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#020.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+ALC- 1 is complete
+Working on ALC: 2
+Warning: Setting FITSTRS false for ALC > 2
+['/work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/examples/simple_iter_single_statepoint-lmp-test-turbo-test//ALC-1/LMP-20//OUTCAR.temps']
+Starting job: GEN_FF-0
+Warning: Setting FITSTRS false for ALC > 2
+['/work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/examples/simple_iter_single_statepoint-lmp-test-turbo-test//ALC-1/LMP-20//OUTCAR.temps']
+Starting job: GEN_FF-1
+Sleeping for 60 more seconds while waiting for jobs  ['713961', '713962'] ... build_amat
+Breaking ... 
+Starting solve_amat from scratch
+Pasting from: 1
+paste GEN_FF/A.txt GEN_FF-1/A.txt > tmp
+A-mat entries:   73872
+b-mat entries:   73872
+natoms entries:  73872
+weight entries:  73872
+Dim file contents: 26 73872
+
+Splitting A-matrix for faster solve
+Will write 48 files with 1539 lines per file
+Counted 26 columns
+Working on a new file no. 0
+Working on a new file no. 1
+Working on a new file no. 2
+Working on a new file no. 3
+Working on a new file no. 4
+Working on a new file no. 5
+Working on a new file no. 6
+Working on a new file no. 7
+Working on a new file no. 8
+Working on a new file no. 9
+Working on a new file no. 10
+Working on a new file no. 11
+Working on a new file no. 12
+Working on a new file no. 13
+Working on a new file no. 14
+Working on a new file no. 15
+Working on a new file no. 16
+Working on a new file no. 17
+Working on a new file no. 18
+Working on a new file no. 19
+Working on a new file no. 20
+Working on a new file no. 21
+Working on a new file no. 22
+Working on a new file no. 23
+Working on a new file no. 24
+Working on a new file no. 25
+Working on a new file no. 26
+Working on a new file no. 27
+Working on a new file no. 28
+Working on a new file no. 29
+Working on a new file no. 30
+Working on a new file no. 31
+Working on a new file no. 32
+Working on a new file no. 33
+Working on a new file no. 34
+Working on a new file no. 35
+Working on a new file no. 36
+Working on a new file no. 37
+Working on a new file no. 38
+Working on a new file no. 39
+Working on a new file no. 40
+Working on a new file no. 41
+Working on a new file no. 42
+Working on a new file no. 43
+Working on a new file no. 44
+Working on a new file no. 45
+Working on a new file no. 46
+    ...split complete
+Sleeping for 60 more seconds while waiting for job  713981 ... solve_amat
+Breaking ... 
+Prior to solve_amat_completed
+Parsing files ...
+...Generating param.txt file for GEN_FF-0
+Command executed successfully
+...Generating param.txt file for GEN_FF-1
+Command executed successfully
+srun -N 1 -n 48 /work2/09982/aoladipupo/stampede3/codes/chimes_calculator-LLfork/etc/lmp/exe/lmp_mpi_chimes -i case-0.indep-0.in.lammps  > out.lammps
+Sleeping for 60 more seconds while waiting for jobs  ['713995'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713995'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713995'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713995'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713995'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['713995'] ... run_md
+Breaking ... 
+	Processing files:         
+	    trjfile:              traj.lammpstrj
+	    logfile:              log.lammps
+	Writing output to:        traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           3001
+	Printing every nth frame: 1
+Printed frames:            3001
+
+Generating 20 evenly spaced frames
+Adding up to 20 traj_bad_r.lt.rin+dp.xyz frames
+Breaking apart file:  traj_bad_r.lt.rin+dp.xyz
+WARNING: Converting forces from Hartree/bohr to simulation units (kca/mol/Ang)
+WARNING: LMP as a gas phase method is untested!
+WARNING: LMP as a gas phase method is untested!
+WARNING: LMP as a gas phase method is untested!
+Breaking apart file:  case_0.indep_0.traj_20F.xyz
+WARNING: Converting forces from Hartree/bohr to simulation units (kca/mol/Ang)
+	On case 0 configuration case_0.indep_0.traj_20F_#000.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#001.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#002.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#003.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#004.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#005.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#006.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#007.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#008.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#009.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#010.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#011.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#012.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#013.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#014.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#015.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#016.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#017.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#018.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#019.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#020.xyz generating LMP .data.in file with template data file index: 1
+Sleeping for 60 more seconds while waiting for jobs  ['714057'] ... setup_qm
+Breaking ... 
+active jobs:  []
+All jobs are complete
+Working on: LMP-20
+Detected 0 unconverged QM jobs
+post-processing...
+Working on: LMP-20
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#000.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#000.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#000.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#001.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#001.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#001.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#002.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#002.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#002.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#003.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#003.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#003.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#004.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#004.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#004.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#005.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#005.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#005.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#006.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#006.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#006.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#007.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#007.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#007.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#008.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#008.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#008.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#009.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#009.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#009.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#010.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#010.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#010.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#011.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#011.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#011.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#012.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#012.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#012.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#013.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#013.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#013.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#014.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#014.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#014.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#015.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#015.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#015.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#016.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#016.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#016.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#017.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#017.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#017.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#018.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#018.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#018.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#019.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#019.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#019.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#020.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#020.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#020.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+ALC- 2 is complete
+Working on ALC: 3
+Warning: Setting FITSTRS false for ALC > 3
+['/work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/examples/simple_iter_single_statepoint-lmp-test-turbo-test//ALC-2/LMP-20//OUTCAR.temps']
+Starting job: GEN_FF-0
+Warning: Setting FITSTRS false for ALC > 3
+['/work2/09982/aoladipupo/stampede3/codes/al_driver-LLfork/examples/simple_iter_single_statepoint-lmp-test-turbo-test//ALC-2/LMP-20//OUTCAR.temps']
+Starting job: GEN_FF-1
+Sleeping for 60 more seconds while waiting for jobs  ['714058', '714059'] ... build_amat
+Breaking ... 
+Starting solve_amat from scratch
+Pasting from: 1
+paste GEN_FF/A.txt GEN_FF-1/A.txt > tmp
+A-mat entries:   78408
+b-mat entries:   78408
+natoms entries:  78408
+weight entries:  78408
+Dim file contents: 26 78408
+
+Splitting A-matrix for faster solve
+Will write 48 files with 1634 lines per file
+Counted 26 columns
+Working on a new file no. 0
+Working on a new file no. 1
+Working on a new file no. 2
+Working on a new file no. 3
+Working on a new file no. 4
+Working on a new file no. 5
+Working on a new file no. 6
+Working on a new file no. 7
+Working on a new file no. 8
+Working on a new file no. 9
+Working on a new file no. 10
+Working on a new file no. 11
+Working on a new file no. 12
+Working on a new file no. 13
+Working on a new file no. 14
+Working on a new file no. 15
+Working on a new file no. 16
+Working on a new file no. 17
+Working on a new file no. 18
+Working on a new file no. 19
+Working on a new file no. 20
+Working on a new file no. 21
+Working on a new file no. 22
+Working on a new file no. 23
+Working on a new file no. 24
+Working on a new file no. 25
+Working on a new file no. 26
+Working on a new file no. 27
+Working on a new file no. 28
+Working on a new file no. 29
+Working on a new file no. 30
+Working on a new file no. 31
+Working on a new file no. 32
+Working on a new file no. 33
+Working on a new file no. 34
+Working on a new file no. 35
+Working on a new file no. 36
+Working on a new file no. 37
+Working on a new file no. 38
+Working on a new file no. 39
+Working on a new file no. 40
+Working on a new file no. 41
+Working on a new file no. 42
+Working on a new file no. 43
+Working on a new file no. 44
+Working on a new file no. 45
+Working on a new file no. 46
+    ...split complete
+Sleeping for 60 more seconds while waiting for job  714076 ... solve_amat
+Breaking ... 
+Prior to solve_amat_completed
+Parsing files ...
+...Generating param.txt file for GEN_FF-0
+Command executed successfully
+...Generating param.txt file for GEN_FF-1
+Command executed successfully
+srun -N 1 -n 48 /work2/09982/aoladipupo/stampede3/codes/chimes_calculator-LLfork/etc/lmp/exe/lmp_mpi_chimes -i case-0.indep-0.in.lammps  > out.lammps
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Sleeping for 60 more seconds while waiting for jobs  ['714092'] ... run_md
+Breaking ... 
+	Processing files:         
+	    trjfile:              traj.lammpstrj
+	    logfile:              log.lammps
+	Writing output to:        traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           3001
+	Printing every nth frame: 1
+Printed frames:            3001
+
+Generating 20 evenly spaced frames
+Adding up to 20 traj_bad_r.lt.rin+dp.xyz frames
+Breaking apart file:  traj_bad_r.lt.rin+dp.xyz
+WARNING: Converting forces from Hartree/bohr to simulation units (kca/mol/Ang)
+WARNING: LMP as a gas phase method is untested!
+WARNING: LMP as a gas phase method is untested!
+WARNING: LMP as a gas phase method is untested!
+Breaking apart file:  case_0.indep_0.traj_20F.xyz
+WARNING: Converting forces from Hartree/bohr to simulation units (kca/mol/Ang)
+	On case 0 configuration case_0.indep_0.traj_20F_#000.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#001.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#002.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#003.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#004.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#005.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#006.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#007.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#008.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#009.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#010.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#011.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#012.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#013.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#014.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#015.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#016.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#017.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#018.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#019.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#020.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#021.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#022.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#023.xyz generating LMP .data.in file with template data file index: 1
+	On case 0 configuration case_0.indep_0.traj_20F_#024.xyz generating LMP .data.in file with template data file index: 1
+Sleeping for 60 more seconds while waiting for jobs  ['714129'] ... setup_qm
+Breaking ... 
+active jobs:  []
+All jobs are complete
+Working on: LMP-20
+Detected 0 unconverged QM jobs
+post-processing...
+Working on: LMP-20
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#000.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#000.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#000.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#001.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#001.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#001.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#002.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#002.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#002.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#003.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#003.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#003.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#004.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#004.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#004.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#005.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#005.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#005.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#006.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#006.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#006.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#007.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#007.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#007.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#008.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#008.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#008.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#009.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#009.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#009.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#010.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#010.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#010.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#011.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#011.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#011.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#012.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#012.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#012.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#013.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#013.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#013.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#014.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#014.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#014.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#015.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#015.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#015.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#016.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#016.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#016.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#017.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#017.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#017.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#018.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#018.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#018.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#019.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#019.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#019.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#020.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#020.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#020.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#021.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#021.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#021.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#022.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#022.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#022.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#023.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#023.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#023.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+	Processing files:         
+	    trjfile:              CASE-0/case_0.indep_0.traj_20F_#024.traj.lammpstrj
+	    logfile:              CASE-0/case_0.indep_0.traj_20F_#024.log.lammps
+	Writing output to:        CASE-0/case_0.indep_0.traj_20F_#024.traj.lammpstrj.xyzf
+	Will use units:           REAL
+	Counted atoms:            72
+	Counted frames:           1
+	Printing every nth frame: 1
+Printed frames:            1
+ALC- 3 is complete

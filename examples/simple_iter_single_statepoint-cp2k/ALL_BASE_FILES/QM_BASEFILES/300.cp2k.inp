@@ -1,0 +1,82 @@
+! CP2K Library file locations
+
+@SET data_dir /nfs/turbo/coe-rklinds/software/cp2k/data/
+
+! Additional input block file locations
+
+@SET cell_file incfg.cell                
+@SET crds_file incfg.xyz                 
+@SET intg_file cp2k.md_int-block.inp    
+@SET mdio_file cp2k.md_io-block.inp     
+@SET qmps_file cp2k.qm_psuedo-block.inp 
+@SET qmbs_file cp2k.qm_basis-block.inp  
+
+! Specify the simualtion temperature
+
+@SET temper 300
+
+!Note: 
+!
+! cell_file: Text file with cell vectors (cp2k format)
+! crds_file: XYZ file with system coordinates (xyz format)
+! intg_file: MD integrator specification, and energy I/O print frequency
+! mdio_file: I/O file names/frequencies for MD (except energy!)
+! qmps_file: QM Psuedo potential/dispersion/etc settings
+! qmbs_file: QM basis sets for each atom type
+
+&GLOBAL
+    PROJECT                 ALD
+    RUN_TYPE                MD
+    PRINT_LEVEL             HIGH
+    SEED                    1111
+    PREFERRED_DIAG_LIBRARY  ELPA
+&END GLOBAL
+
+&MOTION
+    &MD
+        @INCLUDE            ${intg_file}
+        
+         STEPS              0
+         TIMESTEP           0.5
+         TEMPERATURE        ${temper}  
+    &END MD
+    
+    &CONSTRAINT
+        	&LAGRANGE_MULTIPLIERS OFF
+            &END LAGRANGE_MULTIPLIERS
+    &END CONSTRAINT
+
+    &PRINT
+        @INCLUDE            ${mdio_file}
+    &END
+&END MOTION
+
+
+&FORCE_EVAL
+   METHOD QS
+   @INCLUDE                 ${qmps_file}
+   
+   &SUBSYS
+      @INCLUDE              ${qmbs_file}
+      &CELL
+         @INCLUDE           ${cell_file}
+         CELL_FILE_FORMAT   cp2k
+         PERIODIC XYZ
+      &END
+      
+      &TOPOLOGY
+        COORD_FILE_NAME     ${crds_file}
+        COORD_FILE_FORMAT   xyz
+      &END TOPOLOGY
+    &END SUBSYS
+
+    STRESS_TENSOR ANALYTICAL
+
+&END FORCE_EVAL
+
+&EXT_RESTART
+   #RESTART_FILE_NAME cp2k.restart
+   #RESTART_DEFAULT F
+   #RESTART_POS T
+   #RESTART_VEL T
+&END EXT_RESTART
