@@ -476,7 +476,7 @@ def restart_solve_amat(my_ALC, **kwargs):
             return int(instr.split('-')[-1])
             
         prev_restart_folders.sort(key=numeric_keys)
-        prev_restart_folders = int(prev_restart_folders[-1]) # Grab the index of the last restart folder 
+        prev_restart_folders = int(prev_restart_folders[-1].split('-')[-1]) # Grab the index of the last restart folder 
     else:
         prev_restart_folders = 0          
     
