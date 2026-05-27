@@ -799,6 +799,7 @@ def build_amat(my_ALC, **kwargs):
                         print("Error: This driver does NOT support SPLITFI functionality in fm_setup.in")
                         print("Exiting.")
                         exit()
+                    found1=False
                 if "SPLITFI" in runfile[i]: 
                     found1=True
                 
