@@ -792,13 +792,17 @@ def build_amat(my_ALC, **kwargs):
             ifstream = open(GEN_FF + "/fm_setup.in",'r')
             runfile  = ifstream.readlines()
 
+            found1=False
             for i in range(len(runfile)): # This loop is to make sure that split files is false
-                if "SPLITFI" in runfile[i]:
-                    if i + 1 < len(runfile) and "true" in runfile[i + 1]:
+                if found1:
+                    if "true" in runfile[i]:
                         print("Error: This driver does NOT support SPLITFI functionality in fm_setup.in")
                         print("Exiting.")
                         exit()
-                    break
+                    else:
+                        break
+                if "SPLITFI" in runfile[i]: 
+                    found1=True
                 
             if len(glob.glob(args["prev_gen_path"] + "/*xyzf"  )) > 0:
                 helpers.run_bash_cmnd("cp " + ' '.join(glob.glob(args["prev_gen_path"] + "/*xyzf"  )) + " " + GEN_FF + "/")
@@ -867,7 +871,6 @@ def build_amat(my_ALC, **kwargs):
             found1 = False
             found2 = False
             found3 = False
-            found4 = False
     
             for i in range(len(runfile)):
     
@@ -906,15 +909,7 @@ def build_amat(my_ALC, **kwargs):
                         ofstream.write('\t' + "false" + '\n')
             
                     found3 = False
-                elif found4:
-                    if "true" in runfile[i]:
-                        print("Error: This driver does NOT support SPLITFI functionality in fm_setup.in")
-                        print("Exiting.")
-                        
-                        exit()
-                    else:
-                        ofstream.write(runfile[i])
-                    found4 = False
+  
                 else:
     
                     ofstream.write(runfile[i])
