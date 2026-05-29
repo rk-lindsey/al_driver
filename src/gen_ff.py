@@ -799,6 +799,8 @@ def build_amat(my_ALC, **kwargs):
                         print("Error: This driver does NOT support SPLITFI functionality in fm_setup.in")
                         print("Exiting.")
                         exit()
+                    else:
+                        break
                 if "SPLITFI" in runfile[i]: 
                     found1=True
                 
@@ -869,7 +871,6 @@ def build_amat(my_ALC, **kwargs):
             found1 = False
             found2 = False
             found3 = False
-            found4 = False
     
             for i in range(len(runfile)):
     
@@ -908,14 +909,7 @@ def build_amat(my_ALC, **kwargs):
                         ofstream.write('\t' + "false" + '\n')
             
                     found3 = False
-                elif found4:
-                    if "true" in runfile[i]:
-                        print("Error: This driver does NOT support SPLITFI functionality in fm_setup.in")
-                        print("Exiting.")
-                        
-                        exit()
-                    else:
-                        ofstream.write(runfile[i])    
+  
                 else:
     
                     ofstream.write(runfile[i])
