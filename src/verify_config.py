@@ -15,6 +15,8 @@ def print_help():
     DETAILS=[]
 
     PARAM.append("EMAIL_ADD");                      VARTYP.append("str");           DETAILS.append("E-mail address for driver to sent status updates to")
+    PARAM.append("STOP_AFTER");                     VARTYP.append("str");           DETAILS.append("Run only cycle 1, stopping after the specied step. Options are \"SOLVE_AMAT\" or \"RUN_MD\"")
+    PARAM.append("EMAIL_ADD");                      VARTYP.append("str");           DETAILS.append("E-mail address for driver to sent status updates to")
     PARAM.append("SEED");                           VARTYP.append("int");           DETAILS.append("Seed for random number generator (used for MC cluster selection)")
     PARAM.append("ATOM_TYPES");                     VARTYP.append("str list");      DETAILS.append("List of atom types in system of interest , e.g. [\"C\", \"H\", \"O\", \"N\"]")
     PARAM.append("NO_CASES");                       VARTYP.append("int");           DETAILS.append("Number of different state points considered")
@@ -69,6 +71,7 @@ def print_help():
     PARAM.append("MD_MODULES");                     VARTYP.append("str");           DETAILS.append("System-specific modules needed to run MD")
     PARAM.append("MD_MPI");                         VARTYP.append("str");           DETAILS.append("MPI-compatible MD exectuable absolute path (either path to \"lmp_mpi_chimes\" or \"chimes_md-mpi\")  ) ")
     PARAM.append("MD_NODES");                       VARTYP.append("int");           DETAILS.append("Number of nodes to use when running md simulations")
+    PARAM.append("MD_OMPEXPORTS");                  VARTYP.append("str");           DETAILS.append("Only used for MD with DFTB. A single line bash export command like: export OMP_NUM_THREADS=4 OMP_PLACES=cores OMP_PROC_BIND=close")    
     PARAM.append("MD_QUEUE");                       VARTYP.append("str");           DETAILS.append("Queue to submit md simulations to to")
     PARAM.append("MD_SER");                         VARTYP.append("str");           DETAILS.append("Serial MD executable absolute path (either LAMMPS path or CHIMES_MD_SER)")
     PARAM.append("MD_TIME");                        VARTYP.append("str");           DETAILS.append("Walltime for md simulations (e.g. \"04:00:00\")")
@@ -165,7 +168,7 @@ def check_VASP(user_config):
     Usage: check_VASP(user_config)
     
     """
-        
+
     if not hasattr(user_config,'VASP_POSTPRC'):
 
         # Location of a vasp post-processing file ... this should really be in a process_vasp.py file...
@@ -320,7 +323,7 @@ def check_DFTB(user_config):
 
         # Memory per node to to use for a DFTB calculation
 
-        if ((user_config.BULK_QM_METHOD == "DFTB") or (user_config.IGAS_QM_METHOD == "DFTB")):
+        if ((user_config.BULK_QM_METHOD == "DFTB+") or (user_config.IGAS_QM_METHOD == "DFTB+")):
             print("WARNING: Option config.DFTB_MEM was not set")
             #print("         Will use a value of 128 (GB)")
 
@@ -758,6 +761,17 @@ def verify(user_config):
         exit()    
     else:    
         user_config.NO_CASES = int(user_config.NO_CASES)
+        
+    if hasattr(user_config,'STOP_AFTER'):
+
+        # User wants to either only generate a model or generate and test a model. No iterative/active learning is requested.
+
+        if ((user_config.STOP_AFTER != "SOLVE_AMAT") and (user_config.STOP_AFTER != "RUN_MD")):
+            print("ERROR: STOP_AFTER can only be set to one of \"SOLVE_AMAT\" or \"RUN_MD\"")
+            exit(0)
+    else:
+
+        user_config.STOP_AFTER = None        
 
     if not hasattr(user_config,'USE_AL_STRS'):
 
@@ -997,7 +1011,7 @@ def verify(user_config):
 
             # Determines whether to build on existing parameter files
             
-            if user_config.FIT_CORRECTION and (user_config.CORRECTED_TYPE == "DFTB"):
+            if user_config.FIT_CORRECTION and (user_config.CORRECTED_TYPE == "DFTB+"):
             
                 print("WARNING: No explicit electron temperature file listed for correction generation.")
                 print("         Will attempt to use values in traj_list.dat")
@@ -1255,6 +1269,9 @@ def verify(user_config):
         print("         Will use \"24:00:00\"")
         
         user_config.CHIMES_SOLVE_TIME = "24:00:00"
+        
+    if hasattr(user_config,'STOP_AFTER') and (user_config.STOP_AFTER  == "SOLVE_AMAT"):
+        return        
 
     ################################
     ##### ChIMES MD
@@ -1269,26 +1286,27 @@ def verify(user_config):
         user_config.MD_STYLE = "CHIMES"
     else:
         print("Will run simulations using method: ", user_config.MD_STYLE)
+        
+    
+    if user_config.MD_STYLE == "ChIMES":
     
     
-    if hasattr(user_config,'CHIMES_MD'):
+        if hasattr(user_config,'CHIMES_MD'):
 
-        # Path to chimes_md executable
+            # Path to chimes_md executable
 
-        print("WARNING: Defunct option config.CHIMES_MD was set")
-        print("         Ignoring. Will search for config.CHIMES_MD_SER and config.CHIMES_MD_MPI")
+            print("WARNING: Defunct option config.CHIMES_MD was set")
+            print("         Ignoring. Will search for config.CHIMES_MD_SER and config.CHIMES_MD_MPI")
         
-    if not hasattr(user_config,'CHIMES_MD_SER'):
+        if not hasattr(user_config,'CHIMES_MD_SER'):
 
-        # Path to the serial chimes_md executable
+            # Path to the serial chimes_md executable
 
-        print("WARNING: Option config.CHIMES_MD_SER was not set")
-        print("         Will use config.CHIMES_SRCDIR + \"chimes_md-serial\"")
+            print("WARNING: Option config.CHIMES_MD_SER was not set")
+            print("         Will use config.CHIMES_SRCDIR + \"chimes_md-serial\"")
         
-        user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "/../build/chimes_md-serial"        
-    
-    if user_config.MD_STYLE == "CHIMES":
-        
+            user_config.CHIMES_MD_SER = user_config.CHIMES_SRCDIR + "/../build/chimes_md-serial"        
+
         if not hasattr(user_config,'CHIMES_MD_MPI'):
 
             # Path to chimes_md executable
@@ -1300,8 +1318,10 @@ def verify(user_config):
 
     else:
     	if not hasattr(user_config,'MD_MPI'):
-            print("ERROR: Option config.MD_MPI was not set")
-            exit(0)
+            print("WARNING: Option config.MD_MPI was not set")
+            print(" 	Attempting to set equal to config.MD_SER")
+            
+            user_config.MD_MPI = user_config.MD_SER
             
     	if not hasattr(user_config,'MD_SER'): 
             print("WARNING: Option config.MD_SER was not set")
@@ -1344,6 +1364,9 @@ def verify(user_config):
         
         user_config.MOLANAL_SPECIES = [""]
     
+    if hasattr(user_config,'MD_FILES'):
+
+        user_config.MDFILES = user_config.MD_FILES
         
     if not hasattr(user_config,'MDFILES'):
 
@@ -1381,6 +1404,17 @@ def verify(user_config):
         
         user_config.MD_NODES = [4]*user_config.NO_CASES
         
+    if not hasattr(user_config,'MD_OMPEXPORTS'):
+
+        # Number of nodes to use for MD jobs
+
+        print("WARNING: Option config.MD_OMPEXPORTS was not set")
+        print("         will not export any OMP variables.")
+        print("         Note: This currently only matters when MD_STYLE is \"DFTB\".")
+        
+        user_config.MD_OMPEXPORTS = None
+        
+        
     elif hasattr(user_config,'MD_NODES') and (len(user_config.MD_NODES) != user_config.NO_CASES):
         print("ERROR: Option config.MD_NODES should be provided in the ")
         print("       form of a NO_CASES long list, e.g. [4]*NO_CASES.")
@@ -1413,6 +1447,9 @@ def verify(user_config):
         print("ERROR: Option config.MD_TIME should be provided in the ")
         print("       form of a NO_CASES long list, e.g. [\"4:00:00\"]*NO_CASES.")
         exit()
+    
+    if hasattr(user_config,'STOP_AFTER') and (user_config.STOP_AFTER  == "RUN_MD"):
+        return
 
     ################################
     ##### Cluster specific paths/variables

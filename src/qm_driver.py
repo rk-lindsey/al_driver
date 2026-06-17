@@ -598,7 +598,7 @@ def check_convergence(my_ALC, bulk_qm_method, igas_qm_method, *argv, **kwargs):
             else:
                 if igas_qm_method == "VASP":
                     total_failed += vasp_driver.check_convergence(my_ALC, args_cases,["all"])
-                elif igas_qm_method == "DFTB":
+                elif igas_qm_method == "DFTB+":
                     total_failed += dftbplus_driver.check_convergence(my_ALC, args_cases,["all"])   
                 elif igas_qm_method == "CP2K":
                     total_failed += cp2k_driver.check_convergence(my_ALC, args_cases,["all"])                                        

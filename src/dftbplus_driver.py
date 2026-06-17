@@ -483,8 +483,8 @@ def post_process(*argv, **kwargs):
             for line in tmpdata:
                 
                 if "Electronic temperature:" in line:
-                
-                    tmp_temp = str(int(float(line.split()[-1])*315777.09))
+
+                    tmp_temp = str(int(float(line.split()[2])*315777.09))
                     break
 
             tmpfile = gencoord_list[j].split(".xyz.gen")
@@ -677,7 +677,11 @@ def setup_dftb(my_ALC, *argv, **kwargs):
             
                 if my_smear == "TRAJ_LIST":
 
-                    temp = int(temps[int(my_case)][2])
+                    try:
+                        temp = int(float(temps[int(my_case)][2]))
+                    except:
+                        temp = int(temps[int(my_case)][2])
+
                     
                 print("\tOn case",my_case,"configuration",j,"generating .gen with smearing temperature:",temp)
 
@@ -734,20 +738,20 @@ def setup_dftb(my_ALC, *argv, **kwargs):
         ################################
     
         # Grab the necessary files
-    
+
         helpers.run_bash_cmnd("cp " + ' '.join(glob.glob(args["basefile_dir"] + "/*")) + " .")
-    
-        # Create the task string
+        
+	# Create the task string
                 
         job_task = []
         job_task.append("module load " + args["modules"] + '\n')
 
         job_task.append("for j in $(ls *xyz.gen)              ")    
         job_task.append("do    ")
-        job_task.append("    rm -f charges.bin tmp-broyden* dftb_pin.hsd dftbjob.gen geo_end.*")
-        job_task.append("    if [[ $j == \"dftbjob.gen\" ]] ; then continue; fi")
+        job_task.append("    rm -f charges.bin tmp-broyden* dftb_pin.hsd tmp.gen geo_end.*")
+        job_task.append("    if [[ $j == \"tmp.gen\" ]] ; then continue; fi")
         job_task.append("    TAG=${j%*.gen}              ")    
-        job_task.append("    cp ${TAG}.gen dftbjob.gen ")
+        job_task.append("    cp ${TAG}.gen tmp.gen ")
         job_task.append("    CHECK=${TAG}.results.tag  ")
         job_task.append("    if [ -e ${CHECK} ] ; then ")    
         job_task.append("        l=`wc -l ${TAG}.dftb.out | awk '{print $1}'` ")    
@@ -755,7 +759,7 @@ def setup_dftb(my_ALC, *argv, **kwargs):
         job_task.append("            continue    ")    
         job_task.append("        fi         ")    
         job_task.append("    fi            ")
-        job_task.append("    TEMP=`awk '{if(NR==2){print int($(NF-1)); exit}}' dftbjob.gen`")
+        job_task.append("    TEMP=`awk '{if(NR==2){print int($(NF-1)); exit}}' tmp.gen`")
         job_task.append("    cp " + args["basefile_dir" ] + "/${TEMP}.dftb_in.hsd dftb_in.hsd        ")    
         if args["job_system"] == "TACC":
             job_task.append("    ibrun " + "-n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
@@ -764,7 +768,7 @@ def setup_dftb(my_ALC, *argv, **kwargs):
         job_task.append("    mv results.tag ${TAG}.results.tag")
         job_task.append("    mv md.out      ${TAG}.md.out     ")
         job_task.append("done    ")
-        job_task.append("rm -f charges.bin tmp-broyden* dftb_pin.hsd dftbjob.gen geo_end.*")    
+        job_task.append("rm -f charges.bin tmp-broyden* dftb_pin.hsd tmp.gen geo_end.*")    
 
         
         this_jobid = helpers.create_and_launch_job(job_task,

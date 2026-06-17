@@ -150,15 +150,23 @@ def main(args):
     config.CHIMES_SOLVER  = config.HPC_PYTHON + " " + config.CHIMES_SOLVER
     config.CHIMES_POSTPRC = config.HPC_PYTHON + " " + config.CHIMES_POSTPRC
     
-    if ((config.BULK_QM_METHOD == "VASP") or (config.IGAS_QM_METHOD == "VASP")):
-        config.VASP_POSTPRC   = config.HPC_PYTHON + " " + config.VASP_POSTPRC
-    if ((config.BULK_QM_METHOD == "DFTB+") or (config.IGAS_QM_METHOD == "DFTB+")):
-        config.DFTB_POSTPRC   = config.HPC_PYTHON + " " + config.DFTB_POSTPRC
-    if ((config.BULK_QM_METHOD == "CP2K") or (config.IGAS_QM_METHOD == "CP2K")):
-        config.CP2K_POSTPRC   = config.HPC_PYTHON + " " + config.CP2K_POSTPRC     
-    if ((config.BULK_QM_METHOD == "LMP") or (config.IGAS_QM_METHOD == "LMP")):
-        config.LMP_POSTPRC   = config.HPC_PYTHON + " " + config.LMP_POSTPRC        
+     
 
+    if config.STOP_AFTER:
+        print("Will stop the ALD after the first cycle complets step: ", config.STOP_AFTER)
+        config.DO_CLUSTER = False
+        config.TIGHT_CRIT = 0.0
+        config.LOOSE_CRIT = 0.0
+        config.CLU_CODE   = ""
+    else:
+        if ((config.BULK_QM_METHOD == "VASP") or (config.IGAS_QM_METHOD == "VASP")):
+            config.VASP_POSTPRC   = config.HPC_PYTHON + " " + config.VASP_POSTPRC
+        if ((config.BULK_QM_METHOD == "DFTB+") or (config.IGAS_QM_METHOD == "DFTB+")):
+           config.DFTB_POSTPRC   = config.HPC_PYTHON + " " + config.DFTB_POSTPRC
+        if ((config.BULK_QM_METHOD == "CP2K") or (config.IGAS_QM_METHOD == "CP2K")):
+            config.CP2K_POSTPRC   = config.HPC_PYTHON + " " + config.CP2K_POSTPRC     
+        if ((config.BULK_QM_METHOD == "LMP") or (config.IGAS_QM_METHOD == "LMP")):
+            config.LMP_POSTPRC   = config.HPC_PYTHON + " " + config.LMP_POSTPRC
     
     if config.EMAIL_ADD:
         EMAIL_ADD = config.EMAIL_ADD    
@@ -689,22 +697,24 @@ def main(args):
             
             os.chdir("ALC-" + str(THIS_ALC))
             
-            qm_all_path = ""
-            qm_20F_path = ""
+            if not config.STOP_AFTER:
             
-            if config.IGAS_QM_METHOD == "VASP":
-                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/VASP-all/"
-            elif config.IGAS_QM_METHOD == "DFTB+":
-                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-all/"
-            elif config.IGAS_QM_METHOD == "CP2K":
-                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/CP2K-all/"
-            elif config.IGAS_QM_METHOD == "Gaussian":
-                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/GAUS-all/"
-            elif config.IGAS_QM_METHOD == "LMP":
-                qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/LMP-all/"                
-            else:
-                print("Error in main driver while building Amat: unkown IGAS QM method:", config.IGAS_QM_METHOD)
-                exit()
+                qm_all_path = ""
+                qm_20F_path = ""
+            
+                if config.IGAS_QM_METHOD == "VASP":
+                    qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/VASP-all/"
+                elif config.IGAS_QM_METHOD == "DFTB+":
+                    qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/DFTB-all/"
+                elif config.IGAS_QM_METHOD == "CP2K":
+                    qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/CP2K-all/"
+                elif config.IGAS_QM_METHOD == "Gaussian":
+                    qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/GAUS-all/"
+                elif config.IGAS_QM_METHOD == "LMP":
+                    qm_all_path = config.WORKING_DIR + "/ALC-" + repr(THIS_ALC-1) + "/LMP-all/"                
+                else:
+                    print("Error in main driver while building Amat: unkown IGAS QM method:", config.IGAS_QM_METHOD)
+                    exit()
             
             if THIS_ALC > 1:
             
@@ -903,7 +913,12 @@ def main(args):
                 
                 helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "SOLVE_AMAT: COMPLETE ")
             else:
-                restart_controller.update_file("SOLVE_AMAT: COMPLETE" + '\n')    
+                restart_controller.update_file("SOLVE_AMAT: COMPLETE" + '\n')   
+                
+            if config.STOP_AFTER == "SOLVE_AMAT":
+                print("Cycle 1 SOLVE_AMAT complete -- stopping per user request")
+                exit(0)
+             
             
             ################################                
             # Run MD
@@ -941,7 +956,8 @@ def main(args):
                         job_executable = config.MD_MPI,     
                         job_system     = config.HPC_SYSTEM,       
                         job_file       = "run.cmd",
-                        job_modules    = config.MD_MODULES
+                        job_modules    = config.MD_MODULES,
+                        job_OMPexports = config.MD_OMPEXPORTS
                         )
                         
         
@@ -980,7 +996,11 @@ def main(args):
                 
                 helpers.email_user(config.DRIVER_DIR, EMAIL_ADD, "ALC-" + str(THIS_ALC) + " status: " + "POST_PROC: COMPLETE ")
             else:
-                restart_controller.update_file("POST_PROC: COMPLETE" + '\n')    
+                restart_controller.update_file("POST_PROC: COMPLETE" + '\n')
+                
+            if config.STOP_AFTER == "RUN_MD":
+                print("Cycle 1 RUN_MD (and POST_PROC) complete -- stopping per user request")      
+                exit(0)              
                 
                 
             if config.DO_CLUSTER:

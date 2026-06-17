@@ -545,8 +545,8 @@ def create_and_launch_job(*argv, **kwargs):
     # 0. Set up an argument parser
     ################################
     
-    default_keys   = [""]*12
-    default_values = [""]*12
+    default_keys   = [""]*13
+    default_values = [""]*13
 
     # Overall job controls
     
@@ -561,7 +561,8 @@ def create_and_launch_job(*argv, **kwargs):
     default_keys[8 ] = "job_file"          ; default_values[8 ] =     "run.cmd"      # Name of the resulting submit script    
     default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Should emails be sent?
     default_keys[10] = "job_modules"       ; default_values[10] =     ""             # Name of the resulting submit script    
-    default_keys[11] = "job_mem"           ; default_values[11] =     "128"             # GB
+    default_keys[11] = "job_mem"           ; default_values[11] =     "128"          # GB
+    default_keys[12] = "job_OMPexports"    ; default_values[12] = None               # Using OMP? If so, specify exports (one line) to add in sbatch script
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -605,6 +606,8 @@ def create_and_launch_job(*argv, **kwargs):
         
     if args["job_modules"]:
         ofstream.write("module load " + args["job_modules"] + '\n')
+    if args["job_OMPexports"]:
+    	ofstream.write(args["job_OMPexports"] + '\n')
     
     if args["job_executable"]:
     

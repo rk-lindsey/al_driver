@@ -9,7 +9,7 @@ def clean_up(method):
     
     if method == "CHIMES":
          chimes_modify_FES.clean_up()
-    elif method == "DFTB":
+    elif method == "DFTB+":
         dftbplus_modify_FES.clean_up()
     elif method == "LMP":
         lmp_modify_FES.clean_up()
@@ -156,7 +156,7 @@ def subtract_off(param_file, md_driver, method, traj_files, temper_files=None):
     
     if method == "CHIMES":
         atmtyps = chimes_modify_FES.check_atomtypes(param_file)
-    elif method == "DFTB":
+    elif method == "DFTB+":
         atmtyps = dftbplus_modify_FES.check_atomtypes(param_file)
     elif method == "LMP":
         atmtyps = lmp_modify_FES.check_atomtypes(param_file)
@@ -354,6 +354,8 @@ def subtract_off(param_file, md_driver, method, traj_files, temper_files=None):
         removed.close()
         helpers.run_bash_cmnd("cp " + traj_files[i] + " " + traj_files[i] + ".original")
         helpers.run_bash_cmnd("mv subtracted.xyzf " + traj_files[i])
+        print("renaming:", traj_files[i] + " to " + traj_files[i] + ".original")
+        print("renaming: subtracted.xyzf to ", traj_files[i]) 
 
             
 def get_FES(xyz_file, param_file, md_driver, method, temperature=None):
@@ -364,7 +366,7 @@ def get_FES(xyz_file, param_file, md_driver, method, temperature=None):
     
     if method == "CHIMES":
         tmp_ener, tmp_stress, force_file = chimes_modify_FES.get_FES("tmp.xyz",param_file, md_driver) 
-    elif method == "DFTB":
+    elif method == "DFTB+":
         tmp_ener, tmp_stress, force_file = dftbplus_modify_FES.get_FES("tmp.xyz",param_file, md_driver,temperature) 
     elif method == "LMP":
         tmp_ener, tmp_stress, force_file = lmp_modify_FES.get_FES("tmp.xyz",param_file, md_driver) 
