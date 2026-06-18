@@ -9,7 +9,7 @@ Driver = VelocityVerlet {
     Temperature [K]          = 6000.0
     CouplingStrength [cm^-1] = 1200.0
   }
-  MDRestartFrequency = 1
+  MDRestartFrequency = 100
 }
 
 Hamiltonian = DFTB {
@@ -30,7 +30,7 @@ Hamiltonian = DFTB {
     Temperature [K] = 6000.0
   }
   Mixer = Broyden {
-    MixingParameter = 0.2
+    MixingParameter = 0.05
   }
   SlaterKosterFiles = Type2FileNames {
     Prefix    = "/usr/workspace/wsb/lindsey11/dftb_tests/mio-1-1/"
@@ -40,8 +40,11 @@ Hamiltonian = DFTB {
   KPointsAndWeights = {
     0.0 0.0 0.0 1.0
   }
+  Differentiation = FiniteDiff {
+    Delta = 1.0E-02
+  }
+  Solver = QR {}
 }
-			   
 
 Options = {
   WriteResultsTag  = Yes

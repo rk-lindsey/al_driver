@@ -11,9 +11,10 @@ Driver = VelocityVerlet {
   }
   MDRestartFrequency = 100
 }
+
 Hamiltonian = DFTB {
   SCC              = Yes
-  SCCTolerance     = 1e-5
+  SCCTolerance     = 1e-6
   MaxSCCIterations = 200
   ShellResolvedSCC = No
   MaxAngularMomentum = {
@@ -26,7 +27,7 @@ Hamiltonian = DFTB {
     Temperature [K] = 6000.0
   }
   Mixer = Broyden {
-    MixingParameter = 0.25
+    MixingParameter = 0.05
   }
   SlaterKosterFiles = Type2FileNames {
     Prefix    = "./"
@@ -36,6 +37,10 @@ Hamiltonian = DFTB {
   KPointsAndWeights = {
     0.0 0.0 0.0 1.0
   }
+  Differentiation = FiniteDiff {
+    Delta = 1.0E-02
+  }
+  Solver = QR {}
 }
 
 Options = {
