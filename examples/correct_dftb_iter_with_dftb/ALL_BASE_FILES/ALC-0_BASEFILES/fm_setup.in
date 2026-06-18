@@ -1,0 +1,41 @@
+####### CONTROL VARIABLES #######
+
+# TRJFILE #  /p/lustre2/rlindsey/ChIMES_Nitrogen-210909/generate_models-DFTBref/al_2+3b-allPBE-AL-211203/ChIMES-DFTB_trained_to_PBE-D2_traj/subtracted.xyzf
+	ChIMES-N.Order-50_15_5.ALC_1-5.PBE_OUTCAR.xyzf
+# WRAPTRJ # 
+        true
+# NFRAMES # 
+	920
+# NLAYERS # 
+        1   
+# FITSTRS #
+	ALL
+# FITENER # 
+        true   
+# PAIRTYP # 
+        CHEBYSHEV 25 10 0 -1 1
+# CHBTYPE #
+        MORSE
+# SPLITFI #
+        false
+
+####### TOPOLOGY VARIABLES #######
+
+# NATMTYP # 
+        1
+
+# TYPEIDX #     # ATM_TYP #     # ATMCHRG #     # ATMMASS # 
+1               N                0.0            14.0067
+
+# PAIRIDX #     # ATM_TY1 #     # ATM_TY1 #     # S_MINIM #     # S_MAXIM #     # S_DELTA #     # MORSE_LAMBDA #
+1               N		N               0.93		3.00		0.01		1.09		
+
+SPECIAL 3B S_MAXIM: ALL 3.0
+
+SPECIAL 4B S_MAXIM: ALL 3.0
+
+# FCUTTYP #
+        TERSOFF 0.75
+
+# ENDFILE #
+

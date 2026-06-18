@@ -1,0 +1,57 @@
+Geometry = GenFormat {
+<<< "case-0.indep-0.gen"
+}
+
+Driver = VelocityVerlet {
+  Steps         = 1000
+  TimeStep [fs] = 0.5
+  Thermostat = NoseHoover {
+    Temperature [K]          = 6000.0
+    CouplingStrength [cm^-1] = 1200.0
+  }
+  MDRestartFrequency = 1
+}
+
+Hamiltonian = DFTB {
+  SCC              = Yes
+  SCCTolerance     = 1e-6
+  MaxSCCIterations = 200
+  ShellResolvedSCC = No
+  MaxAngularMomentum = {
+    N = "p"
+  }
+  Dispersion = LennardJones {
+    Parameters = UFFParameters {}
+  }
+  Chimes {
+    ParameterFile = "params.txt"
+  }	
+  Filling = Fermi {
+    Temperature [K] = 6000.0
+  }
+  Mixer = Broyden {
+    MixingParameter = 0.2
+  }
+  SlaterKosterFiles = Type2FileNames {
+    Prefix    = "/usr/workspace/wsb/lindsey11/dftb_tests/mio-1-1/"
+    Separator = "-"
+    Suffix    = ".skf"
+  }
+  KPointsAndWeights = {
+    0.0 0.0 0.0 1.0
+  }
+}
+			   
+
+Options = {
+  WriteResultsTag  = Yes
+  WriteDetailedOut = Yes
+}
+
+Analysis = {
+  WriteBandOut = No
+}
+
+ParserOptions {
+  ParserVersion = 14
+}
