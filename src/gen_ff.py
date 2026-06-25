@@ -966,18 +966,21 @@ def build_amat(my_ALC, **kwargs):
     
         # Create the task string
         print("Starting job: " + GEN_FF) # Added by BL
-        # job_task = "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " fm_setup.in | tee fm_setup.log"
-        
 
         job_task = args["job_executable"] + " fm_setup.in | tee fm_setup.log"
+
         if int(args["n_hyper_sets"]) == 1:
-            job_task = "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + job_task
+            job_task = " " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + job_task
+
         if (args["job_system"] == "slurm" or args["job_system"] == "UM-ARC") and int(args["n_hyper_sets"]) == 1:
-            job_task = "srun "   + job_task
+            job_task = "srun -n"   + job_task
         elif args["job_system"] == "TACC" and int(args["n_hyper_sets"]) == 1:
-            job_task = "ibrun "   + job_task
+            job_task = "ibrun -n"   + job_task
+        elif (args["job_system"] == "conda-slurm") and int(args["n_hyper_sets"]) == 1:
+            job_task = "mpirun -np" + job_task    
+	    
         elif int(args["n_hyper_sets"]) == 1:
-            job_task = "mpirun " + job_task    
+            job_task = "mpirun -np" + job_task  	    
     
         # Launch the job
     
@@ -1259,6 +1262,8 @@ def solve_amat(my_ALC, **kwargs):
 
         if args["job_system"] == "TACC":
             job_task += "--mpistyle ibrun "
+        elif args["job_system"] == "conda-slurm":
+            job_task += "--mpistyle mpirun "
         else:
             job_task += "--mpistyle srun "
         

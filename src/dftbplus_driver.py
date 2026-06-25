@@ -763,6 +763,8 @@ def setup_dftb(my_ALC, *argv, **kwargs):
         job_task.append("    cp " + args["basefile_dir" ] + "/${TEMP}.dftb_in.hsd dftb_in.hsd        ")    
         if args["job_system"] == "TACC":
             job_task.append("    ibrun " + "-n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
+        elif args["job_system"] == "conda-slurm":
+            job_task.append("    mpirun " + "-np " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
         else:
             job_task.append("    srun -N " + str(args["job_nodes" ]) + " -n " + str(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.dftb.out  ")        
         job_task.append("    mv results.tag ${TAG}.results.tag")

@@ -453,8 +453,10 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
         job_task += "srun -N "   + repr(int(args["job_nodes" ])) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
     elif args["job_system"] == "TACC":
         job_task += "ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
+    elif args["job_system"] == "conda-slurm":
+        job_task += "mpirun " + "-np " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
     else:
-        job_task += "mpirun -np" + repr(int(args["job_nodes" ])) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
+        job_task += "mpirun -np" + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
         
     job_task += args["job_executable"] + " -i " + md_infile + "  > out.lammps"
     print(job_task)
