@@ -6,9 +6,6 @@
 ChIMES Active Learning Driver Documentation
 ------------------------------------------------
 
-
-*Note: This documentation is under still construction.*
-
 The Active Learning Driver is an extensible multifunction workflow tool for generating ChIMES [1] models. At its simplest, the ALD can be used for model generation via iterative refinement [2], at at its most complex, via active learning [3].
 
 Before proceeding, the user is strongly encouraged to familiarize themselves with the ChIMES literature (See references below) and ChIMES LSQ user manual. Note that the ALD itself only contains the tools necessary to orchestrate model generation and active learning, and must be used in conjunction with the ChIMES design matrix generator, a supported MD code, and a supported quantum code. Note also that the ALD is only intended for use on high performance computing platforms and currently only supports runs via Slurm (SBATCH) schedulers. 
@@ -17,7 +14,7 @@ Before proceeding, the user is strongly encouraged to familiarize themselves wit
 * [2] [**link**](https://doi.org/10.1063/5.0012840) R.K. Lindsey, N. Goldman, L.E. Fried, S. Bastea, JCP, 153 054103 (2020)
 * [3] [**link**](https://doi.org/10.1063/5.0021965) R.K. Lindsey, L.E. Fried, N. Goldman, S. Bastea, JCP, 153 134117 (2020)
 
-The Active Learning Driver was developed at Lawrence Livermore National Laboratory with funding from the US Department of Energy (DOE), and is open source, distributed freely under the terms of the LGPL v3.0 License.
+The Active Learning Driver was developed in part at Lawrence Livermore National Laboratory with funding from the US Department of Energy (DOE), and is open source, distributed freely under the terms of the LGPL v3.0 License.
 
 This work was produced under the auspices of the U.S. Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344.
 
@@ -27,7 +24,7 @@ This work was produced under the auspices of the U.S. Department of Energy by La
 Documentation
 ----------------
 
-[**Documentation**](https://https://al-driver.readthedocs.io/en/latest/) is available, but under construction.
+Documentation is available [**here**](https://https://al-driver.readthedocs.io/en/latest/), and in the doc folder.
 
 <hr>
 
