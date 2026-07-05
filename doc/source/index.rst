@@ -7,20 +7,6 @@
 ChIMES Active Learning Driver Documentation
 ############################################
 
-*Note: This documentation is under still construction.*
-
-
-.. TO DO:
-.. ------
-
-.. * Hierarchical fitting mode overivew
-.. * Correction fitting mode overivew
-.. * Cluster fitting mode overivew
-.. * Committe fitting mode overivew
-.. * Sample config files
-.. * Complete sample input decks
-
-
 
 ----------
 
@@ -52,13 +38,6 @@ For additional information, see:
    legal
 
 
-
-.. Indices and tables
-.. ==================
-.. 
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`
 
 ---------------
 
