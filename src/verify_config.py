@@ -1022,7 +1022,7 @@ def verify(user_config):
                 print("         Will use None")        
                 user_config.CORRECTED_TEMPS_BY_FILE = None            
             
-        elif hasattr(user_config,'CORRECTED_TYPE_EXE') and (user_config.CORRECTED_TYPE == "DFTB"):
+        elif hasattr(user_config,'CORRECTED_TYPE_EXE') and (user_config.CORRECTED_TYPE == "DFTB+"):
         
             if user_config.CORRECTED_TEMPS_BY_FILE:
                 print("Will attempt to use electron temperatures specified in CORRECTED_TYPE_FILES")

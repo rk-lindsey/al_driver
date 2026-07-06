@@ -1,3 +1,5 @@
+.. _page-correction:
+
 ***************************************
 Correction Fitting Mode
 ***************************************
@@ -8,7 +10,7 @@ Correction Fitting Mode
   :align: center
   :width: 300
   
-  Delta-learning overview: Learning a ChIMES correction to bring the baseline model (GT) into agreement with the ground truth (GT)
+  **Fig. 1:** Delta-learning overview: learning a ChIMES correction to bring the baseline model (BLM) into agreement with the ground truth (GT).
   
 
 
@@ -79,7 +81,7 @@ DFTB parameterization is concentrated.
 Workflow
 ===========================================
 
-For the purpose of these example, we'll take DFT as our GT and a pre-parameterized DFTB model (Mio-1-1)  as our 
+For the purpose of this example, we'll take DFT as our GT and a pre-parameterized DFTB model (Mio-1-1) as our 
 BLM. Our goal is to generate: 
 
 .. math::
@@ -98,8 +100,9 @@ DFTB+ can then be used to run calculations/simulations that integrate this model
 The basic workflow is as shown below:
 
 .. figure:: delta_workflow.png
-  :align: center
-  
+  :align: center;
+
+  **Fig. 2:** The delta-learning workflow.
 
 Given the dataset (training trajectory) indicated in step 1, the ALD can automate steps 2--4.
 
@@ -128,11 +131,11 @@ To begin, inspect the contents of the config.py file:
    ##### General options
    ################################
 
-   ATOM_TYPES	  = ["N"]
-   NO_CASES	  = 1
+   ATOM_TYPES     = ["N"]
+   NO_CASES       = 1
    #STOP_AFTER     = Set this if you do not want to do any active learning. Options are SOLVE_AMAT" or "RUN_MD"
 
-   DRIVER_DIR	  = "/usr/WS2/lindsey11/dftb_tests/al_driver/"
+   DRIVER_DIR     = "/usr/WS2/lindsey11/dftb_tests/al_driver/"
    WORKING_DIR    = "/usr/WS2/lindsey11/dftb_tests/tests/ALD_one_cycle/"
    CHIMES_SRCDIR  = "/usr/WS2/lindsey11/dftb_tests/chimes_lsq/src/"
    DFTBPLUS_EXE   = "/usr/WS2/lindsey11/dftb_tests/dftbplus/installation/bin/dftb+"
@@ -142,14 +145,14 @@ To begin, inspect the contents of the config.py file:
    ################################
 
    HPC_ACCOUNT = "iap"   # Adjust this for your system - this is the charge bank
-   HPC_PPN     = 8	 # Just set it to a low number for this excersise
+   HPC_PPN     = 8       # Just set it to a low number for this excersise
 
    ################################
    ##### ChIMES LSQ
    ################################
 
-   ALC0_FILES	  = WORKING_DIR + "ALL_BASE_FILES/ALC-0_BASEFILES/"
-   CHIMES_LSQ	  = CHIMES_SRCDIR + "../build/chimes_lsq"
+   ALC0_FILES     = WORKING_DIR + "ALL_BASE_FILES/ALC-0_BASEFILES/"
+   CHIMES_LSQ     = CHIMES_SRCDIR + "../build/chimes_lsq"
    CHIMES_SOLVER  = CHIMES_SRCDIR + "../build/chimes_lsq.py"
    CHIMES_POSTPRC = CHIMES_SRCDIR + "../build/post_proc_chimes_lsq.py"
    CHIMES_MODULES = "intel-classic/2021.6.0-magic mvapich2/2.3.7 mkl" # Adjust this for your system - these are the modules you use for ChIMES
@@ -186,53 +189,53 @@ To begin, inspect the contents of the config.py file:
    ##### Molecular Dynamics
    ################################
 
-   MD_STYLE	     = "DFTB+"
-   MD_FILES	     = WORKING_DIR + "ALL_BASE_FILES/DFTBMD_BASEFILES/"
-   MD_QUEUE	     = ["pdebug"]*NO_CASES
-   MD_TIME	     = ["00:10:00"]*NO_CASES
-   MD_SER	     = DFTBPLUS_EXE
-   MD_NODES	     = [1]*NO_CASES
+   MD_STYLE          = "DFTB+"
+   MD_FILES          = WORKING_DIR + "ALL_BASE_FILES/DFTBMD_BASEFILES/"
+   MD_QUEUE          = ["pdebug"]*NO_CASES
+   MD_TIME           = ["00:10:00"]*NO_CASES
+   MD_SER            = DFTBPLUS_EXE
+   MD_NODES          = [1]*NO_CASES
    MD_OMPEXPORTS     = "export OMP_NUM_THREADS=4 OMP_PLACES=cores OMP_PROC_BIND=close" # Special flags to make DFTB calculations efficient
 
    RUN_MOLANAL     = True
-   MOLANAL	   = CHIMES_SRCDIR + "../contrib/molanal/src/"
+   MOLANAL         = CHIMES_SRCDIR + "../contrib/molanal/src/"
    MOLANAL_SPECIES = ["N1", "N2", "N3"]
 
 
    ################################
-   ##### Correction fitting block - This is where we specify that we want to fit the ChIMES 
+   ##### Correction fitting block - This is where we specify that we want to fit the ChIMES
    ##### model to the difference between the ground truth (the .xyzf file in ALL_BASEFILES/ALC-0_BASEFILES, DFT in this case) and DFTB.
    ################################
 
-   # Note: if CORRECTED_TEMPS_BY_FILE true, temps in traj_list.dat ignored by correction FES subtraction. 
-   # Instead, searches for <filesnames>.temps where .temps replaces whatever last extension was, in 
+   # Note: if CORRECTED_TEMPS_BY_FILE true, temps in traj_list.dat ignored by correction FES subtraction.
+   # Instead, searches for <filesnames>.temps where .temps replaces whatever last extension was, in
    # CORRECTED_TYPE_FILES. Temps in traj_list are still used for the MD step, however.
 
 
-   FIT_CORRECTION	   = True
-   CORRECTED_TYPE	   = "DFTB+"
+   FIT_CORRECTION          = True
+   CORRECTED_TYPE          = "DFTB+"
    CORRECTED_TYPE_FILES    = WORKING_DIR + "ALL_BASE_FILES/DFTBSP_BASEFILES/"
-   CORRECTED_TYPE_EXE	   = DFTBPLUS_EXE
-   CORRECTED_TEMPS_BY_FILE = True 
+   CORRECTED_TYPE_EXE      = DFTBPLUS_EXE
+   CORRECTED_TEMPS_BY_FILE = True
 
 
    ################################
-   ##### Single-Point QM -- This is where things get silly. The ALL_BASEFILES/ALC-0_BASEFILES/*.xyzf is DFT therefore this should 
-   ##### also be the same DFT method. We're using DFTB here just for code testing purposes. 
+   ##### Single-Point QM -- This is where things get silly. The ALL_BASEFILES/ALC-0_BASEFILES/*.xyzf is DFT therefore this should
+   ##### also be the same DFT method. We're using DFTB here just for code testing purposes.
    ################################
 
    # Note: GEN FILENAME IN BASEFILE  MUST BE dftbjob.gen
 
    BULK_QM_METHOD = "DFTB+"
    IGAS_QM_METHOD = "DFTB+" # Must be defined, even if unused
-   QM_FILES	  = WORKING_DIR + "ALL_BASE_FILES/DFTBSP_BASEFILES"   # UPDATE THE MANUAL TO GET RID OF THE DFTBFILES OPTION
+   QM_FILES       = WORKING_DIR + "ALL_BASE_FILES/DFTBSP_BASEFILES"
 
-   DFTB_MEM	  = 1
-   DFTB_NODES	  = 1  
-   DFTB_PPN	  = 1
-   DFTB_TIME	  = "00:10:00"  
-   DFTB_QUEUE	  = "pdebug"  
-   DFTB_EXE	  = DFTBPLUS_EXE  
+   DFTB_MEM       = 1
+   DFTB_NODES     = 1
+   DFTB_PPN       = 1
+   DFTB_TIME      = "00:10:00"
+   DFTB_QUEUE     = "pdebug"
+   DFTB_EXE       = DFTBPLUS_EXE
    
 
 Comparing with the ``config.py`` provided in the :ref:`page-basic` example, a few lines are noteworthy:
@@ -241,18 +244,18 @@ Comparing with the ``config.py`` provided in the :ref:`page-basic` example, a fe
 
 * **Line 7:** Currently commented out, this variable gives the user the option to stop immediately after generating the parameter file (option ``SOLVE_AMAT``) or immediately after the MD simulation of the first cycle (option ``RUN_MD``); useful if you do not want to do iterative learning. If these are specified, related sections of the input file can be omitted.
 
-* **Lines 33--34:** We are providing a file that explicitly specifies weights for the first cycle. The file contains one line per expected row in the A-matrix, which specifies the weight to apply during regresion. This is a purely optional choice and was done to replicate a fit performed earlier by hand.
+* **Lines 33--34:** We are providing a file that explicitly specifies weights for the first cycle. The file contains one line per expected row in the A-matrix, which specifies the weight to apply during regression. This is a purely optional choice and was done to replicate a fit performed earlier by hand.
 
 * **Lines 63--69:** These lines specify that the MD driver during the learning process will be the supported DFTB code, `DFTB+ <https://dftbplus.org/index.html>`_. Note that this option only makes sense when trying to delta learn a ChIMES correction for DFTB. These lines also indicate that the basefiles for running these simulations will be provided in ``ALL_BASE_FILES/DFTBMD_BASEFILES``. The DFTB+ compilation indicated here includes OpenMP support, hence related variables are provided via ``MD_OMPEXPORTS``.
 
-* **Lines 86--90:** Specify that this run is to generate a correction. ``CORRECTED_TYPE`` indicates what software will be used to evaluate BLM interactions. Currently only ``DFTB+`` is supported -- support for LAMMPS is coming soon. This block also indicates where the files needed to evaluate the BLM interactions are provided -- in this case, ``ALL_BASE_FILES/DFTBSP_BASEFILES/``
+* **Lines 86--90:** Specify that this run is to generate a correction. ``CORRECTED_TYPE`` indicates what software will be used to evaluate BLM interactions. Currently only ``DFTB+`` has been verified with this option, though LAMMPS can also be used, in principle. **This is a developer TODO.** -- support for LAMMPS is coming soon. This block also indicates where the files needed to evaluate the BLM interactions are provided -- in this case, ``ALL_BASE_FILES/DFTBSP_BASEFILES/``
 
-* **Lines 100-109:** This bit is for demonstrative purposes. This block is typically where information on how to run the GT calculations is provided. As will be discussed below, the GT established by our training trajecory file is DFT (PBE)in this example. However you can see that we have instead provided DFTB+ as our GT labeling method, which doesn't make sense! We have done so here only to provide an example of how one might specify DFTB as a GT method -- this would be useful in the case of trying to fit a standard ChIMES model to reproduce a trusted DFTB model. 
+* **Lines 100--109:** This bit is for demonstrative purposes. This block is typically where information on how to run the GT calculations is provided. As will be discussed below, the GT established by our training trajectory file is DFT (PBE) in this example. However you can see that we have instead provided DFTB+ as our GT labeling method, which doesn't make sense! We have done so here only to provide an example of how one might specify DFTB as a GT method -- this would be useful in the case of trying to fit a standard ChIMES model to reproduce a trusted DFTB model. 
 
-The neccesary input files and directory tree structure are provided in the example folder, i.e.:
+The necessary input files and directory tree structure are provided in the example folder, i.e.:
 
 .. code-block:: bash
-    :emphasize-lines: 5,8,10,16
+    :emphasize-lines: 5,10,16
     :linenos:
 
     $ tree
@@ -288,17 +291,42 @@ Comparing with the ``ALC-0_BASEFILES`` folder provided in the :ref:`page-basic`,
 
 * **Line 10:** This is where the files needed to run DFTB-MD simulations are placed. As in other examples, we provide the input structure file(s) (``*.gen``) and simulation specification files (``*.hsd``). A ``*.skf`` is also provided for each atom pair type. An optional ``bonds.dat`` file is included to facilitate speciation analysis via ``molanal`` -- see option ``RUN_MOLANAL`` in the :doc:`options page <options>`.
 
-* **Line 16:** This folder contains the files neccessary to run the BLM calculations for the GT-BLM residuals. The ``*.hsd`` files are configured for a DFTB+ single point calculation for the target system using the target electron temperature; each of these use Mio-1-1 parameters as defined in the ``N-N.skf`` file.
+* **Line 16:** This folder contains the files necessary to run the BLM calculations for the GT-BLM residuals. The ``*.hsd`` files are configured for a DFTB+ single point calculation for the target system using the target electron temperature; each of these uses Mio-1-1 parameters as defined in the ``N-N.skf`` file.
 
+
+-------
+
+Running
+====================================================
+
+Contents of ``config.py`` must be modified to reflect your system and absolute paths prior to running this example (i.e., ``DRIVER_DIR``, ``WORKING_DIR``, ``CHIMES_SRCDIR``, ``DFTBPLUS_EXE``, and the queue, time, and charge account settings). Then, as in the :ref:`page-basic` example, run the ALD from within a screen session:
+
+.. code-block:: bash
+
+    $: cd /path/to/examples/correct_dftb_iter_with_dftb
+    $: screen
+    $: unbuffer python3 /path/to/your/ald/installation/main.py 0 1 2 | tee driver-0.log
+
+If ``unbuffer`` is not implemented on your HPC system, use ``python3 -u`` instead. Note that in the final line above, the sequence of numbers indicates two cycles will be run (i.e., the ``0`` is ignored but required when simple iterative refinement mode is selected), and ``| tee driver-0.log`` sends all output to both the screen and a file named driver-0.log.
+
+.. Tip::
+
+   The DFTB+ single point calculations can be slow when submitted through the queue. Running the ALD from within an interactive allocation (e.g., ``salloc -N 1 -n 1 -t 60 -p pdebug``) and on an NFS-type file system is recommended for this example.
+
+-------
 
 Evaluating Fit Performance
 ====================================================
 
-After running the ALD, the following files will be produced. The output below corresponds to a single cycle:
+.. Warning::
+
+   When running the ALD, ALWAYS read through the resulting log file carefully. The driver sets a large number of default parameters if the user does not specify them manually, which may or may not be conducive to the user's end goal. The top portion of the log file tells the user every default that it sets.
+
+After running the ALD, the following files will be produced within each ``ALC-*`` folder. The output below corresponds to a single cycle:
 
 
 .. code-block:: bash
-    :emphasize-lines: 5,9,15
+    :emphasize-lines: 5,16,17
     :linenos:
    
     |-- b-labeled_full.traj_file_idx-0.dat
@@ -321,28 +349,28 @@ After running the ALD, the following files will be produced. The output below co
     |   `-- ...
     `-- ...
 
-**Parameter files** : Lines XX indicate 3 different parmeter files are produced, one params.txt and two params.txt.reduced. They all contain the same parameters. The differences are: (1) params.txt vs params.txr.reduced -- the latter has been post-processed to delete any parameters that have a value of zero to improve compuational efficiency during simulation; (2) the params.txt.reduced in the CASE* folder has penalty function parameters added in. 
+**Parameter files**: Lines 5, 16, and 17 indicate three different parameter files are produced, one params.txt and two params.txt.reduced. They all contain the same parameters. The differences are: (1) params.txt vs params.txt.reduced -- the latter has been post-processed to delete any parameters that have a value of zero to improve computational efficiency during simulation; (2) the params.txt.reduced in the CASE* folder has penalty function parameters added in. 
 
-Parity plots are a common quick assessment of model training performance. For a delta-learned model, one can constuct many such parity plots per-property:
+Parity plots are a common quick assessment of model training performance. For a delta-learned model, one can construct many such parity plots per property:
 
 #. **GT vs BLM:** Tells you how accurate the original BLM model was with respect to the target GT
 #. **GT-BLM vs ChIMES:** Tells you how well ChIMES learned the residual
-#. **GT vs BLM+ChIMES:** Tells you how well the new ChIMES-corrected BLM model performas with respect to the target GT.
+#. **GT vs BLM+ChIMES:** Tells you how well the new ChIMES-corrected BLM model performs with respect to the target GT.
 
 The data needed to make these plots are available in the files shown below. Namely:
 
-* ``b-labeled_full.traj_file_idx-0.dat:`` Forces (F) and optionally energies (E) and stresses (S) in training set, **labeled by the GT method** 
-* ``b-labeled_subtracted..traj_file_idx-0.dat:`` F, E, and optionally S **labeled by the BLM method**
-* ``b-labeled_comb.txt:`` **GT - BLM** for each F, E, and optionally S
-* ``force.txt:`` **ChIMES value** for each F, E, and optionally S (fit to GT - BLM)
+* ``b-labeled_full.traj_file_idx-0.dat``: Forces (F) and optionally energies (E) and stresses (S) in training set, **labeled by the GT method** 
+* ``b-labeled_subtracted..traj_file_idx-0.dat``: F, E, and optionally S **labeled by the BLM method**
+* ``b-labeled_comb.txt``: **GT - BLM** for each F, E, and optionally S
+* ``force.txt``: **ChIMES value** for each F, E, and optionally S (fit to GT - BLM)
 
 Hence, you can use a script like the following to generate your parity plots:
 
-.. code:: bash
+.. code-block:: bash
 
    #!/bin/bash
    
-   # Run from your ALC-*/GEN_FF folder
+   # Run from your ALC-* folder
 
    # What we're starting with: DFT vs DFTB
    paste b-labeled_full.traj_file_idx-0.dat b-labeled_subtracted..traj_file_idx-0.dat > compare_all_DFTvsDFTB.txt
@@ -350,7 +378,7 @@ Hence, you can use a script like the following to generate your parity plots:
    # What we're trying to fit ChIMES to: DFT-DFTB vs ChIMES
    paste GEN_FF/b-labeled_comb.txt GEN_FF/force.txt > compare_all_DFT-DFTBvsChIMES.txt
 
-   # Our target final prodcut: DFT vs DFTB+ChIMES
+   # Our target final product: DFT vs DFTB+ChIMES
    paste b-labeled_full.traj_file_idx-0.dat b-labeled_subtracted..traj_file_idx-0.dat GEN_FF/force.txt | awk '{print($1, $2, $4+$5)}' > compare_all_DFTvsDFTB+ChIMES.txt
 
    # Now let's break these up into force, energy, and stress. Units will be in terms of kcal/mol, Angstrom
@@ -366,9 +394,9 @@ Hence, you can use a script like the following to generate your parity plots:
    	   awk '/\+1/{print($2,$3)}' compare_all_${i}.txt > compare_E_${i}.txt
    done
    
-You can then plot the results with your chosen plotting software. For example, to examine the energy fitiing, you can use the following gnuplot ocmmands:
+You can then plot the results with your chosen plotting software. For example, to examine the energy fitting, you can use the following gnuplot commands:
 
-.. code:: bash
+.. code-block:: bash
   
    eval "set terminal " . GPVAL_TERM . " size 1200, 400"
    set multiplot layout 1,3 margins 0.08, 0.95, 0.15, 0.92 spacing 0.08, 0.1
@@ -415,6 +443,8 @@ The result should be the following:
 .. figure:: ALC1_E_parity.png
   :align: center
 
+  **Fig. 3:** Energy parity plots for the ALC-1 correction fit.
+
 
 
 -------
@@ -422,7 +452,7 @@ The result should be the following:
 DFTB+ with ChIMES
 ====================================================
    
-If run with ``STOP_AFTER = "SOLVE_AMAT"``, generated models will be available in ``ALC-1/GEN_FF/params.txt``, without penalty parameters added. For any other type of run (``SOLVE_AMAT = RUN_MD`` or not specified), it is recommended to take paratmeter files from the last of any of ``ALC-*/CASE*/params.txt.reduced``.
+If run with ``STOP_AFTER = "SOLVE_AMAT"``, generated models will be available in ``ALC-1/GEN_FF/params.txt``, without penalty parameters added. For any other type of run (``STOP_AFTER = "RUN_MD"`` or not specified), it is recommended to take parameter files from the last of any of ``ALC-*/CASE-*_INDEP_*/params.txt.reduced``.
 
 ``ALL_BASE_FILES/DFTBMD_BASEFILES/case-0.indep-0.dftb_in.hsd`` provides an example of how to run a DFTB+ calculation with ChIMES. As is shown in the ``Hamiltonian`` block:
 
@@ -452,18 +482,19 @@ If run with ``STOP_AFTER = "SOLVE_AMAT"``, generated models will be available in
        MixingParameter = 0.05
      }
      SlaterKosterFiles = Type2FileNames {
-       Prefix	 = "/usr/workspace/wsb/lindsey11/dftb_tests/mio-1-1/"
+       Prefix    = "./"
        Separator = "-"
        Suffix	 = ".skf"
      }
      ...
    }
-   
-   
+
+Note that ``Prefix`` is set to ``"./"`` because the ALD copies the ``*.skf`` files provided in ``DFTBMD_BASEFILES`` into each MD run directory; if ``Prefix`` points elsewhere, DFTB+ will read Slater-Koster files from that location instead. The ``Chimes`` block (lines 12--14) requires a DFTB+ build compiled with ChIMES support; this example has been verified against DFTB+ 25.1 (development commit 6ae315b4).
+
 -------
 
 Tips and Tricks
 ====================================================
 
   * **Delta learning is not always a good choice!** Delta learning is only beneficial when the :math:`\mathrm{GT}-\mathrm{BLM}` residual is less than :math:`\mathrm{GT}-\mathrm{Nothing}`.
-  * For recommendations on setting ChIMES hyperparameters for correction fitting, see the ChIMES recipes in `DFTB+ Recipes <https://dftbplus-recipes.readthedocs.io/en/stable/>`_ 
+  * For recommendations on setting ChIMES hyperparameters for correction fitting, see the ChIMES recipes in `DFTB+ Recipes <https://dftbplus-recipes.readthedocs.io/en/stable/>`__ 
