@@ -23,7 +23,7 @@ NO_CASES       = 1
 #STOP_AFTER     = Set this if you do not want to do any active learning. Options are SOLVE_AMAT" or "RUN_MD"
 
 DRIVER_DIR     = "/usr/WS2/lindsey11/dftb_tests/al_driver/"
-WORKING_DIR    = "/usr/WS2/lindsey11/dftb_tests/tests/ALD_one_cycle/"
+WORKING_DIR    = "/usr/WS2/lindsey11/dftb_tests/al_driver/examples/correct_dftb_iter_with_dftb/" 
 CHIMES_SRCDIR  = "/usr/WS2/lindsey11/dftb_tests/chimes_lsq/src/"
 DFTBPLUS_EXE   = "/usr/WS2/lindsey11/dftb_tests/dftbplus/installation/bin/dftb+"
 

@@ -1,7 +1,7 @@
 ####### CONTROL VARIABLES #######
 
-# TRJFILE #  /p/lustre2/rlindsey/ChIMES_Nitrogen-210909/generate_models-DFTBref/al_2+3b-allPBE-AL-211203/ChIMES-DFTB_trained_to_PBE-D2_traj/subtracted.xyzf
-	ChIMES-N.Order-50_15_5.ALC_1-5.PBE_OUTCAR.xyzf
+# TRJFILE # 
+	MULTI traj_list.dat
 # WRAPTRJ # 
         true
 # NFRAMES # 

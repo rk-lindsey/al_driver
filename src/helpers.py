@@ -594,7 +594,7 @@ def create_and_launch_job(*argv, **kwargs):
     
     for i in range(len(JOB)):
     
-        if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
+        if args["job_system"] == "slurm" or args["job_system"] ==  "TACC" or args["job_system"] == "UM-ARC":
             JOB[i] = "#SBATCH" + JOB[i]
         elif args["job_system"] == "torque":
             JOB[i] = "#PBS"  + JOB[i]
@@ -673,7 +673,7 @@ def wait_for_job(active_job, **kwargs):
         
         check_job = ""
         
-        if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
+        if args["job_system"] == "slurm" or args["job_system"] ==  "TACC" or args["job_system"] ==  "UM-ARC":
             check_job = "squeue -j " + active_job
             
         elif args["job_system"] == "torque":
@@ -741,7 +741,7 @@ def wait_for_jobs(*argv, **kwargs):
             if type(active_jobs[i]) == type(1):
                 active_jobs[i] = str(active_jobs[i])
         
-            if args["job_system"] == "slurm" or "TACC":
+            if args["job_system"] == "slurm" or args["job_system"] == "TACC":
 
                 check_job = "squeue -j " + active_jobs[i]
             
