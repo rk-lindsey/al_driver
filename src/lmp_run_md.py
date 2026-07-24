@@ -317,31 +317,33 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     ### ...kwargs
     
-    default_keys   = [""]*17
-    default_values = [""]*17
+    default_keys   = [""]*18
+    default_values = [""]*18
 
     # MD specific controls
 
-    default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../LMP-MD_BASEFILES/"    # Directory containing run_md.base, etc.
-    default_keys[1 ] = "driver_dir"    ; default_values[1 ] = ""                           # Post_proc_lsq*py file... should also include the python command
-    default_keys[2 ] = "penalty_pref"  ; default_values[2 ] = 1.0E6                        # Penalty function pre-factor
-    default_keys[3 ] = "penalty_dist"  ; default_values[3 ] = 0.02                         # Pentaly function kick-in distance
-    default_keys[4 ] = "chimes_exe"    ; default_values[4 ] = None                         # Unused by this function
-    default_keys[5 ] = "n_hyper_sets"  ; default_values[5 ] = 1                            # Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data
+    default_keys[0 ] = "basefile_dir"  ; default_values[0 ] = "../LMP-MD_BASEFILES/"         # Directory containing run_md.base, etc.
+    default_keys[1 ] = "driver_dir"    ; default_values[1 ] = ""                             # Post_proc_lsq*py file... should also include the python command
+    default_keys[2 ] = "penalty_pref"  ; default_values[2 ] = 1.0E6                          # Penalty function pre-factor
+    default_keys[3 ] = "penalty_dist"  ; default_values[3 ] = 0.02                           # Pentaly function kick-in distance
+    default_keys[4 ] = "chimes_exe"    ; default_values[4 ] = None                           # Unused by this function
+    default_keys[5 ] = "n_hyper_sets"  ; default_values[5 ] = 1                              # Number of unique fm_setup.in files; allows fitting, e.g., multiple overlapping models to the same data
     
     # Overall job controls
 
     default_keys[6 ] = "job_name"      ; default_values[6 ] = "ALC-"+ repr(my_ALC)+"-md"     # Name for ChIMES md job
-    default_keys[7 ] = "job_nodes"     ; default_values[7 ] = "2"			     # Number of nodes for ChIMES md job
-    default_keys[8 ] = "job_ppn"       ; default_values[8 ] = "36"			     # Number of processors per node for ChIMES md job
-    default_keys[9 ] = "job_walltime"  ; default_values[9 ] = "1"			     # Walltime in hours for ChIMES md job
-    default_keys[10] = "job_queue"     ; default_values[10] = "pdebug"  		     # Queue for ChIMES md job
-    default_keys[11] = "job_account"   ; default_values[11] = "pbronze" 		     # Account for ChIMES md job
-    default_keys[12] = "job_executable"; default_values[12] = ""			     # Full path to executable for ChIMES md job
-    default_keys[13] = "job_system"    ; default_values[13] = "slurm"			     # slurm or torque    
-    default_keys[14] = "job_file"      ; default_values[14] = "run.cmd" 		     # Name of the resulting submit script
-    default_keys[15] = "job_email"     ; default_values[15] = True			     # Send slurm emails?
+    default_keys[7 ] = "job_nodes"     ; default_values[7 ] = "2"                            # Number of nodes for ChIMES md job
+    default_keys[8 ] = "job_ppn"       ; default_values[8 ] = "36"                           # Number of processors per node for ChIMES md job
+    default_keys[9 ] = "job_walltime"  ; default_values[9 ] = "1"                            # Walltime in hours for ChIMES md job
+    default_keys[10] = "job_queue"     ; default_values[10] = "pdebug"                       # Queue for ChIMES md job
+    default_keys[11] = "job_account"   ; default_values[11] = "pbronze"                      # Account for ChIMES md job
+    default_keys[12] = "job_executable"; default_values[12] = ""                             # Full path to executable for ChIMES md job
+    default_keys[13] = "job_system"    ; default_values[13] = "slurm"                        # slurm or torque    
+    default_keys[14] = "job_file"      ; default_values[14] = "run.cmd"                      # Name of the resulting submit script
+    default_keys[15] = "job_email"     ; default_values[15] = True                           # Send slurm emails?
     default_keys[16] = "job_modules"   ; default_values[16] = ""                             # Modules to load in sbatch script
+    default_keys[17] = "md_debug_mode" ; default_values[17] = False                          # Random seed or debug mode
+
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
@@ -431,9 +433,12 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
         
         # Set seed (velocity all create)
     
-        if "seed equal" in runfile[i]:
-            ofstream.write("variable seed equal " + str(random.randint(0,9999)) + '\n')          
+        # Check if the line contains the seed AND if we are NOT in debug mode
+        if "seed equal" in runfile[i] and not args["md_debug_mode"]:
+            # Overwrite the seed with a random one
+            ofstream.write("variable seed equal " + str(random.randint(0,9999)) + '\n')
         else:
+            # In debug mode or for any other line, write it as-is
             ofstream.write(runfile[i])
                 
     ofstream.close()

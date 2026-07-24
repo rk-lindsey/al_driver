@@ -345,4 +345,8 @@ See the core documentation: :ref:`page-basic`.
 
 **Pro Tip:** Start with full transfer when possible for better stability, then explore partial fitting as needed.
 
+.. seealso::
+
+   **Multilayer (TurboChIMES)** — To vary *resolution vs. distance* (dense short-range + sparse long-range basis) on the same species and DFT database, rather than splitting parameters by element families, see :ref:`page-turboChimes`. That mode is orthogonal to hierarchical tiling: you can read :ref:`page-hierarch` for chemical transfer and :ref:`page-turboChimes` for range-based multilayering.
+
 

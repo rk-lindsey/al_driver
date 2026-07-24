@@ -137,6 +137,8 @@ def main(args):
     
     verify_config.verify(config)
     
+    print(config.MD_DEBUG_MODE)
+
     print("The following has been set as the working directory:")
     print('\t', config.WORKING_DIR)
     print("The ALC-X contents of this directory will be overwritten.")
@@ -957,6 +959,7 @@ def main(args):
                         job_system     = config.HPC_SYSTEM,       
                         job_file       = "run.cmd",
                         job_modules    = config.MD_MODULES,
+                        md_debug_mode  = config.MD_DEBUG_MODE
                         job_OMPexports = config.MD_OMPEXPORTS
                         )
                         

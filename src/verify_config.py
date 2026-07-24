@@ -1451,6 +1451,18 @@ def verify(user_config):
     if hasattr(user_config,'STOP_AFTER') and (user_config.STOP_AFTER  == "RUN_MD"):
         return
 
+    if not hasattr(user_config,'MD_DEBUG_MODE'):
+        # Add the abilitry to use the same seed for MD for debugging
+        print("WARNING: Option config.MD_DEBUG_MODE was not set.")
+        print("         Will use False (MD seeds will be random).")
+        user_config.MD_DEBUG_MODE = False
+
+    if user_config.MD_DEBUG_MODE:
+        print("INFO: MD_DEBUG_MODE set to True")
+        print("      Will preserve user-specified seeds in MD input files.")
+    else:
+        print("INFO: MD_DEBUG_MODE set to False")
+        print("      Will overwrite MD seeds with random values.")
     ################################
     ##### Cluster specific paths/variables
     ################################

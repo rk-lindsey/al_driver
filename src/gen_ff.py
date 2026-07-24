@@ -602,7 +602,7 @@ def parse_hyper_params(**kwargs):
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
-    
+
     import numpy as np
     
     # Read in all the raw parameters
@@ -618,20 +618,44 @@ def parse_hyper_params(**kwargs):
     
         dim.append(int(helpers.head("GEN_FF-" + str(i) + "/dim.txt")[0].split()[0]))
         
-    
-    # Read GEN_FF-(i)/A.txt matrix
-        A = np.loadtxt("GEN_FF-" + str(i) + "/A.txt")
-        A = np.array(A, dtype=float)
-        A = A.astype('float64')
-    
-    # Reshape x to a matrix
         x_numeric = np.array(x[npar:npar+dim[i]], dtype=float)
-        x_matrix = np.reshape(x[npar:npar+dim[i]], (dim[i], 1))
-        x_matrix = x_matrix.astype('float64')
+        x_matrix = np.reshape(x_numeric, (dim[i], 1)).astype('float64')
+
     
-    # Perform matrix multiplication
-        result_matrix = np.dot(A, x_matrix)
+        file_path = "GEN_FF-" + str(i) + "/A.txt"
+
+        try:
+            A = np.loadtxt(file_path)
+            A = np.array(A, dtype=float).astype('float64')
+            result_matrix = np.dot(A, x_matrix)
     
+        except np.core._exceptions._ArrayMemoryError:
+            print("Memory error encountered. Processing A in chunks...")
+    
+            # Set a chunk size (number of rows per chunk)
+            chunk_size = 10000  
+            result_chunks = []
+            
+            with open(file_path, 'r') as f:
+                while True:
+                    lines = []
+                    for _ in range(chunk_size):
+                        line = f.readline()
+                        if not line:
+                            break
+                        lines.append(line)
+                    
+                    if not lines:
+                        break
+            
+                    # Convert the list of lines to a NumPy array
+                    chunk = np.array([np.fromstring(line, sep=' ') for line in lines], dtype=np.float64)
+                    result_chunk = np.dot(chunk, x_matrix)
+                    result_chunks.append(result_chunk)
+    
+            # Combine all the results from chunks
+            result_matrix = np.vstack(result_chunks)
+       
     # Save the result_matrix to a file
         np.savetxt("GEN_FF-" + str(i) + "/force.txt", result_matrix)
         np.savetxt("GEN_FF-" + str(i) + "/Ax.txt", result_matrix)
@@ -763,6 +787,23 @@ def build_amat(my_ALC, **kwargs):
             helpers.run_bash_cmnd("cp " + args["prev_gen_path"] + "/" + FM_SETUP   + " " + GEN_FF + "/fm_setup.in")
             helpers.run_bash_cmnd("cp " + args["prev_gen_path"] + "/traj_list.dat" + " " + GEN_FF + "/traj_list.dat")
             
+
+            
+            ifstream = open(GEN_FF + "/fm_setup.in",'r')
+            runfile  = ifstream.readlines()
+
+            found1=False
+            for i in range(len(runfile)): # This loop is to make sure that split files is false
+                if found1:
+                    if "true" in runfile[i]:
+                        print("Error: This driver does NOT support SPLITFI functionality in fm_setup.in")
+                        print("Exiting.")
+                        exit()
+                    else:
+                        break
+                if "SPLITFI" in runfile[i]: 
+                    found1=True
+                
             if len(glob.glob(args["prev_gen_path"] + "/*xyzf"  )) > 0:
                 helpers.run_bash_cmnd("cp " + ' '.join(glob.glob(args["prev_gen_path"] + "/*xyzf"  )) + " " + GEN_FF + "/")
             else:
@@ -867,7 +908,8 @@ def build_amat(my_ALC, **kwargs):
                         print("Warning: Setting FITSTRS false for ALC >",my_ALC)
                         ofstream.write('\t' + "false" + '\n')
             
-                    found3 = False    
+                    found3 = False
+  
                 else:
     
                     ofstream.write(runfile[i])
@@ -879,7 +921,10 @@ def build_amat(my_ALC, **kwargs):
                         found2 = True    
                         
                     if "FITSTRS" in runfile[i]:
-                        found3 = True            
+                        found3 = True   
+                        
+                    if "SPLITFI" in runfile[i]:
+                        found4 = True          
                     
             ofstream.close()
             ifstream.close()
