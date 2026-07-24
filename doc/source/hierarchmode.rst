@@ -5,7 +5,6 @@ Hierarchical Fitting Mode
 ***************************************
 
 .. figure:: hierarchy.png
-
   :width: 500
   :align: center
 
@@ -14,11 +13,11 @@ Hierarchical Fitting Mode
 
 Machine-learned interatomic models offer near quantum-accurate predictions for complex phenomena with orders-of-magnitude greater computational efficiency. However, they often struggle when applied to systems containing many element types, due to the near-exponential growth in the number of parameters required as the number of elements increases. However, the inherent nature of ChIMES parameters allows for **hierarchical fitting strategy**, where parameters are grouped into "families" that can be learned **independently** and then **combined** to model multi-element complex systems.
 
-For example, Fig. 1 shows the ChIMES parameter hierarchy for an up-to-4-body model describing interactions in a Si, O, H, and N-containing system. Each "tile" represents a family of parametrs, e.g., the H tile contains the 1-through 4-body parameters for H, HH, HHH, and HHHH interactions. Tiles on the same row (e.g. H and N) can be fit indepent of one another; tiles containing two or more atoms describe *only* simultaneous cross-interactions between the indicated atom types, e.g., the HN tile *only* contains parameters for HN, HHN, HNN, HHHN, HHNN, and HNNN interactions. Practically, this means simulating an H- and N- containing system requires all the parameters contained in the H, N, and HN tiles. 
+For example, Fig. 1 shows the ChIMES parameter hierarchy for an up-to-4-body model describing interactions in a Si, O, H, and N-containing system. Each "tile" represents a family of parameters, e.g., the H tile contains the 1-through 4-body parameters for H, HH, HHH, and HHHH interactions. Tiles on the same row (e.g. H and N) can be fit independent of one another; tiles containing two or more atoms describe *only* simultaneous cross-interactions between the indicated atom types, e.g., the HN tile *only* contains parameters for HN, HHN, HNN, HHHN, HHNN, and HNNN interactions. Practically, this means simulating an H- and N- containing system requires all the parameters contained in the H, N, and HN tiles. 
 
-Fitting row-1 tiles requires no special treatment. However, fitting tiles on row-2 and above requires pre-processing training data during each learning iteration to remove contributions from the relavant lower row tiles. For example, an HN tile fit would require H and N tile contributions to be removed from the training data. Additionally, parameter sets must be combined into a cohesive file before running dynamics. *The ALD can perform these tasks automatically.*
+Fitting row-1 tiles requires no special treatment. However, fitting tiles on row-2 and above requires pre-processing training data during each learning iteration to remove contributions from the relevant lower row tiles. For example, an HN tile fit would require H and N tile contributions to be removed from the training data. Additionally, parameter sets must be combined into a cohesive file before running dynamics. *The ALD can perform these tasks automatically.*
 
-This section provides an overview of how to configure the ALD for a hierarchical fitting strategy, within the context of a liquid C/N system. Before proceding, ensure you have read through and fully understand the :ref:`page-basic`.
+This section provides an overview of how to configure the ALD for a hierarchical fitting strategy, within the context of a liquid C/N system. Before proceeding, ensure you have read through and fully understand the :ref:`page-basic`.
 
 =================================
 Why Use Hierarchical Fitting?
@@ -77,35 +76,37 @@ Example: Hierarchical Fit for Solid C/N System
     Files for this example are located in:
     ``./<al_driver base folder>/examples/hierarch_fit``
 
-This example demonstrates a 3-iteration hierarchical fit for a solid carbon-nitrogen (C/N) system (approx. 75% C, 6000 K, 3.5 g/cc) using up-to-4-body interactions. The setup mirrors the structure described in the :ref:`page-basic` but introduces the hierarchical mechanism.Given the substantial increase in number of fitting parameters and system complexity relative to pure carbon case the basic fitting example, this case will take substantially longer to run.The neccesary input files and directory tree structure are provided in the example folder, i.e.:
+This example demonstrates a 3-iteration hierarchical fit for a solid carbon-nitrogen (C/N) system (approx. 75% C, 6000 K, 3.5 g/cc) using up-to-4-body interactions. The setup mirrors the structure described in the :ref:`page-basic` but introduces the hierarchical mechanism. Given the substantial increase in the number of fitting parameters and system complexity relative to the pure-carbon basic fitting example, this case will take substantially longer to run. The necessary input files and directory tree structure are provided in the example folder, i.e.:
 
 **Directory Structure**
 
 .. code-block:: bash
-    :emphasize-lines: 4,14-16
+    :emphasize-lines: 5,15-17
 
     $ tree
     .
-    ├── ALC-0_BASEFILES
-    │   ├── 20.3percN_3.5gcc.temps
-    │   ├── 20.3percN_3.5gcc.xyzf
-    │   ├── fm_setup.in
-    │   └── traj_list.dat
-    ├── CHIMESMD_BASEFILES
-    │   ├── base.run_md.in
-    │   ├── bonds.dat
-    │   ├── case-0.indep-0.input.xyz
-    │   ├── case-0.indep-0.run_md.in
-    │   └── run_molanal.sh
-    ├── HIERARCH_PARAMS
-    │   ├── C.params.txt.reduced
-    │   └── N.params.txt.reduced
-    └── QM_BASEFILES
-        ├── 6000.INCAR
-        ├── C.POTCAR
-        ├── N.POTCAR
-        ├── KPOINTS
-        └── POTCAR
+    ├── ALL_BASE_FILES
+    │   ├── ALC-0_BASEFILES
+    │   │   ├── 20.3percN_3.5gcc.temps
+    │   │   ├── 20.3percN_3.5gcc.xyzf
+    │   │   ├── fm_setup.in
+    │   │   └── traj_list.dat
+    │   ├── CHIMESMD_BASEFILES
+    │   │   ├── base.run_md.in
+    │   │   ├── bonds.dat
+    │   │   ├── case-0.indep-0.input.xyz
+    │   │   ├── case-0.indep-0.run_md.in
+    │   │   └── run_molanal.sh
+    │   ├── HIERARCH_PARAMS
+    │   │   ├── C.params.txt.reduced
+    │   │   └── N.params.txt.reduced
+    │   └── QM_BASEFILES
+    │       ├── 6000.INCAR
+    │       ├── C.POTCAR
+    │       ├── N.POTCAR
+    │       ├── KPOINTS
+    │       └── POTCAR
+    └── config.py
 
 Comparing with the ``ALC-0_BASEFILES`` folder provided in the :ref:`page-basic`, the primary difference is the ``HIERARCH_PARAMS`` directory, i.e., which contains parameters for the C and N tiles, and the ``.temps`` file, which provides a single temperature for each frame in the corresponding ``.xyzf`` file, are highlighted.
 
@@ -179,7 +180,7 @@ The ALC-0_BASEFILES Files
         C C C C
         N N N N
     
-    Users must also ensure that the ``fm_setup.in`` topolgy contents are consistent with those in the ALL_BASE_FILES/HIERARCH_PARAMS files. For the present C/N fitting example, those would be the highlighted lines below:
+    Users must also ensure that the ``fm_setup.in`` topology contents are consistent with those in the ALL_BASE_FILES/HIERARCH_PARAMS files. For the present C/N fitting example, those would be the highlighted lines below:
         
     .. code-block:: bash     
         :emphasize-lines: 5,6,9,10
@@ -211,7 +212,7 @@ The ALC-0_BASEFILES Files
     
 .. Note ::
     
-    Each training trajectory file in ALL_BASE_FILES/ALC-0_BASEFILES needs a corresponding .temps file that gives the temperature for each frame this ensures the right tempertaure corrections is done for each frame. 
+    Each training trajectory file in ALL_BASE_FILES/ALC-0_BASEFILES needs a corresponding .temps file that gives the temperature for each frame; this ensures the right temperature correction is done for each frame. 
     
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The config.py File
@@ -221,7 +222,7 @@ The `config.py` file is given below:
 
 .. code-block :: python
     :linenos:
-    :emphasize-lines: 55-57
+    :emphasize-lines: 67-69
     
     ################################
     ##### General variables
@@ -245,7 +246,7 @@ The `config.py` file is given below:
     HPC_SYSTEM  = "TACC"
     HPC_PPN     = 48 
     HPC_EMAIL     = False 
-    N_HYPER_SET = 1
+    N_HYPER_SETS = 1
 
     ################################
     ##### ChIMES LSQ
@@ -280,6 +281,7 @@ The `config.py` file is given below:
 
     MD_STYLE        = "CHIMES"
     CHIMES_MD_MPI   = CHIMES_SRCDIR + "../build/chimes_md"
+    CHIMES_MD_SER   = CHIMES_SRCDIR + "../build/chimes_md-serial"
 
     MOLANAL         = CHIMES_SRCDIR + "../contrib/molanal/src/"
     MOLANAL_SPECIES = ["C1", "N1"]
@@ -299,18 +301,14 @@ The `config.py` file is given below:
     QM_FILES = WORKING_DIR + "ALL_BASE_FILES/QM_BASEFILES"
     VASP_EXE = "/usr/gapps/emc-vasp/vasp.5.4.4/build/gam/vasp"
     
-The primary difference between the present ``config.py`` and that provided in :ref:`page-basic` documentation are the highlighted lines 55--57, which specify hierarchical fitting should be performed (line 55), the name of all parameter files that the present model should be built upon (line 56), and the executable to use when evaluating contributions from the parameter files specified on line 56 (line 57); for this example, we're using ChIMES_MD. Note that this executable should be compiled for serial runs to prevent issues with the queueing system. As in the example provided in :ref:`page-basic` documentation, contents of the ``config.py`` file must be modified to reflect your e-mail address and absolute paths prior to running this example. Make sure to update paths, email, and queue settings based on your environment. For Patial Hierarchical fitting you only specify either 'C.params.txt.reduced' if you want to learn both N and cross terms.
+The primary difference between the present ``config.py`` and that provided in :ref:`page-basic` documentation are the highlighted lines 67--69, which specify hierarchical fitting should be performed (line 67), the name of all parameter files that the present model should be built upon (line 68), and the executable to use when evaluating contributions from the parameter files specified on line 68 (line 69); for this example, we're using ChIMES_MD. Note that this executable should be compiled for serial runs to prevent issues with the queueing system. As in the example provided in :ref:`page-basic` documentation, contents of the ``config.py`` file must be modified to reflect your e-mail address and absolute paths prior to running this example. Make sure to update paths, email, and queue settings based on your environment. For partial hierarchical fitting, you would specify only 'C.params.txt.reduced' if you want to learn both the N and cross terms.
 
 
 ------------------------------------------
 Running
 ------------------------------------------
 
-...
-
--------
-
-Same procedure as in the basic example, depending on standard queuing times for your system, the ALD could take quite some time (e.g., hours) finish. For this reason it is generally, it is recommended to run the ALD from within a screen session on your HPC system. To do so, log into your HPC system and execute the following commands:
+The procedure is the same as in the basic example. Depending on standard queuing times for your system, the ALD could take quite some time (e.g., hours) to finish. For this reason, it is generally recommended to run the ALD from within a screen session on your HPC system. To do so, log into your HPC system and execute the following commands:
 
 
 1. Configure `config.py`
@@ -337,6 +335,7 @@ In-Depth Setup and Options
 ------------------------------------------
 
 For a complete explanation of:
+
 - File preparation
 - Order settings
 - Parameter exclusion

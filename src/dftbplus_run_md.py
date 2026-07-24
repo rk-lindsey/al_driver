@@ -7,6 +7,7 @@ import os
 
 import helpers
 import cluster
+import dftbplus_helpers
 
 def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
 
@@ -76,7 +77,9 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     ################################
     # 1. Run molanal
     ################################
-    if user_config.RUN_MOLANAL:
+    
+    if  args["run_molanal"]:
+    
         if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
         
             helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
@@ -127,26 +130,16 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
     else:
         print("Skipping MOLANAL")
     
+    		      
     ################################
-    # 2. Cluster
+    # 2. Don't cluster, but use it's file paring utility to grab candidate 20F trajectories
+    #    THIS NEEDS TO BE UPDATED SOMEHOW TO ALLOW FOR PROPER TRAJBAD GENERATION! (260611 - RKL)
+    #    In current form, just takes the traj file and turns it into traj_bad_r.ge.rin+dp_dftbfrq.xyz and leaves the other two files empty
     ################################
-    
-    
-    helpers.run_bash_cmnd("cp traj_bad_r.lt.rin+dp.cumul.xyz         traj_bad_r.lt.rin+dp.xyz")
-    helpers.run_bash_cmnd("cp traj_bad_r.lt.rin.cumul.xyz            traj_bad_r.lt.rin.xyz")
-    helpers.run_bash_cmnd("cp traj_bad_r.ge.rin+dp_dftbfrq.cumul.xyz traj_bad_r.ge.rin+dp_dftbfrq.xyz")
 
-    cluster.get_pared_trajs(args["do_cluster"])
-        
-    if args["do_cluster"]:
-        
-        print("compilation: ", args["compilation"])
-                
-        cluster.generate_clusters(traj_file   = "traj_250F.xyz",
-                      tight_crit  = args["tight_crit" ],
-                      loose_crit  = args["loose_crit" ],
-                      clu_code    = args["clu_code"   ],
-                      compilation = args["compilation"])
+    dftbplus_helpers.generate_trajbads("geo_end.xyz", ' '.join(glob.glob("case-*.indep-*.gen")), "params.txt.reduced")
+
+    cluster.get_pared_trajs(False) # Argument: We will not prepare for cluster analysis, since it is incompatible with LAMMPS      
         
     os.chdir("..")
     
@@ -161,7 +154,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     Usage: run_md(1, 0, 0, <arguments>)
     
-    Notes: ???
+    Notes: 
                
     """
     
@@ -201,6 +194,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     default_keys[14] = "job_email"     ; default_values[14] = True                           # Send slurm emails?
     default_keys[15] = "job_modules"   ; default_values[15] = ""                             # Send slurm emails?
     default_keys[16] = "md_debug_mode" ; default_values[16] = False                          # Random seed or debug mode
+    default_keys[17] = "job_OMPexports"; default_values[17] = None                           # Using OMP? If so, specify exports (one line) to add in sbatch script
 
     args = dict(list(zip(default_keys, default_values)))
     args.update(kwargs)    
@@ -215,14 +209,12 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     helpers.run_bash_cmnd("rm -rf " + my_md_path)
     helpers.run_bash_cmnd("mkdir -p " + my_md_path)
 
-    # *dftb_in.hsd *K*gcc.gen
     helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/case-" + str(my_case) + ".indep-" + str(my_indep) + ".dftb_in.hsd" )) + " " + my_md_path + "/dftb_in.hsd")
     helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/case-" + str(my_case) + ".indep-" + str(my_indep) + ".gen" )) + " " + my_md_path)
     helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/*skf")) + " " + my_md_path)
     helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/bonds.dat"     )) + " " + my_md_path)
     helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/run_molanal.sh")) + " " + my_md_path)
-    helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["chimes_exe"])) + " " + my_md_path + "/chimes_md")
-    helpers.run_bash_cmnd("cp "+ ' '.join(glob.glob(args["basefile_dir"] + "/run_md.in")) + " " + my_md_path)
+
     # Previous ALC ChIMES file
     helpers.run_bash_cmnd("cp GEN_FF/params.txt.reduced " + my_md_path)
 
@@ -255,8 +247,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
                 found  = True
     ofstream.close()
     helpers.run_bash_cmnd("mv tmp params.txt")
-    
-    
+        
     ################################
     # 3. Post-process the run_md.in file
     ################################
@@ -297,14 +288,16 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     # Create the task string
     
-    job_task  = "-n 1 " + args["job_executable"] + " > dftb.out"    
+    job_task  = " 1 " + args["job_executable"] + " > dftb.out"    
 
     if (args["job_system"] == "slurm" or args["job_system"] == "UM-ARC"):
-        job_task = "srun "   + job_task
+        job_task = "srun -n "   + job_task
     elif args["job_system"] == "TACC":
-        job_task = "ibrun "  + job_task
+        job_task = "ibrun -n "  + job_task
+    elif args["job_system"] == "conda-slurm":
+        job_task = "mpirun -np "  + job_task
     else:
-        job_task = "mpirun " + job_task    
+        job_task = "mpirun -np " + job_task    
     
     md_jobid = helpers.create_and_launch_job(
         job_name       =     args["job_name"    ] ,
@@ -317,6 +310,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
         job_executable =     job_task,
         job_system     =     args["job_system"  ] ,
         job_modules    =     args["job_modules" ] ,
+	job_OMPexports =     args["job_OMPexports"],
         job_file       =     "run_dftb.cmd")
         
     

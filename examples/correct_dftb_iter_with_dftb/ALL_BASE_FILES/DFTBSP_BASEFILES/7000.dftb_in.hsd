@@ -1,0 +1,57 @@
+Geometry = GenFormat {
+  <<< "tmp.gen"
+}
+
+Driver = VelocityVerlet {
+  Steps         = 0
+  TimeStep [fs] = 0.5
+  Thermostat = NoseHoover {
+    Temperature [K]          = 7000.0
+    CouplingStrength [cm^-1] = 1200.0
+  }
+  MDRestartFrequency = 100
+}
+
+Hamiltonian = DFTB {
+  SCC              = Yes
+  SCCTolerance     = 1e-6
+  MaxSCCIterations = 200
+  ShellResolvedSCC = No
+  MaxAngularMomentum = {
+    N = "p"
+  }
+  Dispersion = LennardJones {
+    Parameters = UFFParameters {}
+  }
+  Filling = Fermi {
+    Temperature [K] = 7000.0
+  }
+  Mixer = Broyden {
+    MixingParameter = 0.05
+  }
+  SlaterKosterFiles = Type2FileNames {
+    Prefix    = "./"
+    Separator = "-"
+    Suffix    = ".skf"
+  }
+  KPointsAndWeights = {
+    0.0 0.0 0.0 1.0
+  }
+  Differentiation = FiniteDiff {
+    Delta = 1.0E-02
+  }
+  Solver = QR {}
+}
+
+Options = {
+  WriteResultsTag  = Yes
+  WriteDetailedOut = Yes
+}
+
+Analysis = {
+  WriteBandOut = No
+}
+
+ParserOptions {
+  ParserVersion = 14
+}

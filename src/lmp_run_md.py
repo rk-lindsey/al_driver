@@ -265,13 +265,12 @@ def post_proc(my_ALC, my_case, my_indep, *argv, **kwargs):
         if os.path.isfile(args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat"):
         
             helpers.run_bash_cmnd("cp " + args["basefile_dir"] + "case-" + str(my_case) + ".skip.dat skip.dat")
-        
-        
+           
         helpers.run_bash_cmnd_to_file("traj.gen-molanal.out",args["molanal_dir"] + "/molanal.new traj.gen")
         helpers.run_bash_cmnd_to_file("traj.gen-find_molecs.out", args["molanal_dir"] + "/findmolecules.pl traj.gen-molanal.out")
         helpers.run_bash_cmnd("rm -rf molecules " + ' '.join(glob.glob("molanal*")))
         
-    print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
+        print(helpers.run_bash_cmnd_presplit([args["local_python"], args["driver_dir"] + "/src/post_process_molanal.py"] + args_species))
     
     ################################
     # 2. Don't cluster, but use it's file paring utility to grab candidate 20F trajectories
@@ -342,7 +341,7 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     default_keys[13] = "job_system"    ; default_values[13] = "slurm"                        # slurm or torque    
     default_keys[14] = "job_file"      ; default_values[14] = "run.cmd"                      # Name of the resulting submit script
     default_keys[15] = "job_email"     ; default_values[15] = True                           # Send slurm emails?
-    default_keys[16] = "job_modules"   ; default_values[16] = ""                             # Send slurm emails?
+    default_keys[16] = "job_modules"   ; default_values[16] = ""                             # Modules to load in sbatch script
     default_keys[17] = "md_debug_mode" ; default_values[17] = False                          # Random seed or debug mode
 
 
@@ -459,8 +458,10 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
         job_task += "srun -N "   + repr(int(args["job_nodes" ])) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
     elif args["job_system"] == "TACC":
         job_task += "ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
+    elif args["job_system"] == "conda-slurm":
+        job_task += "mpirun " + "-np " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
     else:
-        job_task += "mpirun -np" + repr(int(args["job_nodes" ])) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
+        job_task += "mpirun -np" + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " "
         
     job_task += args["job_executable"] + " -i " + md_infile + "  > out.lammps"
     print(job_task)

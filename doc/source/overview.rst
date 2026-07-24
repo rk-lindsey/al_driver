@@ -30,8 +30,8 @@ Additional information on different execution modes as well as example scripts c
    basicmode
    hierarchmode
    turboChimesMode
-   clusterALmode
-
+   clusterALmode  
+   correctionmode
 
 
 

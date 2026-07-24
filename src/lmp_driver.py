@@ -570,6 +570,8 @@ def setup_lmp(my_ALC, *argv, **kwargs):
         job_task.append("    echo \"Attempt\" >> ${TAG}.tries")
         if args["job_system"] == "TACC":
             job_task.append("    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i in.lammps > ${TAG}.out.lammps  ")
+        elif args["job_system"] == "conda-slurm":
+            job_task.append("    mpirun " + "-np " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i in.lammps > ${TAG}.out.lammps  ")
         else:
             job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i in.lammps > ${TAG}.out.lammps  ")
         

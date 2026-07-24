@@ -1,4 +1,4 @@
-.. _page-clusterAL
+.. _page-clusterAL:
 
 ***************************************
 Cluster AL Fitting Mode
@@ -10,9 +10,9 @@ Cluster AL Fitting Mode
   
   **Fig. 1:** The ChIMES Active Learning Driver Workflow.
 
-When developing models for molecular reacting systems, our cluster-based active learning (AL) can be advantageous. This AL strategy attemps to improve description of conformational energetics and nominal reaction barriers. This is achieved by supplementing the basic mode by carving out candidate molecules  and nominal transition states from DFT- and ChIMES-generated simulation trajectories , down-selecting a maximally informative subset, and adding them to the training set. Details of this strategy are outlined in `R.K. Lindsey et al, JCP 2020 <https://doi.org/10.1063/5.0021965>`_. 
+When developing models for molecular reacting systems, our cluster-based active learning (AL) can be advantageous. This AL strategy attempts to improve description of conformational energetics and nominal reaction barriers. This is achieved by supplementing the basic mode by carving out candidate molecules  and nominal transition states from DFT- and ChIMES-generated simulation trajectories, down-selecting a maximally informative subset, and adding them to the training set. Details of this strategy are outlined in `R.K. Lindsey et al, JCP 2020 <https://doi.org/10.1063/5.0021965>`_. 
 
-... Warning::
+.. Warning::
 
     This capability will only run on Slurm systems, and may require a specific Slurm specification. See the ``utilities/new*sh`` files for details.
 
@@ -28,7 +28,7 @@ Example Fit: Water
 
     Files for this example are located in ``./<al_driver base folder>/examples/cluster_based_active_learning_single_statepoint-VASP/``
     
-In this section, an example 1-iteration fit for water at 1000 K and 1.25 g/cc is overviewed. The model will include up-to-three body interactions with the following hyperparameters. Note: This example is intended to run quickly and will not yield neither a quality nor stable model.
+In this section, an example 1-iteration fit for water at 1000 K and 1.25 g/cc is overviewed. The model will include up-to-three body interactions with the following hyperparameters. Note: This example is intended to run quickly and will yield neither a quality nor a stable model.
 
 
 =====================   =============
@@ -50,7 +50,7 @@ Tersoff parameter       0.75
 Input Files 
 ------------------------------------------
 
-The neccesary input files and directory tree structure are provided in the example folder, i.e.:
+The necessary input files and directory tree structure are provided in the example folder, i.e.:
 
 .. code-block :: 
 
@@ -76,13 +76,14 @@ The neccesary input files and directory tree structure are provided in the examp
     │   ├── run_md.cluster
     │   ├── loose_bond_crit.dat    
     │   └── tight_bond_crit.dat
+    └── config.py
 
 
 Beginning with the contents of the ``ALC-0_BASEFILES`` folder: ``fm_setup.in``, ``traj_list.dat``, and the training trajectory (``reactive_water.xyzf``) require no special treatment for cluster-based AL. However, an additional file (``reactive_water.temps``) is now required. This file must have the same name as the training .xyzf file and end with a ".temps" extension. For each frame in the .xyzf file, the .temps file contains the corresponding target system temperature.
 
-The contents of the ``CHIMESMD_BASEFILES`` and ``QM_BASEFILES`` foldera also requires no special treatment.
+The contents of the ``CHIMESMD_BASEFILES`` and ``QM_BASEFILES`` folders also require no special treatment.
 
-Three new files are required, which sit directly in the ``ALL_BASE_FILES`` folder: ``run_md.cluster``, ``tight_bond_crit.dat``, and ``loose_bond_crit.dat``. The ``run_md.cluster`` file can be taken exactly as provided in the example folder. The ``tight*`` and ``loose*`` files provide the bonding distanct criteria used to identify molecules and nominal transition state species, respctively. The format of each file is as follows: The first line gives a space-separated list of each element present in the system (e.g., "O H"). The second line gives the unique number of atom pair types formed by those atoms, e.g., O an H can form 3 pairs, O O, O H, and H H. Then, one line is given for each pair, which gives the two atom types and the corresponding distance criteria, (e.g., "H H 1.4").
+Three new files are required, which sit directly in the ``ALL_BASE_FILES`` folder: ``run_md.cluster``, ``tight_bond_crit.dat``, and ``loose_bond_crit.dat``. The ``run_md.cluster`` file can be taken exactly as provided in the example folder. The ``tight*`` and ``loose*`` files provide the bonding distance criteria used to identify molecules and nominal transition state species, respectively. The format of each file is as follows: The first line gives a space-separated list of each element present in the system (e.g., "O H"). The second line gives the unique number of atom pair types formed by those atoms, e.g., O and H can form 3 pairs, O O, O H, and H H. Then, one line is given for each pair, which gives the two atom types and the corresponding distance criteria, (e.g., "H H 1.4").
 
 
 Contents of the ``config.py`` file must be modified to reflect your HPC system and absolute paths prior to running this example. File contents specific to/required for cluster-based AL are highlighted below:
@@ -199,10 +200,10 @@ Contents of the ``config.py`` file must be modified to reflect your HPC system a
 
 The variable ``DO_CLUSTER`` controls whether cluster-based AL is used. This variable is false by default; when false, no variables in the  "Do Cluster-based active learning" block above need be specified. ``MAX_CLUATM`` controls the maximum number of atoms that a molecule can be comprised of. ``TIGHT_CRIT`` and ``LOOSE_CRIT`` are the full paths to the tight and loose bond criteria files in the ``ALL_BASE_FILES`` folder. ``CLU_CODE`` is the path to the cluster-extraction code.
 
-The next chunk of variables control the cluster down-selection process. ``MEM_BINS`` is the number of bins in the cluster energy histogram, ``MEM_CYCLE`` is the number of Monte Carlo cycles to perform during the down-selection process, ``MEM_NSEL`` is the number of molecules to select each AL cycle, and ``MEM_ECUT`` a cutoff the ignores any molecules whose absolute energy is greater than ``MEM_ECUT``.
+The next chunk of variables control the cluster down-selection process. ``MEM_BINS`` is the number of bins in the cluster energy histogram, ``MEM_CYCL`` is the number of Monte Carlo cycles to perform during the down-selection process, ``MEM_NSEL`` is the number of molecules to select each AL cycle, and ``MEM_ECUT`` a cutoff that ignores any molecules whose absolute energy is greater than ``MEM_ECUT``.
 
 
-``CALC_REPO_ENER_CENT*`` and ``CALC_REPO_ENER`` specify computational resources for assinging ChIMES energies to each candidate cluster.
+``CALC_REPO_ENER_CENT*`` and ``CALC_REPO_ENER`` specify computational resources for assigning ChIMES energies to each candidate cluster.
 
 
 

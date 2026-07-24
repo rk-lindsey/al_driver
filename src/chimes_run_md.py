@@ -280,14 +280,16 @@ def run_md(my_ALC, my_case, my_indep, *argv, **kwargs):
     
     # Create the task string
     
-    job_task  = "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " +  args["job_executable"] + " " + md_infile + " > run_md.out"    
+    job_task  = repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " +  args["job_executable"] + " " + md_infile + " > run_md.out"    
     
     if (args["job_system"] == "slurm" or args["job_system"] == "UM-ARC"):
-        job_task = "srun "   + job_task
+        job_task = "srun -n "   + job_task
     elif args["job_system"] == "TACC":
-        job_task = "ibrun "  + job_task
+        job_task = "ibrun -n "  + job_task
+    elif args["job_system"] == "conda-slurm":
+        job_task = "mpirun -np "  + job_task	
     else:
-        job_task = "mpirun " + job_task    
+        job_task = "mpirun -np " + job_task    
     
     md_jobid = helpers.create_and_launch_job(
         job_name       =     args["job_name"    ] ,

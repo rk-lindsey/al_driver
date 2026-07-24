@@ -545,8 +545,8 @@ def create_and_launch_job(*argv, **kwargs):
     # 0. Set up an argument parser
     ################################
     
-    default_keys   = [""]*12
-    default_values = [""]*12
+    default_keys   = [""]*13
+    default_values = [""]*13
 
     # Overall job controls
     
@@ -561,7 +561,8 @@ def create_and_launch_job(*argv, **kwargs):
     default_keys[8 ] = "job_file"          ; default_values[8 ] =     "run.cmd"      # Name of the resulting submit script    
     default_keys[9 ] = "job_email"         ; default_values[9 ] =     True           # Should emails be sent?
     default_keys[10] = "job_modules"       ; default_values[10] =     ""             # Name of the resulting submit script    
-    default_keys[11] = "job_mem"           ; default_values[11] =     "128"             # GB
+    default_keys[11] = "job_mem"           ; default_values[11] =     "128"          # GB
+    default_keys[12] = "job_OMPexports"    ; default_values[12] = None               # Using OMP? If so, specify exports (one line) to add in sbatch script
     
 
     args = dict(list(zip(default_keys, default_values)))
@@ -593,7 +594,7 @@ def create_and_launch_job(*argv, **kwargs):
     
     for i in range(len(JOB)):
     
-        if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
+        if args["job_system"] == "slurm" or args["job_system"] ==  "TACC" or args["job_system"] == "UM-ARC":
             JOB[i] = "#SBATCH" + JOB[i]
         elif args["job_system"] == "torque":
             JOB[i] = "#PBS"  + JOB[i]
@@ -605,6 +606,8 @@ def create_and_launch_job(*argv, **kwargs):
         
     if args["job_modules"]:
         ofstream.write("module load " + args["job_modules"] + '\n')
+    if args["job_OMPexports"]:
+    	ofstream.write(args["job_OMPexports"] + '\n')
     
     if args["job_executable"]:
     
@@ -624,7 +627,7 @@ def create_and_launch_job(*argv, **kwargs):
 
     jobid = None
     
-    if args["job_system"] == "slurm" or args["job_system"] == "TACC" or args["job_system"] == "UM-ARC":
+    if args["job_system"] == "slurm" or args["job_system"] == "conda-slurm" or args["job_system"] == "TACC" or args["job_system"] == "UM-ARC":
         jobid = run_bash_cmnd("sbatch " + args["job_file"]).split()[-1]
     else:    
         jobid = run_bash_cmnd("qsub " + args["job_file"])
@@ -670,7 +673,7 @@ def wait_for_job(active_job, **kwargs):
         
         check_job = ""
         
-        if args["job_system"] == "slurm" or "TACC" or "UM-ARC":
+        if args["job_system"] == "slurm" or args["job_system"] ==  "TACC" or args["job_system"] ==  "UM-ARC":
             check_job = "squeue -j " + active_job
             
         elif args["job_system"] == "torque":
@@ -738,7 +741,7 @@ def wait_for_jobs(*argv, **kwargs):
             if type(active_jobs[i]) == type(1):
                 active_jobs[i] = str(active_jobs[i])
         
-            if args["job_system"] == "slurm" or "TACC":
+            if args["job_system"] == "slurm" or args["job_system"] == "TACC":
 
                 check_job = "squeue -j " + active_jobs[i]
             

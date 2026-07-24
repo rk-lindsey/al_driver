@@ -915,6 +915,8 @@ def setup_vasp(my_ALC, *argv, **kwargs):
 
         if args["job_system"] == "TACC":
             job_task.append("    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
+        if args["job_system"] == "conda-slurm":
+            job_task.append("    mpirun " + "-np " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
         else:   
             job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " > ${TAG}.out  ")
         job_task.append("    cp OUTCAR  ${TAG}.OUTCAR    ")
