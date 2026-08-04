@@ -141,7 +141,14 @@ The ALC-0_BASEFILES Files
         $: ls -l <my_fit>/ALL_BASE_FILES/HIERARCH_PARAMS
         -rw------- 1 rlindsey rlindsey 169630 May  1 10:55 C.params.txt.reduced
         -rw------- 1 rlindsey rlindsey 160015 May  1 10:55 N.params.txt.reduced
+    
+    To prevent unphysical fits from being generated, *it is imperative that you manually zero out the penalty parameters, e.g.:*
 
+    .. code-block:: text
+
+        PAIR CHEBYSHEV PENALTY DIST:    0.0
+        PAIR CHEBYSHEV PENALTY SCALING: 0.0
+     
     Hierarchical fitting also requires special options in ``ALL_BASE_FILES/ALC-0_BASEFILES/fm_setup.in`` to ensure base the parameter types (e.g., in {C,N}.params.txt.reduced) are properly excluded from the fit. First, one must ensure that requested polynomial orders are greater or equal to those in the reference  ``ALL_BASE_FILES/HIERARCH_PARAMS`` parameter files. Next, add the highlighted lines to ``fm_setup.in``:
 
     .. code-block:: bash 
