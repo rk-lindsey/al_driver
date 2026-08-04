@@ -1288,7 +1288,7 @@ def verify(user_config):
         print("Will run simulations using method: ", user_config.MD_STYLE)
         
     
-    if user_config.MD_STYLE == "ChIMES":
+    if user_config.MD_STYLE == "CHIMES":
     
     
         if hasattr(user_config,'CHIMES_MD'):
