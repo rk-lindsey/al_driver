@@ -959,7 +959,7 @@ def main(args):
                         job_system     = config.HPC_SYSTEM,       
                         job_file       = "run.cmd",
                         job_modules    = config.MD_MODULES,
-                        md_debug_mode  = config.MD_DEBUG_MODE
+                        md_debug_mode  = config.MD_DEBUG_MODE,
                         job_OMPexports = config.MD_OMPEXPORTS
                         )
                         
