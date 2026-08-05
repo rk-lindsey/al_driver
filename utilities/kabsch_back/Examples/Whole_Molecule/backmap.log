@@ -1,0 +1,43 @@
+============================================================
+Kabsch-Back : Backmapping Tool - CG to All-Atom
+============================================================
+
+Input files:
+  Reference CG:  naphthalene_cg_ref.gro
+  Reference AA:  naphthalene_aa_ref.gro
+  CG Trajectory: naphthalene_cg_ref.gro
+  Mapping index: naphthalene_index.ndx
+  Output prefix: backmapped
+  Reference mol: 0
+
+============================================================
+Reading input files...
+============================================================
+
+Reading mapping scheme from naphthalene_index.ndx...
+  Found 1 mapping groups
+    Group 1: 5 CG beads → 18 AA atoms
+
+Reading reference CG structure from naphthalene_cg_ref.gro...
+  Detected: 200 molecules, 5 beads/molecule
+  Using molecule 0 as reference
+
+Reading reference AA structure from naphthalene_aa_ref.gro...
+  Detected: 200 molecules, 18 atoms/molecule
+
+Reading CG trajectory from naphthalene_cg_ref.gro...
+  Found 1 frames
+
+============================================================
+Starting backmapping: 1 frames, 200 molecules each
+============================================================
+  Processed 1/1 frames...
+
+============================================================
+BACKMAPPING COMPLETE
+============================================================
+Output file: backmapped.gro
+Mean RMSD: 0.0038 nm
+Max RMSD:  0.0077 nm
+Min RMSD:  0.0000 nm
+

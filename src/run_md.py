@@ -34,7 +34,7 @@ def post_proc(my_ALC, my_case, my_indep, style, *argv, **kwargs):
     
     if style == "CHIMES":
         chimes_run_md.post_proc(my_ALC, my_case, my_indep, *argv, **kwargs)
-    elif style == "DFTB":
+    elif style == "DFTB+":
         dftbplus_run_md.post_proc(my_ALC, my_case, my_indep, *argv, **kwargs)
     elif style == "LMP":
         lmp_run_md.post_proc(my_ALC, my_case, my_indep, *argv, **kwargs)        
@@ -68,7 +68,7 @@ def run_md(my_ALC, my_case, my_indep, style, *argv, **kwargs):
     
     if style == "CHIMES":
         md_jobid = chimes_run_md.run_md(my_ALC, my_case, my_indep, *argv, **kwargs)
-    elif style == "DFTB":
+    elif style == "DFTB+":
         md_jobid = dftbplus_run_md.run_md(my_ALC, my_case, my_indep, *argv, **kwargs)
     elif style == "LMP":
         md_jobid = lmp_run_md.run_md(my_ALC, my_case, my_indep, *argv, **kwargs)        

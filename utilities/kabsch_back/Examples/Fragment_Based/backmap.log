@@ -1,0 +1,45 @@
+============================================================
+Kabsch-Back : Backmapping Tool - CG to All-Atom
+============================================================
+
+Input files:
+  Reference CG:  phenytoin_cg_ref.gro
+  Reference AA:  phenytoin_aa_ref.gro
+  CG Trajectory: phenytoin_cg_ref.gro
+  Mapping index: phenytoin_index.ndx
+  Output prefix: backmapped
+  Reference mol: 0
+
+============================================================
+Reading input files...
+============================================================
+
+Reading mapping scheme from phenytoin_index.ndx...
+  Found 3 mapping groups
+    Group 1: 4 CG beads → 9 AA atoms
+    Group 2: 3 CG beads → 11 AA atoms
+    Group 3: 3 CG beads → 11 AA atoms
+
+Reading reference CG structure from phenytoin_cg_ref.gro...
+  Detected: 396 molecules, 10 beads/molecule
+  Using molecule 0 as reference
+
+Reading reference AA structure from phenytoin_aa_ref.gro...
+  Detected: 396 molecules, 31 atoms/molecule
+
+Reading CG trajectory from phenytoin_cg_ref.gro...
+  Found 1 frames
+
+============================================================
+Starting backmapping: 1 frames, 396 molecules each
+============================================================
+  Processed 1/1 frames...
+
+============================================================
+BACKMAPPING COMPLETE
+============================================================
+Output file: backmapped.gro
+Mean RMSD: 0.0002 nm
+Max RMSD:  0.0004 nm
+Min RMSD:  0.0000 nm
+

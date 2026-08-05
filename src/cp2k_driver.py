@@ -844,6 +844,8 @@ def setup_cp2k(my_ALC, *argv, **kwargs):
         job_task.append("    done                               ")
         if args["job_system"] == "TACC":
             job_task.append("    ibrun " + "-n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
+        elif args["job_system"] == "conda-slurm":
+            job_task.append("    mpirun " + "-np " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
         else:
             job_task.append("    srun -N " + repr(args["job_nodes" ]) + " -n " + repr(int(args["job_nodes"])*int(args["job_ppn"])) + " " + args["job_executable"] + " -i cp2k.inp > ${TAG}.cp2k.out  ")
         

@@ -48,7 +48,7 @@ Tersoff parameter       0.75
 Input Files 
 ------------------------------------------
 
-The neccesary input files and directory tree structure are provided in the example folder, i.e.:
+The necessary input files and directory tree structure are provided in the example folder, i.e.:
 
 .. code-block :: 
 
@@ -73,8 +73,8 @@ The neccesary input files and directory tree structure are provided in the examp
 Briefly:
 
 * ``ALL_BASE_FILES/ALC-0_BASEFILES`` contains files specifying how step 2 of figure 1 should be run, i.e., model hyperparameters (``fm_setup.in``), a list of training configuration files (``traj_list.dat``), and in this case, a single initial training configuration file (``liquid_6000K_2.0gcc.xyzf``). 
-* The ``ALL_BASE_FILES/CHIMESMD_BASEFILES`` directory contains files specifying how step 3 of figure 1 should be run, i.e., simulation parameters (``case-0.indep-0.run_md.in``), initial system configurations for simulation (``case-0.indep-0.input.xyz``), and hyperparameters for simulation output post-processing (``bonds.dat`` VERIFY RUN MOLANAL IS NEEDED ... CAN MOVE IT INTO AL DRIVER FILES). 
-* The ``ALL_BASE_FILES/QM_BASEFILES`` directory contains files specifying how step 6 of figure 1 should be run, i.e., quantum calculation instructions (``6000.INCAR``), psuedopotential files (``C.POTCAR``), and a K-point file (``KPOINTS``). 
+* The ``ALL_BASE_FILES/CHIMESMD_BASEFILES`` directory contains files specifying how step 3 of figure 1 should be run, i.e., simulation parameters (``case-0.indep-0.run_md.in``), initial system configurations for simulation (``case-0.indep-0.input.xyz``), and hyperparameters for simulation output post-processing (``bonds.dat``). 
+* The ``ALL_BASE_FILES/QM_BASEFILES`` directory contains files specifying how step 6 of figure 1 should be run, i.e., quantum calculation instructions (``6000.INCAR``), pseudopotential files (``C.POTCAR``), and a K-point file (``KPOINTS``). 
 * the ``config.py`` provides high-level instructions on how *all* steps in figure 1 should be run.
 
 A detailed description of the files in ``ALL_BASE_FILES/ALC-0_BASEFILES`` and ``ALL_BASE_FILES/CHIMESMD_BASEFILES`` can be found in the `ChIMES LSQ manual <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_. 
@@ -82,10 +82,10 @@ A detailed description of the files in ``ALL_BASE_FILES/ALC-0_BASEFILES`` and ``
 
 .. Tip ::
 
-    In ``fm_setup.in``, 3-and-greater polnomial orders are given as n+1. In the following example, a 3-body order of 4 is desired, hence a value of n+1 = 5 is given in the example ``fm_setup.in``.
+    In ``fm_setup.in``, 3-and-greater polynomial orders are given as n+1. In the following example, a 3-body order of 4 is desired, hence a value of n+1 = 5 is given in the example ``fm_setup.in``.
 
 
-Contents of the ``config.py`` file must be modified to reflect your absolute paths prior to running this example, i.e. on the lines highlighed below:
+Contents of the ``config.py`` file must be modified to reflect your absolute paths prior to running this example, i.e. on the lines highlighted below:
     
 .. code-block :: python
     :linenos:
@@ -132,7 +132,7 @@ Contents of the ``config.py`` file must be modified to reflect your absolute pat
 Running
 ------------------------------------------
 
-Depending on standard queuing times for your system, the ALD could take quite some time (e.g., hours) finish. For this reason it is generally, it is recommended to run the ALD from within a screen session on your HPC system. To do so, log into your HPC system and execute the following commands:
+Depending on standard queuing times for your system, the ALD could take quite some time (e.g., hours) to finish. For this reason, it is generally recommended to run the ALD from within a screen session on your HPC system. To do so, log into your HPC system and execute the following commands:
 
 .. code-block :: bash
 
@@ -142,13 +142,13 @@ Depending on standard queuing times for your system, the ALD could take quite so
     
 
 If ``unbuffer`` is not implemented on your HPC system, use ``python3 -u`` instead. 
-Note that in the final line above, the sequence of numbers indicates 3 active learning cycles will be run (i.e., the ``0`` is ignored but required when simple iterative refinement mode is selected), and ``| tee driver.log`` sends all output to both the screen and a file named driver.log. 
+Note that in the final line above, the sequence of numbers indicates 3 active learning cycles will be run (i.e., the ``0`` is ignored but required when simple iterative refinement mode is selected), and ``| tee driver-0.log`` sends all output to both the screen and a file named driver-0.log. 
 
 .. Tip :: 
     
-    To detach from the screen session, execute ``ctrl a`` followed by ``ctrl d``. You can now log out of the HPC system without dirupting the ALD. Be sure to take note of which node you were logged into. You can reattach to the session later by logging into the same node and executing ``screen -r``
+    To detach from the screen session, execute ``ctrl a`` followed by ``ctrl d``. You can now log out of the HPC system without disrupting the ALD. Be sure to take note of which node you were logged into. You can reattach to the session later by logging into the same node and executing ``screen -r``
 
-.. For simplicity this documentation will describe all other features as they are executed in this basic mode. Active learning features are described in **SECTION**, and **SECTION** provides an option compatibility table. 
+.. For simplicity this documentation will describe all other features as they are executed in this basic mode. Active learning features are described in the following pages.
 
 
 ------------------------------------------
@@ -157,7 +157,7 @@ Inspecting the output
 
 .. Warning::
 
-   When running the Active Learning Driver, ALWAYS read through the resulting log file carefully. If driver sets a large number of default parameters if the user does not specify them manually, which may or many not be conducive to the user's end goal. The top portion of the log file tells the user every default that it sets. 
+   When running the Active Learning Driver, ALWAYS read through the resulting log file carefully. The driver sets a large number of default parameters if the user does not specify them manually, which may or may not be conducive to the user's end goal. The top portion of the log file tells the user every default that it sets. 
 
 
 Once the ALD has finished running, execute the following commands:
@@ -173,7 +173,7 @@ Then, plot ``ALC-{3,2,1}/GEN_FF/compare.txt`` with your favorite plotting softwa
      :width: 400
      :align: center
   
-     **Fig. 2:** ALD fitting force pairty plot.
+     **Fig. 2:** ALD fitting force parity plot.
 
 
 This force parity plot provides DFT-assigned per-atom forces on the x-axis, and corresponding ChIMES predicted forces on the y-axis, in kcal/mol/Angstrom. The ALC-1 data corresponds to data generated by DFT (i.e., the forces contained in ``liquid_6000K_2.0gcc.xyzf``); the ALC-2 data contain everything from ALC-1, as well as forces for the ChIMES-generated configurations selected in step 5 of figure 1, which were assigned DFT forces in step 6 of figure 1. The ALC-3 data is structured similarly.
@@ -188,7 +188,7 @@ Next, plot the ``ALC-{1..3}/CASE-0_INDEP_0/md_statistics.out`` files. If LAMMPS 
      **Fig. 3:** Conserved quantity for ChIMES molecular dynamics (MD) during ALD iterations.
 
 
-This figure shows how the conserved quantity varies during ChIMES-MD NVT simulations using the models generated at each ALC. As expected due to the minimal initial training set, dynamics with the ALC-1 model are very unstable (i.e., varying by 55 kcal/mol/atom over 60 ps). Stability is signficantly improved by ALC-2, with the conserved quantity varying by only ~2 kcal/mol/atom. By ALC-3, the model is fully stable, varying by less than .01 kca/mol/atom over the 60 ps trajectory). 
+This figure shows how the conserved quantity varies during ChIMES-MD NVT simulations using the models generated at each ALC. As expected due to the minimal initial training set, dynamics with the ALC-1 model are very unstable (i.e., varying by 55 kcal/mol/atom over 60 ps). Stability is significantly improved by ALC-2, with the conserved quantity varying by only ~2 kcal/mol/atom. By ALC-3, the model is fully stable, varying by less than 0.01 kcal/mol/atom over the 60 ps trajectory. 
 
 -------
 
@@ -205,7 +205,7 @@ hierarch_fit                                              carbon/nitrogen   Hier
 hydrogen                                                  hydrogen          Simple ALD for hydrogen system with 2 cases.
 simple_bulk_MFI_cp2k                                      MFI zeolite       ALD with CP2K with 1 case ran on TACC Stampede3 HPC system. 
 simple_iter_single_statepoint-cp2k                        MFI zeolite       ALD with CP2K with 1 case ran on UM-ARC Greatlakes HPC system. 
-simple_iter_single_statepoint-MultiNode                   MFI zeolite       ALD with CP2K with 3 cases ran on different number nodes for each case. 
+simple_iter_single_statepoint-cp2k-MultiNode              MFI zeolite       ALD with CP2K with 3 cases run on a different number of nodes for each case. 
 simple_iter_single_statepoint-lmp-test                    molten carbon     ALD with LAMMPS as the MD module and the labeling method with 1 case.
 simple_iter_single_statepoint-lmp-test-turbo-test         molten carbon     ALD with LAMMPS for turbo ChIMES fit. Turbo ChIMES functionalities will be included later. 
 =======================================================   ===============   =========================================================================================================================================
@@ -222,7 +222,7 @@ In-depth Setup and Options Overview
 Setting up Steps 1 & 2
 ------------------------------------------
 
-As with a standard ChIMES fit (see e.g, the `ChIMES LSQ manual <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_), model generation must begin with selecting an intial training set and specifying fitting hyperparameters. In the ALD, this involves the following files, at a minimum:
+As with a standard ChIMES fit (see e.g, the `ChIMES LSQ manual <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_), model generation must begin with selecting an initial training set and specifying fitting hyperparameters. In the ALD, this involves the following files, at a minimum:
 
 .. code-block :: text
 
@@ -399,7 +399,7 @@ and
 
 Each ``case-*.indep-0.input.xyz`` is a ChIMES ``.xyz`` file containing initial coordinates for the system of interest for the corresponding case, while each ``case-*.indep-0.run_md.in`` is the corresponding ChIMES MD input file. Note that ``case-*.indep-0.run_md.in`` options ``# PRMFILE #`` and ``# CRDFILE #`` should be set to ``WILL_AUTO_UPDATE``. For more information on these files, see the `(ChIMES LSQ manual) <https://chimes-lsq.readthedocs.io/en/latest/index.html>`_. The bonds.dat file will be described below.
 
-In the config.py file snipped above, lines 5 and 6 tell the ALD to use ChIMES MD for MD simulation runs, and provides a path to the MPI-enabled and serial compilations. Lines 9 and 10 provide information on how to post-process the trajectory. Specifically, the ALD will use the a molecular analyzer `("molanal") <https://pubs.acs.org/doi/pdf/10.1021/ja808196e>`_ to determine speciation for the generated MD trajectories. Once speciation is determined, the ALD will provide a summary of lifetimes and molefractions for species listed in ``MOLANAL_SPECIES``. Note that the species names must match the "Molecule type" fields produced by molanal *exactly*. These strings are usually determined by running molanal on DFT-MD trajectories, prior to any ALD. Finally, the ``bonds.dat`` file specifies bond length and lifetime criteria for molanal. See the molanal ``readme.txt`` file for additional information. Be sure to verify specified bonds.dat lifetime criteria are consistent with the timestep and output frequency specified in ``case-*.indep-0.run_md.in``
+In the config.py file snippet above, lines 5 and 6 tell the ALD to use ChIMES MD for MD simulation runs, and provide a path to the MPI-enabled compilation. Lines 9 and 10 provide information on how to post-process the trajectory. Specifically, the ALD will use a molecular analyzer `("molanal") <https://pubs.acs.org/doi/pdf/10.1021/ja808196e>`_ to determine speciation for the generated MD trajectories. Once speciation is determined, the ALD will provide a summary of lifetimes and molefractions for species listed in ``MOLANAL_SPECIES``. Note that the species names must match the "Molecule type" fields produced by molanal *exactly*. These strings are usually determined by running molanal on DFT-MD trajectories, prior to any ALD. Finally, the ``bonds.dat`` file specifies bond length and lifetime criteria for molanal. See the molanal ``readme.txt`` file for additional information. Be sure to verify specified bonds.dat lifetime criteria are consistent with the timestep and output frequency specified in ``case-*.indep-0.run_md.in``
 
 -------
 
@@ -454,11 +454,11 @@ and
     VASP_MODULES = "mkl intel/18.0.1 impi/2018.0"
     
     
-There should be one ``*.INCAR`` file for each case temperature, i.e. ``{1000,2000,3000}.INCAR`` for the present example, with all options set to user desired values for single point evaluation. Note that ``IALGO = 48`` should be used to specifiy the electronic minimization algorithm, and any variable related to restart should be set to the corresponding "new" value. There should also be one ``.*POTCAR`` file for each atom type considered, i.e. H.POTCAR for the present example.
+There should be one ``*.INCAR`` file for each case temperature, i.e. ``{1000,2000,3000}.INCAR`` for the present example, with all options set to user desired values for single point evaluation. Note that ``IALGO = 48`` should be used to specify the electronic minimization algorithm, and any variable related to restart should be set to the corresponding "new" value. There should also be one ``.*POTCAR`` file for each atom type considered, i.e. H.POTCAR for the present example.
 
 .. Note ::
 
-    Support for additional data labeling schemes (i.e., both quantum- and moleuclar mechanics-based) are incoming.
+    Support for additional data labeling schemes (i.e., both quantum- and molecular mechanics-based) are incoming.
     
 .. Tip ::
 

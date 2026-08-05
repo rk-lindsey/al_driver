@@ -24,7 +24,7 @@ HPC_PPN     = 48 #for spr it has 112, for skx its 48
 
 HPC_EMAIL     = False 
 
-N_HYPER_SET = 1
+N_HYPER_SETS = 1
 ################################
 ##### ChIMES LSQ
 ################################

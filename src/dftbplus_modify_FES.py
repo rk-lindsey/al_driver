@@ -97,10 +97,15 @@ def get_FES(xyz_file, param_file, md_driver, temperature):
     
     energy     = None
     tmp_stress = []
+    forces     = []
     
+    kcalpermolAng2HperB = 1/627.50960803/1.889725989 # Multiply a value in kcal/mol/Ang by this to get H/B
+
     for i in range(len(contents)):
     
-        if "total_energy" in contents[i]:
+        if "total_energy" in contents[i]: # This is no longer printed in results.tag for modern DFTB+
+            tmp_ener = float(contents[i+1])*627.50960803
+        if "forcerelated_energy"  in contents[i]: # Used in modern DFTB+
             tmp_ener = float(contents[i+1])*627.50960803
         if "stress" in contents[i]:
             sx = contents[i+1].split() # sxx, sxy, sxz
@@ -115,23 +120,9 @@ def get_FES(xyz_file, param_file, md_driver, temperature):
             
             tmp_stress.append(float(sx[1])*29421.9091) # xy
             tmp_stress.append(float(sx[2])*29421.9091) # xz
-            tmp_stress.append(float(sy[2])*29421.9091) # yz                    
-    
-    # Forces
-    
-    ifstream = open("detailed.out",'r')
-    contents = ifstream.readlines()
-    ifstream.close()
-
-
-    kcalpermolAng2HperB = 1/627.50960803/1.889725989 # Multiply a value in kcal/mol/Ang by this to get H/B
-
-
-    forces = []
-    
-    for i in range(len(contents)):
-    
-        if "Total Forces" in contents[i]:
+            tmp_stress.append(float(sy[2])*29421.9091) # yz  
+            
+        if "forces" in contents[i]:
         
             for j in range(natoms):
             
@@ -139,7 +130,8 @@ def get_FES(xyz_file, param_file, md_driver, temperature):
 
                 forces.append(str(float(temp[0])/kcalpermolAng2HperB)+'\n')
                 forces.append(str(float(temp[1])/kcalpermolAng2HperB)+'\n')
-                forces.append(str(float(temp[2])/kcalpermolAng2HperB)+'\n')
+                forces.append(str(float(temp[2])/kcalpermolAng2HperB)+'\n')            
+
                 
     helpers.writelines("forceout.txt",forces)
 

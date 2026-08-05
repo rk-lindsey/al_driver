@@ -1,0 +1,1 @@
+Penalty parameters for these files have been explicitly set to zero. This prevents issues when subtracting off model contributions. If left non-zero, unphysically large values can be subtracted off the training data, leading to bad model quality.
